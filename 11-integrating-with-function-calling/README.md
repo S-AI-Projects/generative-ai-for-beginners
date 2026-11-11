@@ -13,6 +13,7 @@ This lesson will cover:
 - Explain what function calling is and its use cases.
 - Creating a function call using Azure OpenAI.
 - How to integrate a function call into an application.
+- Modeling local response streaming states (`pending`, `streaming`, `complete`, `error`) with a stable message ID.
 
 ## Learning Goals
 
@@ -454,6 +455,137 @@ To continue your learning of Azure OpenAI Function Calling you can build:
 - Create error handling when the function call and/or API call does not return any suitable courses
 
 Hint: Follow the [Learn API reference documentation](https://learn.microsoft.com/training/support/catalog-api-developer-reference?WT.mc_id=academic-105485-koreyst) page to see how and where this data is available.
+
+## Local Response Streaming Lifecycle Simulation (Applied Lab)
+
+> **Simulation / Synthetic Fixture Notice:** The runnable lab at [example.py](./applied-labs/r40-t052/example.py?WT.mc_id=academic-105485-koreyst) (with tests in [test_example.py](./applied-labs/r40-t052/test_example.py?WT.mc_id=academic-105485-koreyst)) is a **local in-memory simulation** using synthetic message IDs and text chunks (`"simulation": true`). It makes no claims about real hardware, cloud service behavior, or trained-model performance. Its simplifications stop at a single-response state machine and do not model live SSE/WebSocket transport, `client.responses.create(stream=True)` events, Microsoft Learn Catalog HTTP calls, persistent storage, or concurrent multi-message streams.
+
+**Prerequisite tools:** Python 3.9+ (standard library only; no model download, API key, paid provider, GPU, or physical device required).
+
+### Fixture Cases & Exact Boundary Decisions
+
+The fixture in [example.py](./applied-labs/r40-t052/example.py?WT.mc_id=academic-105485-koreyst) highlights four cases:
+
+1. **Smallest valid (`smallest_valid`)**: Starts `msg-valid-001` in `pending`, appends two chunks (`"Hello "`, `"world"`) in order via `streaming`, and finishes in `complete` with `received_text == "Hello world"`.
+2. **Boundary — error after partial stream (`boundary_error_preserves_text`)**: Receives `"Partial "` in `streaming` and calls `fail("stream interrupted")`, preserving `received_text == "Partial "` alongside `error_marker == "[ERROR: stream interrupted]"` (`display_text == "Partial [ERROR: stream interrupted]"`).
+3. **Boundary — zero-chunk completion (`boundary_zero_chunk_complete`)**: Calls `complete()` directly from `pending` with 0 chunks (`received_text == ""`, `status == "complete"`).
+4. **Invalid — chunk after completion (`invalid_chunk_after_completion`)**: Attempts `append_chunk(" late")` after `complete()`, which is rejected with `ValueError` while keeping `status == "complete"` and `received_text == "Done"`.
+
+**Exact boundary decisions:**
+- **Terminal-state boundary:** Chunks are accepted only while `status` is `pending` or `streaming` (inclusive). Once `complete()` or `fail()` moves the response into a terminal state (`complete` or `error`), all subsequent `append_chunk()`, `complete()`, or `fail()` calls raise `ValueError` and leave `message_id`, `status`, and `received_text` unchanged.
+- **Zero-chunk / empty-delta boundary:** `complete()` from `pending` (0 chunks) and `append_chunk("")` (0-length string delta) are valid at the lower boundary, whereas non-string chunks, blank `message_id`, and blank error reasons are rejected (`ValueError`).
+
+### Inputs and Outputs Connected to Lesson Concepts
+
+| Public Symbol / Field | Role in `LocalStreamingResponse` | Lesson Concept Connection |
+| --- | --- | --- |
+| `message_id` | Stable identifier required at initialization | Parallels correlating `call_id` / assistant response items across multi-step tool flows |
+| `append_chunk(chunk)` | Moves `pending` -> `streaming` and appends ordered text | Models incremental assistant output arriving downstream after tool execution |
+| `complete()` / `fail(reason)` | Transitions into terminal `complete` or `error` state | Models clean turn completion vs. partial-output recovery on failure |
+| `status`, `received_text`, `error_marker`, `display_text` | Serialized state (`simulation: true`, preserved text, optional `[ERROR: ...]` marker) | Ensures downstream UIs keep partial context visible and block late mutations after completion |
+
+### Exact Invocation and Expected Output
+
+Run the simulation from the repository root:
+
+```bash
+python3 11-integrating-with-function-calling/applied-labs/r40-t052/example.py
+```
+
+Expected output:
+
+```json
+{
+  "simulation": true,
+  "scenario": "all",
+  "cases": [
+    {
+      "case": "smallest_valid",
+      "transitions": [
+        "pending",
+        "streaming",
+        "streaming",
+        "complete"
+      ],
+      "result": {
+        "simulation": true,
+        "message_id": "msg-valid-001",
+        "status": "complete",
+        "chunks_received": [
+          "Hello ",
+          "world"
+        ],
+        "received_text": "Hello world",
+        "error_marker": null,
+        "display_text": "Hello world"
+      }
+    },
+    {
+      "case": "boundary_error_preserves_text",
+      "transitions": [
+        "pending",
+        "streaming",
+        "error"
+      ],
+      "result": {
+        "simulation": true,
+        "message_id": "msg-boundary-002",
+        "status": "error",
+        "chunks_received": [
+          "Partial "
+        ],
+        "received_text": "Partial ",
+        "error_marker": "[ERROR: stream interrupted]",
+        "display_text": "Partial [ERROR: stream interrupted]"
+      }
+    },
+    {
+      "case": "boundary_zero_chunk_complete",
+      "transitions": [
+        "pending",
+        "complete"
+      ],
+      "result": {
+        "simulation": true,
+        "message_id": "msg-boundary-003",
+        "status": "complete",
+        "chunks_received": [],
+        "received_text": "",
+        "error_marker": null,
+        "display_text": ""
+      }
+    },
+    {
+      "case": "invalid_chunk_after_completion",
+      "transitions": [
+        "pending",
+        "streaming",
+        "complete"
+      ],
+      "late_chunk": " late",
+      "rejected": true,
+      "rejection_reason": "Cannot append chunk when response 'msg-invalid-004' is in terminal state 'complete'",
+      "result": {
+        "simulation": true,
+        "message_id": "msg-invalid-004",
+        "status": "complete",
+        "chunks_received": [
+          "Done"
+        ],
+        "received_text": "Done",
+        "error_marker": null,
+        "display_text": "Done"
+      }
+    }
+  ]
+}
+```
+
+Run the unit tests:
+
+```bash
+python3 -m unittest discover -s 11-integrating-with-function-calling/applied-labs/r40-t052 -p "test_*.py"
+```
 
 ## Great Work! Continue the Journey
 

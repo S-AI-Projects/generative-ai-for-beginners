@@ -1,0 +1,330 @@
+{
+  "tool_versions": {
+    "python": "3.14.7",
+    "python_implementation": "CPython",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "git": "git version 2.55.0",
+    "unittest": "stdlib"
+  },
+  "scenarios": [
+    {
+      "name": "normal_smallest_valid",
+      "category": "normal",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/11-integrating-with-function-calling/applied-labs/r40-t052/example.py",
+        "--scenario",
+        "valid"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "expected": {
+        "case": "smallest_valid",
+        "status": "complete",
+        "message_id": "msg-valid-001",
+        "received_text": "Hello world",
+        "transitions": [
+          "pending",
+          "streaming",
+          "streaming",
+          "complete"
+        ]
+      },
+      "actual": {
+        "simulation": true,
+        "scenario": "valid",
+        "cases": [
+          {
+            "case": "smallest_valid",
+            "transitions": [
+              "pending",
+              "streaming",
+              "streaming",
+              "complete"
+            ],
+            "result": {
+              "simulation": true,
+              "message_id": "msg-valid-001",
+              "status": "complete",
+              "chunks_received": [
+                "Hello ",
+                "world"
+              ],
+              "received_text": "Hello world",
+              "error_marker": null,
+              "display_text": "Hello world"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "boundary_error_preserves_text",
+      "category": "boundary",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/11-integrating-with-function-calling/applied-labs/r40-t052/example.py",
+        "--scenario",
+        "boundary_error"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "expected": {
+        "case": "boundary_error_preserves_text",
+        "status": "error",
+        "message_id": "msg-boundary-002",
+        "received_text": "Partial ",
+        "error_marker": "[ERROR: stream interrupted]",
+        "display_text": "Partial [ERROR: stream interrupted]"
+      },
+      "actual": {
+        "simulation": true,
+        "scenario": "boundary_error",
+        "cases": [
+          {
+            "case": "boundary_error_preserves_text",
+            "transitions": [
+              "pending",
+              "streaming",
+              "error"
+            ],
+            "result": {
+              "simulation": true,
+              "message_id": "msg-boundary-002",
+              "status": "error",
+              "chunks_received": [
+                "Partial "
+              ],
+              "received_text": "Partial ",
+              "error_marker": "[ERROR: stream interrupted]",
+              "display_text": "Partial [ERROR: stream interrupted]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "boundary_zero_chunk_complete",
+      "category": "boundary",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/11-integrating-with-function-calling/applied-labs/r40-t052/example.py",
+        "--scenario",
+        "boundary_zero"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "expected": {
+        "case": "boundary_zero_chunk_complete",
+        "status": "complete",
+        "message_id": "msg-boundary-003",
+        "received_text": "",
+        "transitions": [
+          "pending",
+          "complete"
+        ]
+      },
+      "actual": {
+        "simulation": true,
+        "scenario": "boundary_zero",
+        "cases": [
+          {
+            "case": "boundary_zero_chunk_complete",
+            "transitions": [
+              "pending",
+              "complete"
+            ],
+            "result": {
+              "simulation": true,
+              "message_id": "msg-boundary-003",
+              "status": "complete",
+              "chunks_received": [],
+              "received_text": "",
+              "error_marker": null,
+              "display_text": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "failure_invalid_late_chunk_rejected",
+      "category": "failure",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/11-integrating-with-function-calling/applied-labs/r40-t052/example.py",
+        "--scenario",
+        "invalid_late_chunk"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "expected": {
+        "case": "invalid_chunk_after_completion",
+        "rejected": true,
+        "status": "complete",
+        "message_id": "msg-invalid-004",
+        "received_text": "Done"
+      },
+      "actual": {
+        "simulation": true,
+        "scenario": "invalid_late_chunk",
+        "cases": [
+          {
+            "case": "invalid_chunk_after_completion",
+            "transitions": [
+              "pending",
+              "streaming",
+              "complete"
+            ],
+            "late_chunk": " late",
+            "rejected": true,
+            "rejection_reason": "Cannot append chunk when response 'msg-invalid-004' is in terminal state 'complete'",
+            "result": {
+              "simulation": true,
+              "message_id": "msg-invalid-004",
+              "status": "complete",
+              "chunks_received": [
+                "Done"
+              ],
+              "received_text": "Done",
+              "error_marker": null,
+              "display_text": "Done"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "failure_unknown_cli_scenario_exits_nonzero",
+      "category": "failure",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/11-integrating-with-function-calling/applied-labs/r40-t052/example.py",
+        "--scenario",
+        "nonexistent"
+      ],
+      "expected_returncode": 2,
+      "actual_returncode": 2,
+      "expected": {
+        "stderr_contains": "invalid choice"
+      },
+      "actual": {
+        "stderr": "usage: example.py [-h]\n                  [--scenario {all,valid,boundary_error,boundary_zero,invalid_late_chunk}]\nexample.py: error: argument --scenario: invalid choice: 'nonexistent' (choose from 'all', 'valid', 'boundary_error', 'boundary_zero', 'invalid_late_chunk')"
+      }
+    }
+  ],
+  "default_all_invocation": {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/11-integrating-with-function-calling/applied-labs/r40-t052/example.py"
+    ],
+    "expected_returncode": 0,
+    "actual_returncode": 0,
+    "actual": {
+      "simulation": true,
+      "scenario": "all",
+      "cases": [
+        {
+          "case": "smallest_valid",
+          "transitions": [
+            "pending",
+            "streaming",
+            "streaming",
+            "complete"
+          ],
+          "result": {
+            "simulation": true,
+            "message_id": "msg-valid-001",
+            "status": "complete",
+            "chunks_received": [
+              "Hello ",
+              "world"
+            ],
+            "received_text": "Hello world",
+            "error_marker": null,
+            "display_text": "Hello world"
+          }
+        },
+        {
+          "case": "boundary_error_preserves_text",
+          "transitions": [
+            "pending",
+            "streaming",
+            "error"
+          ],
+          "result": {
+            "simulation": true,
+            "message_id": "msg-boundary-002",
+            "status": "error",
+            "chunks_received": [
+              "Partial "
+            ],
+            "received_text": "Partial ",
+            "error_marker": "[ERROR: stream interrupted]",
+            "display_text": "Partial [ERROR: stream interrupted]"
+          }
+        },
+        {
+          "case": "boundary_zero_chunk_complete",
+          "transitions": [
+            "pending",
+            "complete"
+          ],
+          "result": {
+            "simulation": true,
+            "message_id": "msg-boundary-003",
+            "status": "complete",
+            "chunks_received": [],
+            "received_text": "",
+            "error_marker": null,
+            "display_text": ""
+          }
+        },
+        {
+          "case": "invalid_chunk_after_completion",
+          "transitions": [
+            "pending",
+            "streaming",
+            "complete"
+          ],
+          "late_chunk": " late",
+          "rejected": true,
+          "rejection_reason": "Cannot append chunk when response 'msg-invalid-004' is in terminal state 'complete'",
+          "result": {
+            "simulation": true,
+            "message_id": "msg-invalid-004",
+            "status": "complete",
+            "chunks_received": [
+              "Done"
+            ],
+            "received_text": "Done",
+            "error_marker": null,
+            "display_text": "Done"
+          }
+        }
+      ]
+    }
+  },
+  "unittest_discover": {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "11-integrating-with-function-calling/applied-labs/r40-t052",
+      "-p",
+      "test_*.py",
+      "-v"
+    ],
+    "expected_returncode": 0,
+    "actual_returncode": 0,
+    "test_count": 7,
+    "output": "test_boundary_error_from_pending_before_any_chunk (test_example.TestLocalStreamingResponse.test_boundary_error_from_pending_before_any_chunk) ... ok\ntest_boundary_error_preserves_received_text_with_marker (test_example.TestLocalStreamingResponse.test_boundary_error_preserves_received_text_with_marker) ... ok\ntest_boundary_zero_chunk_completion_and_empty_string_delta (test_example.TestLocalStreamingResponse.test_boundary_zero_chunk_completion_and_empty_string_delta) ... ok\ntest_fresh_process_cli_normal_and_invalid_scenario (test_example.TestLocalStreamingResponse.test_fresh_process_cli_normal_and_invalid_scenario) ... ok\ntest_invalid_chunk_after_completion_rejected_and_state_preserved (test_example.TestLocalStreamingResponse.test_invalid_chunk_after_completion_rejected_and_state_preserved) ... ok\ntest_invalid_transitions_and_bad_inputs_raise_value_error (test_example.TestLocalStreamingResponse.test_invalid_transitions_and_bad_inputs_raise_value_error) ... ok\ntest_smallest_valid_two_chunks_append_in_order (test_example.TestLocalStreamingResponse.test_smallest_valid_two_chunks_append_in_order) ... ok\n\n----------------------------------------------------------------------\nRan 7 tests in 0.112s\n\nOK"
+  },
+  "deliberate_wrong_result_check": {
+    "expected_returncode_nonzero": true,
+    "actual_returncode": 1,
+    "output": "test_smallest_valid_two_chunks_append_in_order (test_example.TestLocalStreamingResponse.test_smallest_valid_two_chunks_append_in_order) ... FAIL\n\n======================================================================\nFAIL: test_smallest_valid_two_chunks_append_in_order (test_example.TestLocalStreamingResponse.test_smallest_valid_two_chunks_append_in_order)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/vedlad/Desktop/snai/generative-ai-for-beginners/11-integrating-with-function-calling/applied-labs/r40-t052/test_example.py\", line 32, in test_smallest_valid_two_chunks_append_in_order\n    self.assertEqual(outcome[\"transitions\"], [\"pending\", \"streaming\", \"streaming\", \"complete\"])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: ['pending', 'streaming', 'complete'] != ['pending', 'streaming', 'streaming', 'complete']\n\nFirst differing element 2:\n'complete'\n'streaming'\n\nSecond list contains 1 additional elements.\nFirst extra element 3:\n'complete'\n\n- ['pending', 'streaming', 'complete']\n+ ['pending', 'streaming', 'streaming', 'complete']\n?                          +++++++++++++\n\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)"
+  }
+}
