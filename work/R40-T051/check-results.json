@@ -1,0 +1,294 @@
+{
+  "tool_versions": {
+    "python": "3.14.7",
+    "python_implementation": "CPython",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "git": "git version 2.55.0",
+    "unittest": "stdlib"
+  },
+  "scenarios": [
+    {
+      "name": "normal_default_fixture",
+      "category": "normal",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/21-meta/applied-labs/r40-t051/example.py"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "expected": {
+        "eligible": [
+          "Fixture A"
+        ],
+        "excluded": [
+          {
+            "name": "Fixture B",
+            "reasons": [
+              "min_ram_gb 8 exceeds ram_budget_gb 6"
+            ]
+          }
+        ]
+      },
+      "actual": {
+        "simulation": true,
+        "ram_budget_gb": 6,
+        "requested_context_tokens": 1024,
+        "eligible": [
+          {
+            "name": "Fixture A",
+            "min_ram_gb": 4,
+            "max_context_tokens": 2048
+          }
+        ],
+        "excluded": [
+          {
+            "name": "Fixture B",
+            "min_ram_gb": 8,
+            "max_context_tokens": 4096,
+            "reasons": [
+              "min_ram_gb 8 exceeds ram_budget_gb 6"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "boundary_exact_fixture_a",
+      "category": "boundary",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/21-meta/applied-labs/r40-t051/example.py",
+        "--ram-budget",
+        "4",
+        "--context",
+        "2048"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "expected": {
+        "eligible": [
+          "Fixture A"
+        ],
+        "excluded": [
+          {
+            "name": "Fixture B",
+            "reasons": [
+              "min_ram_gb 8 exceeds ram_budget_gb 4"
+            ]
+          }
+        ]
+      },
+      "actual": {
+        "simulation": true,
+        "ram_budget_gb": 4,
+        "requested_context_tokens": 2048,
+        "eligible": [
+          {
+            "name": "Fixture A",
+            "min_ram_gb": 4,
+            "max_context_tokens": 2048
+          }
+        ],
+        "excluded": [
+          {
+            "name": "Fixture B",
+            "min_ram_gb": 8,
+            "max_context_tokens": 4096,
+            "reasons": [
+              "min_ram_gb 8 exceeds ram_budget_gb 4"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "boundary_exact_both",
+      "category": "boundary",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/21-meta/applied-labs/r40-t051/example.py",
+        "--ram-budget",
+        "8",
+        "--context",
+        "2048"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "expected": {
+        "eligible": [
+          "Fixture A",
+          "Fixture B"
+        ],
+        "excluded": []
+      },
+      "actual": {
+        "simulation": true,
+        "ram_budget_gb": 8,
+        "requested_context_tokens": 2048,
+        "eligible": [
+          {
+            "name": "Fixture A",
+            "min_ram_gb": 4,
+            "max_context_tokens": 2048
+          },
+          {
+            "name": "Fixture B",
+            "min_ram_gb": 8,
+            "max_context_tokens": 4096
+          }
+        ],
+        "excluded": []
+      }
+    },
+    {
+      "name": "boundary_context_exceeds_a",
+      "category": "boundary",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/21-meta/applied-labs/r40-t051/example.py",
+        "--ram-budget",
+        "8",
+        "--context",
+        "2049"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "expected": {
+        "eligible": [
+          "Fixture B"
+        ],
+        "excluded": [
+          {
+            "name": "Fixture A",
+            "reasons": [
+              "max_context_tokens 2048 is below requested_context_tokens 2049"
+            ]
+          }
+        ]
+      },
+      "actual": {
+        "simulation": true,
+        "ram_budget_gb": 8,
+        "requested_context_tokens": 2049,
+        "eligible": [
+          {
+            "name": "Fixture B",
+            "min_ram_gb": 8,
+            "max_context_tokens": 4096
+          }
+        ],
+        "excluded": [
+          {
+            "name": "Fixture A",
+            "min_ram_gb": 4,
+            "max_context_tokens": 2048,
+            "reasons": [
+              "max_context_tokens 2048 is below requested_context_tokens 2049"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "failure_both_constraints_excluded",
+      "category": "failure",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/21-meta/applied-labs/r40-t051/example.py",
+        "--ram-budget",
+        "2",
+        "--context",
+        "5000"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "expected": {
+        "eligible": [],
+        "excluded": [
+          {
+            "name": "Fixture A",
+            "reasons": [
+              "min_ram_gb 4 exceeds ram_budget_gb 2",
+              "max_context_tokens 2048 is below requested_context_tokens 5000"
+            ]
+          },
+          {
+            "name": "Fixture B",
+            "reasons": [
+              "min_ram_gb 8 exceeds ram_budget_gb 2",
+              "max_context_tokens 4096 is below requested_context_tokens 5000"
+            ]
+          }
+        ]
+      },
+      "actual": {
+        "simulation": true,
+        "ram_budget_gb": 2,
+        "requested_context_tokens": 5000,
+        "eligible": [],
+        "excluded": [
+          {
+            "name": "Fixture A",
+            "min_ram_gb": 4,
+            "max_context_tokens": 2048,
+            "reasons": [
+              "min_ram_gb 4 exceeds ram_budget_gb 2",
+              "max_context_tokens 2048 is below requested_context_tokens 5000"
+            ]
+          },
+          {
+            "name": "Fixture B",
+            "min_ram_gb": 8,
+            "max_context_tokens": 4096,
+            "reasons": [
+              "min_ram_gb 8 exceeds ram_budget_gb 2",
+              "max_context_tokens 4096 is below requested_context_tokens 5000"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "failure_invalid_negative_ram_budget",
+      "category": "failure",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/21-meta/applied-labs/r40-t051/example.py",
+        "--ram-budget",
+        "-1",
+        "--context",
+        "1024"
+      ],
+      "expected_returncode": 2,
+      "actual_returncode": 2,
+      "expected": {
+        "stderr_contains": "ram_budget_gb must be >= 0"
+      },
+      "actual": {
+        "stderr": "Error: ram_budget_gb must be >= 0"
+      }
+    }
+  ],
+  "unittest_discover": {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "21-meta/applied-labs/r40-t051",
+      "-p",
+      "test_*.py",
+      "-v"
+    ],
+    "expected_returncode": 0,
+    "actual_returncode": 0,
+    "test_count": 8,
+    "output": "test_boundary_context_exceeds_fixture_a_admits_only_b (test_example.TestSyntheticModelSelection.test_boundary_context_exceeds_fixture_a_admits_only_b) ... ok\ntest_boundary_exact_match_for_both_fixtures (test_example.TestSyntheticModelSelection.test_boundary_exact_match_for_both_fixtures) ... ok\ntest_boundary_exact_match_for_fixture_a (test_example.TestSyntheticModelSelection.test_boundary_exact_match_for_fixture_a) ... ok\ntest_boundary_exact_match_for_fixture_b_excludes_a_on_context (test_example.TestSyntheticModelSelection.test_boundary_exact_match_for_fixture_b_excludes_a_on_context) ... ok\ntest_failure_both_ram_and_context_reported (test_example.TestSyntheticModelSelection.test_failure_both_ram_and_context_reported) ... ok\ntest_failure_invalid_inputs_raise_value_error (test_example.TestSyntheticModelSelection.test_failure_invalid_inputs_raise_value_error) ... ok\ntest_fresh_process_cli_normal_and_failure_exit (test_example.TestSyntheticModelSelection.test_fresh_process_cli_normal_and_failure_exit) ... ok\ntest_normal_fixture_admits_only_fixture_a (test_example.TestSyntheticModelSelection.test_normal_fixture_admits_only_fixture_a) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.111s\n\nOK"
+  },
+  "deliberate_wrong_result_check": {
+    "expected_returncode_nonzero": true,
+    "actual_returncode": 1,
+    "output": "test_normal_fixture_admits_only_fixture_a (test_example.TestSyntheticModelSelection.test_normal_fixture_admits_only_fixture_a) ... FAIL\n\n======================================================================\nFAIL: test_normal_fixture_admits_only_fixture_a (test_example.TestSyntheticModelSelection.test_normal_fixture_admits_only_fixture_a)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/vedlad/Desktop/snai/generative-ai-for-beginners/21-meta/applied-labs/r40-t051/test_example.py\", line 34, in test_normal_fixture_admits_only_fixture_a\n    self.assertEqual([item[\"name\"] for item in result[\"eligible\"]], [\"Fixture A\"])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: ['Fixture B'] != ['Fixture A']\n\nFirst differing element 0:\n'Fixture B'\n'Fixture A'\n\n- ['Fixture B']\n?           ^\n\n+ ['Fixture A']\n?           ^\n\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)"
+  }
+}

@@ -7,6 +7,7 @@ This lesson will cover:
 - Exploring the two main Meta family models - Llama 3.1 and Llama 3.2, plus the currently available alternatives used in the code samples (Llama 3.3 and Llama 4) 
 - Understanding the use-cases and scenarios for each model 
 - Code sample to show the unique features of each model 
+- Selecting eligible models from a local synthetic manifest using explicit RAM and context constraints
 
 
 ## The Meta Family of Models 
@@ -163,6 +164,70 @@ response = client.complete(
 )
 
 print(response.choices[0].message.content)
+```
+
+## Local Model Selection Simulation (Applied Lab)
+
+> **Simulation / Synthetic Fixture Notice:** The runnable lab at [example.py](./applied-labs/r40-t051/example.py?WT.mc_id=academic-105485-koreyst) (with tests in [test_example.py](./applied-labs/r40-t051/test_example.py?WT.mc_id=academic-105485-koreyst)) is a **local synthetic simulation** using invented teaching fixtures (`Fixture A` and `Fixture B`). Its numbers are teaching placeholders—not claims about the named real Meta Llama models, physical hardware requirements, cloud service behavior, or trained-model performance. Its simplifications stop at static integer thresholds and do not model KV-cache growth, quantization, GPU VRAM vs. system RAM split, multimodal inputs, or live Microsoft Foundry API calls.
+
+**Prerequisite tools:** Python 3.9+ (standard library only; no model download, API key, paid provider, GPU, or physical device required).
+
+### Synthetic Teaching Fixture
+
+- `Fixture A`: `min_ram_gb = 4`, `max_context_tokens = 2048`
+- `Fixture B`: `min_ram_gb = 8`, `max_context_tokens = 4096`
+- Simulated request: `ram_budget_gb = 6`, `requested_context_tokens = 1024` (admits only `Fixture A`)
+
+### Public Inputs and Outputs Mapped to Lesson Concepts
+
+| Public Symbol / Field | Role in `select_eligible_models` | Lesson Concept Connection |
+| --- | --- | --- |
+| `manifest` (`name`, `min_ram_gb`, `max_context_tokens`) | List of synthetic model entries evaluated locally | Represents candidate Meta-family variants across different sizes and context limits (e.g., compact edge-oriented variants vs. larger variants) |
+| `ram_budget_gb` | Simulated device RAM limit (`6` GB by default) | Mirrors host/edge memory constraints that decide whether smaller variants can run locally while larger ones cannot |
+| `requested_context_tokens` | Simulated prompt/context length (`1024` by default) | Mirrors prompt and RAG/tool-calling context-window needs emphasized in the Llama 3.1 context upgrade |
+| `simulation` | Boolean flag (`true`) in the output payload | Marks the output as a deterministic local simulation rather than a live model or device probe |
+| `eligible` | Entries where `min_ram_gb <= ram_budget_gb` and `max_context_tokens >= requested_context_tokens` | Candidate entries that fit both the device memory budget and prompt context requirement |
+| `excluded` (with `reasons`) | Rejected entries paired with explicit per-constraint failure strings | Explains the exact trade-off (insufficient RAM, insufficient context window, or both) for each excluded entry |
+
+### Exact Invocation and Expected Output
+
+Run the local simulation from the repository root:
+
+```bash
+python3 21-meta/applied-labs/r40-t051/example.py
+```
+
+Expected output:
+
+```json
+{
+  "simulation": true,
+  "ram_budget_gb": 6,
+  "requested_context_tokens": 1024,
+  "eligible": [
+    {
+      "name": "Fixture A",
+      "min_ram_gb": 4,
+      "max_context_tokens": 2048
+    }
+  ],
+  "excluded": [
+    {
+      "name": "Fixture B",
+      "min_ram_gb": 8,
+      "max_context_tokens": 4096,
+      "reasons": [
+        "min_ram_gb 8 exceeds ram_budget_gb 6"
+      ]
+    }
+  ]
+}
+```
+
+Run the unit tests:
+
+```bash
+python3 -m unittest discover -s 21-meta/applied-labs/r40-t051 -p "test_*.py"
 ```
 
 ## Learning does not stop here, continue the journey
