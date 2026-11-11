@@ -6,6 +6,7 @@ This lesson will cover:
 - Exploring the different Mistral Models 
 - Understanding the use-cases and scenarios for each model 
 - Exploring code samples that show the unique features of each model. 
+- Running a deterministic local lexical retriever test double behind a callable interface.
 
 ## The Mistral Models 
 
@@ -344,6 +345,107 @@ tokens, text = tokenized.tokens, tokenized.text
 
 # Count the number of tokens
 print(len(tokens))
+```
+
+## Local Lexical Retriever Test Double (Applied Lab)
+
+> **Lexical Test Double / Simulation Notice:** The runnable lab at [example.py](./applied-labs/r40-t055/example.py?WT.mc_id=academic-105485-koreyst) (with tests in [test_example.py](./applied-labs/r40-t055/test_example.py?WT.mc_id=academic-105485-koreyst)) is a **lexical test double, not a production vector search** (`"simulation": true`). It makes no claims about real hardware, cloud service behavior, or trained-model performance. Specifically, this local mock **does not establish**:
+> - Dense semantic or cross-lingual embedding similarity (such as `cohere-embed-v3-multilingual` in the RAG sample above).
+> - FAISS vector indexing, `IndexFlatL2` distance ranking, or document chunking/tokenization behavior.
+> - Live `EmbeddingsClient` / `ChatCompletionsClient` network calls, credentials, rate limits, or Mistral answer synthesis and citation faithfulness.
+
+**Prerequisite tools:** Python 3.9+ (standard library only; no model download, API key, paid provider, GPU, or physical device required).
+
+### Callable Interface, Deterministic Adapter & Fixture
+
+- **Callable interface (`RetrieverFn`):** `run_retrieval(query, retriever)` accepts any `Callable[[str], list[dict[str, Any]]]`, isolating callers from the external retrieval service.
+- **Deterministic local adapter (`make_lexical_retriever`):** Normalizes queries and documents to lowercase word sets, scores exact word overlap (`score > 0`), breaks ties ascending by `doc_id`, and returns `doc_ids` with results (or `[]` when nothing matches).
+- **Fixture:** `A = "red apple"`, `B = "green apple"`, `C = "blue sky"`:
+  - Query `"red apple"` ranks `A` (score `2`) before `B` (score `1`) and excludes `C`.
+  - Query `"ocean"` returns no matches (`results = []`, `doc_ids = []`).
+
+### Exact Invocation and Expected Output
+
+Run the default fixture queries (`"red apple"` and `"ocean"`) from the repository root:
+
+```bash
+python3 20-mistral/applied-labs/r40-t055/example.py
+```
+
+Expected output:
+
+```json
+{
+  "simulation": true,
+  "test_double_note": "lexical test double (lowercase word-set overlap), not a production vector search",
+  "documents": [
+    {
+      "doc_id": "A",
+      "text": "red apple"
+    },
+    {
+      "doc_id": "B",
+      "text": "green apple"
+    },
+    {
+      "doc_id": "C",
+      "text": "blue sky"
+    }
+  ],
+  "runs": [
+    {
+      "simulation": true,
+      "test_double_note": "lexical test double (lowercase word-set overlap), not a production vector search",
+      "query": "red apple",
+      "normalized_terms": [
+        "apple",
+        "red"
+      ],
+      "results": [
+        {
+          "doc_id": "A",
+          "text": "red apple",
+          "score": 2,
+          "matched_terms": [
+            "apple",
+            "red"
+          ]
+        },
+        {
+          "doc_id": "B",
+          "text": "green apple",
+          "score": 1,
+          "matched_terms": [
+            "apple"
+          ]
+        }
+      ],
+      "doc_ids": [
+        "A",
+        "B"
+      ],
+      "matched_count": 2
+    },
+    {
+      "simulation": true,
+      "test_double_note": "lexical test double (lowercase word-set overlap), not a production vector search",
+      "query": "ocean",
+      "normalized_terms": [
+        "ocean"
+      ],
+      "results": [],
+      "doc_ids": [],
+      "matched_count": 0
+    }
+  ]
+}
+```
+
+You can also query a single string with `--query` and run the unit tests:
+
+```bash
+python3 20-mistral/applied-labs/r40-t055/example.py --query "red apple"
+python3 -m unittest discover -s 20-mistral/applied-labs/r40-t055 -p "test_*.py"
 ```
 
 ## Learning does not stop here, continue the journey
