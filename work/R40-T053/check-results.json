@@ -1,0 +1,475 @@
+{
+  "tool_versions": {
+    "python": "3.14.7",
+    "python_implementation": "CPython",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "git": "git version 2.55.0",
+    "unittest": "stdlib"
+  },
+  "scenarios": [
+    {
+      "name": "normal_budget_3_truncates_one",
+      "category": "normal",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/19-slm/applied-labs/r40-t053/example.py",
+        "--prompt",
+        "one two three four",
+        "--budget",
+        "3"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "expected": {
+        "retained_tokens": [
+          "one",
+          "two",
+          "three"
+        ],
+        "removed_tokens": [
+          "four"
+        ],
+        "removed_count": 1,
+        "truncated": true,
+        "matches_independent": true
+      },
+      "actual": {
+        "simulation": true,
+        "tokenizer_note": "whitespace teaching approximation, not the model's real tokenizer",
+        "direct_result": {
+          "simulation": true,
+          "tokenizer_note": "whitespace teaching approximation, not the model's real tokenizer",
+          "prompt": "one two three four",
+          "budget": 3,
+          "total_tokens": 4,
+          "retained_tokens": [
+            "one",
+            "two",
+            "three"
+          ],
+          "retained_count": 3,
+          "removed_tokens": [
+            "four"
+          ],
+          "removed_count": 1,
+          "truncated": true
+        },
+        "independent_result": {
+          "total_tokens": 4,
+          "retained_tokens": [
+            "one",
+            "two",
+            "three"
+          ],
+          "retained_count": 3,
+          "removed_tokens": [
+            "four"
+          ],
+          "removed_count": 1,
+          "truncated": true
+        },
+        "matches_independent": true
+      }
+    },
+    {
+      "name": "boundary_exact_fit",
+      "category": "boundary",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/19-slm/applied-labs/r40-t053/example.py",
+        "--prompt",
+        "one two three",
+        "--budget",
+        "3"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "expected": {
+        "retained_tokens": [
+          "one",
+          "two",
+          "three"
+        ],
+        "removed_tokens": [],
+        "removed_count": 0,
+        "truncated": false,
+        "matches_independent": true
+      },
+      "actual": {
+        "simulation": true,
+        "tokenizer_note": "whitespace teaching approximation, not the model's real tokenizer",
+        "direct_result": {
+          "simulation": true,
+          "tokenizer_note": "whitespace teaching approximation, not the model's real tokenizer",
+          "prompt": "one two three",
+          "budget": 3,
+          "total_tokens": 3,
+          "retained_tokens": [
+            "one",
+            "two",
+            "three"
+          ],
+          "retained_count": 3,
+          "removed_tokens": [],
+          "removed_count": 0,
+          "truncated": false
+        },
+        "independent_result": {
+          "total_tokens": 3,
+          "retained_tokens": [
+            "one",
+            "two",
+            "three"
+          ],
+          "retained_count": 3,
+          "removed_tokens": [],
+          "removed_count": 0,
+          "truncated": false
+        },
+        "matches_independent": true
+      }
+    },
+    {
+      "name": "boundary_empty_input",
+      "category": "boundary",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/19-slm/applied-labs/r40-t053/example.py",
+        "--prompt",
+        "",
+        "--budget",
+        "3"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "expected": {
+        "retained_tokens": [],
+        "removed_tokens": [],
+        "removed_count": 0,
+        "truncated": false,
+        "matches_independent": true
+      },
+      "actual": {
+        "simulation": true,
+        "tokenizer_note": "whitespace teaching approximation, not the model's real tokenizer",
+        "direct_result": {
+          "simulation": true,
+          "tokenizer_note": "whitespace teaching approximation, not the model's real tokenizer",
+          "prompt": "",
+          "budget": 3,
+          "total_tokens": 0,
+          "retained_tokens": [],
+          "retained_count": 0,
+          "removed_tokens": [],
+          "removed_count": 0,
+          "truncated": false
+        },
+        "independent_result": {
+          "total_tokens": 0,
+          "retained_tokens": [],
+          "retained_count": 0,
+          "removed_tokens": [],
+          "removed_count": 0,
+          "truncated": false
+        },
+        "matches_independent": true
+      }
+    },
+    {
+      "name": "boundary_zero_budget",
+      "category": "boundary",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/19-slm/applied-labs/r40-t053/example.py",
+        "--prompt",
+        "one two",
+        "--budget",
+        "0"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "expected": {
+        "retained_tokens": [],
+        "removed_tokens": [
+          "one",
+          "two"
+        ],
+        "removed_count": 2,
+        "truncated": true,
+        "matches_independent": true
+      },
+      "actual": {
+        "simulation": true,
+        "tokenizer_note": "whitespace teaching approximation, not the model's real tokenizer",
+        "direct_result": {
+          "simulation": true,
+          "tokenizer_note": "whitespace teaching approximation, not the model's real tokenizer",
+          "prompt": "one two",
+          "budget": 0,
+          "total_tokens": 2,
+          "retained_tokens": [],
+          "retained_count": 0,
+          "removed_tokens": [
+            "one",
+            "two"
+          ],
+          "removed_count": 2,
+          "truncated": true
+        },
+        "independent_result": {
+          "total_tokens": 2,
+          "retained_tokens": [],
+          "retained_count": 0,
+          "removed_tokens": [
+            "one",
+            "two"
+          ],
+          "removed_count": 2,
+          "truncated": true
+        },
+        "matches_independent": true
+      }
+    },
+    {
+      "name": "failure_negative_budget_rejected",
+      "category": "failure",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/19-slm/applied-labs/r40-t053/example.py",
+        "--prompt",
+        "one two",
+        "--budget",
+        "-1"
+      ],
+      "expected_returncode": 2,
+      "actual_returncode": 2,
+      "expected": {
+        "stderr_contains": "budget must be >= 0"
+      },
+      "actual": {
+        "stderr": "Error: budget must be >= 0"
+      }
+    }
+  ],
+  "comparison_table_invocation": {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/19-slm/applied-labs/r40-t053/example.py"
+    ],
+    "expected_returncode": 0,
+    "actual_returncode": 0,
+    "actual": {
+      "simulation": true,
+      "tokenizer_note": "whitespace teaching approximation, not the model's real tokenizer",
+      "comparisons": [
+        {
+          "case": "normal_budget_3_truncates_one",
+          "prompt": "one two three four",
+          "budget": 3,
+          "direct_result": {
+            "simulation": true,
+            "tokenizer_note": "whitespace teaching approximation, not the model's real tokenizer",
+            "prompt": "one two three four",
+            "budget": 3,
+            "total_tokens": 4,
+            "retained_tokens": [
+              "one",
+              "two",
+              "three"
+            ],
+            "retained_count": 3,
+            "removed_tokens": [
+              "four"
+            ],
+            "removed_count": 1,
+            "truncated": true
+          },
+          "independent_result": {
+            "total_tokens": 4,
+            "retained_tokens": [
+              "one",
+              "two",
+              "three"
+            ],
+            "retained_count": 3,
+            "removed_tokens": [
+              "four"
+            ],
+            "removed_count": 1,
+            "truncated": true
+          },
+          "expected_table_result": {
+            "total_tokens": 4,
+            "retained_tokens": [
+              "one",
+              "two",
+              "three"
+            ],
+            "retained_count": 3,
+            "removed_tokens": [
+              "four"
+            ],
+            "removed_count": 1,
+            "truncated": true
+          },
+          "matches_independent": true,
+          "matches_expected_table": true
+        },
+        {
+          "case": "boundary_exact_fit",
+          "prompt": "one two three",
+          "budget": 3,
+          "direct_result": {
+            "simulation": true,
+            "tokenizer_note": "whitespace teaching approximation, not the model's real tokenizer",
+            "prompt": "one two three",
+            "budget": 3,
+            "total_tokens": 3,
+            "retained_tokens": [
+              "one",
+              "two",
+              "three"
+            ],
+            "retained_count": 3,
+            "removed_tokens": [],
+            "removed_count": 0,
+            "truncated": false
+          },
+          "independent_result": {
+            "total_tokens": 3,
+            "retained_tokens": [
+              "one",
+              "two",
+              "three"
+            ],
+            "retained_count": 3,
+            "removed_tokens": [],
+            "removed_count": 0,
+            "truncated": false
+          },
+          "expected_table_result": {
+            "total_tokens": 3,
+            "retained_tokens": [
+              "one",
+              "two",
+              "three"
+            ],
+            "retained_count": 3,
+            "removed_tokens": [],
+            "removed_count": 0,
+            "truncated": false
+          },
+          "matches_independent": true,
+          "matches_expected_table": true
+        },
+        {
+          "case": "boundary_empty_input",
+          "prompt": "",
+          "budget": 3,
+          "direct_result": {
+            "simulation": true,
+            "tokenizer_note": "whitespace teaching approximation, not the model's real tokenizer",
+            "prompt": "",
+            "budget": 3,
+            "total_tokens": 0,
+            "retained_tokens": [],
+            "retained_count": 0,
+            "removed_tokens": [],
+            "removed_count": 0,
+            "truncated": false
+          },
+          "independent_result": {
+            "total_tokens": 0,
+            "retained_tokens": [],
+            "retained_count": 0,
+            "removed_tokens": [],
+            "removed_count": 0,
+            "truncated": false
+          },
+          "expected_table_result": {
+            "total_tokens": 0,
+            "retained_tokens": [],
+            "retained_count": 0,
+            "removed_tokens": [],
+            "removed_count": 0,
+            "truncated": false
+          },
+          "matches_independent": true,
+          "matches_expected_table": true
+        },
+        {
+          "case": "boundary_zero_budget",
+          "prompt": "one two",
+          "budget": 0,
+          "direct_result": {
+            "simulation": true,
+            "tokenizer_note": "whitespace teaching approximation, not the model's real tokenizer",
+            "prompt": "one two",
+            "budget": 0,
+            "total_tokens": 2,
+            "retained_tokens": [],
+            "retained_count": 0,
+            "removed_tokens": [
+              "one",
+              "two"
+            ],
+            "removed_count": 2,
+            "truncated": true
+          },
+          "independent_result": {
+            "total_tokens": 2,
+            "retained_tokens": [],
+            "retained_count": 0,
+            "removed_tokens": [
+              "one",
+              "two"
+            ],
+            "removed_count": 2,
+            "truncated": true
+          },
+          "expected_table_result": {
+            "total_tokens": 2,
+            "retained_tokens": [],
+            "retained_count": 0,
+            "removed_tokens": [
+              "one",
+              "two"
+            ],
+            "removed_count": 2,
+            "truncated": true
+          },
+          "matches_independent": true,
+          "matches_expected_table": true
+        }
+      ],
+      "invalid_negative_budget": {
+        "prompt": "one two",
+        "budget": -1,
+        "rejected": true,
+        "error": "budget must be >= 0"
+      }
+    }
+  },
+  "unittest_discover": {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "19-slm/applied-labs/r40-t053",
+      "-p",
+      "test_*.py",
+      "-v"
+    ],
+    "expected_returncode": 0,
+    "actual_returncode": 0,
+    "test_count": 6,
+    "output": "test_boundary_empty_and_whitespace_only_retain_none (test_example.TestWhitespaceBudgetPreflight.test_boundary_empty_and_whitespace_only_retain_none) ... ok\ntest_boundary_exact_fit_and_zero_budget (test_example.TestWhitespaceBudgetPreflight.test_boundary_exact_fit_and_zero_budget) ... ok\ntest_comparison_matches_independent_and_expected_table (test_example.TestWhitespaceBudgetPreflight.test_comparison_matches_independent_and_expected_table) ... ok\ntest_failure_negative_and_invalid_inputs_rejected (test_example.TestWhitespaceBudgetPreflight.test_failure_negative_and_invalid_inputs_rejected) ... ok\ntest_fresh_process_cli_normal_and_negative_budget (test_example.TestWhitespaceBudgetPreflight.test_fresh_process_cli_normal_and_negative_budget) ... ok\ntest_normal_budget_3_retains_three_and_removes_one (test_example.TestWhitespaceBudgetPreflight.test_normal_budget_3_retains_three_and_removes_one) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.159s\n\nOK"
+  },
+  "deliberate_wrong_result_check": {
+    "expected_returncode_nonzero": true,
+    "actual_returncode": 1,
+    "output": "test_normal_budget_3_retains_three_and_removes_one (test_example.TestWhitespaceBudgetPreflight.test_normal_budget_3_retains_three_and_removes_one) ... FAIL\n\n======================================================================\nFAIL: test_normal_budget_3_retains_three_and_removes_one (test_example.TestWhitespaceBudgetPreflight.test_normal_budget_3_retains_three_and_removes_one)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/vedlad/Desktop/snai/generative-ai-for-beginners/19-slm/applied-labs/r40-t053/test_example.py\", line 30, in test_normal_budget_3_retains_three_and_removes_one\n    self.assertEqual(result[\"retained_tokens\"], [\"one\", \"two\", \"three\"])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: ['one', 'two', 'three', 'four'] != ['one', 'two', 'three']\n\nFirst list contains 1 additional elements.\nFirst extra element 3:\n'four'\n\n- ['one', 'two', 'three', 'four']\n?                       --------\n\n+ ['one', 'two', 'three']\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)"
+  }
+}
