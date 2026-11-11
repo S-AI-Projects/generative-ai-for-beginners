@@ -36,6 +36,7 @@ By the end of this lesson, you should be able to answer the following questions:
 - What is the difference between SLM and LLM?
 - What is the Microsoft Phi-3/3.5 Family?
 - How to run inference with the Microsoft Phi-3/3.5 Family?
+- How to run a local preflight prompt-budget check using a whitespace-token approximation?
 
 Ready? Let's get started.
 
@@ -343,6 +344,81 @@ while not generator.is_done():
 
 In addition to ONNX Runtime, Ollama, and Foundry Local reference methods, we can also complete the reference of quantitative models based on the model reference methods provided by different manufacturers. Such as Apple MLX framework with Apple Metal, Qualcomm QNN with NPU, Intel OpenVINO with CPU/GPU, etc. You can also get more content from [Phi-3 Cookbook](https://github.com/microsoft/phi-3cookbook?WT.mc_id=academic-105485-koreyst)
 
+
+## Local Prompt-Budget Preflight Simulation (Applied Lab)
+
+> **Simulation / Teaching Approximation Notice:** The runnable lab at [example.py](./applied-labs/r40-t053/example.py?WT.mc_id=academic-105485-koreyst) (tested in [test_example.py](./applied-labs/r40-t053/test_example.py?WT.mc_id=academic-105485-koreyst)) is a **local synthetic simulation** (`"simulation": true`). Its whitespace splitter (`prompt.split()`) is a **teaching approximation, not the model's real tokenizer** (such as Phi-3/3.5 or ONNX Runtime's `og.Tokenizer`). It makes no claims about real hardware, cloud service behavior, or trained-model performance; its simplifications stop at static token-count slicing and do not model subword tokenization, chat-template special tokens, KV-cache memory, or live inference.
+
+**Prerequisite tools:** Python 3.9+ (standard library only; no model download, API key, paid provider, GPU, or physical device required).
+
+### Fixture & Cross-Check Comparison Table
+
+`example.py` runs identical inputs through the direct slice-based function (`check_prompt_budget`), a simpler independent calculation (`independent_budget_calculation`), and an explicit expected-result table (`EXPECTED_FIXTURE_TABLE`):
+
+| Case | Input `prompt` | `budget` | `retained_tokens` | `removed_tokens` (`removed_count`) | `truncated` | Cross-Check Match |
+| --- | --- | --- | --- | --- | --- | --- |
+| `normal_budget_3_truncates_one` | `"one two three four"` | `3` | `["one", "two", "three"]` | `["four"]` (`1`) | `true` | `matches_independent` & `matches_expected_table` = `true` |
+| `boundary_exact_fit` | `"one two three"` | `3` | `["one", "two", "three"]` | `[]` (`0`) | `false` | `matches_independent` & `matches_expected_table` = `true` |
+| `boundary_empty_input` | `""` | `3` | `[]` | `[]` (`0`) | `false` | `matches_independent` & `matches_expected_table` = `true` |
+| `boundary_zero_budget` | `"one two"` | `0` | `[]` | `["one", "two"]` (`2`) | `true` | `matches_independent` & `matches_expected_table` = `true` |
+| `invalid_negative_budget` | `"one two"` | `-1` | rejected (`ValueError`) | — | — | raises `budget must be >= 0` |
+
+### Exact Invocation and Expected Output
+
+Run the direct preflight check on the primary fixture (`budget = 3`, `prompt = "one two three four"`):
+
+```bash
+python3 19-slm/applied-labs/r40-t053/example.py --prompt "one two three four" --budget 3
+```
+
+Expected output:
+
+```json
+{
+  "simulation": true,
+  "tokenizer_note": "whitespace teaching approximation, not the model's real tokenizer",
+  "direct_result": {
+    "simulation": true,
+    "tokenizer_note": "whitespace teaching approximation, not the model's real tokenizer",
+    "prompt": "one two three four",
+    "budget": 3,
+    "total_tokens": 4,
+    "retained_tokens": [
+      "one",
+      "two",
+      "three"
+    ],
+    "retained_count": 3,
+    "removed_tokens": [
+      "four"
+    ],
+    "removed_count": 1,
+    "truncated": true
+  },
+  "independent_result": {
+    "total_tokens": 4,
+    "retained_tokens": [
+      "one",
+      "two",
+      "three"
+    ],
+    "retained_count": 3,
+    "removed_tokens": [
+      "four"
+    ],
+    "removed_count": 1,
+    "truncated": true
+  },
+  "matches_independent": true
+}
+```
+
+Run the full comparison fixture table (`EXPECTED_FIXTURE_TABLE` + negative budget check) and unit tests:
+
+```bash
+python3 19-slm/applied-labs/r40-t053/example.py
+python3 -m unittest discover -s 19-slm/applied-labs/r40-t053 -p "test_*.py"
+```
 
 ## More
 
