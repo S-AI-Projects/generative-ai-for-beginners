@@ -13,6 +13,7 @@ This lesson will cover:
 - Explain what function calling is and its use cases.
 - Creating a function call using Azure OpenAI.
 - How to integrate a function call into an application.
+- Recording intermediate response streaming states (`pending`, `streaming`, `complete`, `error`) and verifying trace-to-output invariants.
 
 ## Learning Goals
 
@@ -454,6 +455,119 @@ To continue your learning of Azure OpenAI Function Calling you can build:
 - Create error handling when the function call and/or API call does not return any suitable courses
 
 Hint: Follow the [Learn API reference documentation](https://learn.microsoft.com/training/support/catalog-api-developer-reference?WT.mc_id=academic-105485-koreyst) page to see how and where this data is available.
+
+## Local Response Streaming Trace & Invariant Simulation (Applied Lab)
+
+> **Simulation / Synthetic Fixture Notice:** The runnable lab at [example.py](./applied-labs/r40-t054/example.py?WT.mc_id=academic-105485-koreyst) (with tests in [test_example.py](./applied-labs/r40-t054/test_example.py?WT.mc_id=academic-105485-koreyst)) is a **local in-memory simulation** using synthetic message IDs and text chunks (`"simulation": true`). It makes no claims about real hardware, cloud service behavior, or trained-model performance. Its simplifications stop at a single-response local state trace and do not model live SSE/WebSocket transport, `client.responses.create(stream=True)` events, Microsoft Learn Catalog HTTP calls, database persistence, or multi-message concurrency.
+
+**Prerequisite tools:** Python 3.9+ (standard library only; no model download, API key, paid provider, GPU, or physical device required).
+
+### Fixture & Trace Invariants Connected to Lesson Concepts
+
+Each scenario in `LocalStreamingTracker` records a snapshot after every operation (`step`, `action`, `accepted`, `message_id`, `status`, `received_text`, `error_marker`, `display_text`) and passes those snapshots plus `final_output` through `verify_trace_invariants`:
+
+- **`normal_two_chunks_complete` (`msg-001`):** Appends `"Hello "` and `"world"` in order and completes (`pending` -> `streaming` -> `streaming` -> `complete`, `received_text == "Hello world"`).
+- **`boundary_error_preserves_text` (`msg-002`):** Receives `"Partial "` and calls `fail("stream interrupted")`, preserving `received_text == "Partial "` with `error_marker == "[ERROR: stream interrupted]"` (`display_text == "Partial [ERROR: stream interrupted]"`).
+- **`failure_chunk_after_completion` (`msg-003`):** Receives `"Done"`, completes, and attempts `append_chunk(" late")`—rejected (`ValueError`, `accepted: false` in the trace) while keeping `status == "complete"` and `received_text == "Done"`.
+
+**Verified trace-to-output invariants:**
+1. `stable_message_id`: Every intermediate snapshot keeps the same `message_id` as `final_output` (analogous to correlating `call_id` / message items across a turn).
+2. `monotonic_received_text`: `received_text` only grows monotonically and is preserved across errors and rejected updates.
+3. `terminal_state_immutable`: Once `complete` or `error` is reached, no later step mutates `status`, `received_text`, `error_marker`, or `display_text`.
+4. `links_to_final_output`: The final snapshot and concatenated accepted chunks match `final_output` exactly.
+
+### Exact Invocation and Expected Output
+
+Run the normal scenario (`--scenario normal`) from the repository root:
+
+```bash
+python3 11-integrating-with-function-calling/applied-labs/r40-t054/example.py --scenario normal
+```
+
+Expected output:
+
+```json
+{
+  "simulation": true,
+  "scenario": "normal",
+  "results": [
+    {
+      "scenario": "normal_two_chunks_complete",
+      "intermediate_states": [
+        {
+          "step": 0,
+          "action": "init",
+          "accepted": true,
+          "chunk": null,
+          "message_id": "msg-001",
+          "status": "pending",
+          "received_text": "",
+          "error_marker": null,
+          "display_text": "",
+          "rejection_reason": null
+        },
+        {
+          "step": 1,
+          "action": "append_chunk",
+          "accepted": true,
+          "chunk": "Hello ",
+          "message_id": "msg-001",
+          "status": "streaming",
+          "received_text": "Hello ",
+          "error_marker": null,
+          "display_text": "Hello ",
+          "rejection_reason": null
+        },
+        {
+          "step": 2,
+          "action": "append_chunk",
+          "accepted": true,
+          "chunk": "world",
+          "message_id": "msg-001",
+          "status": "streaming",
+          "received_text": "Hello world",
+          "error_marker": null,
+          "display_text": "Hello world",
+          "rejection_reason": null
+        },
+        {
+          "step": 3,
+          "action": "complete",
+          "accepted": true,
+          "chunk": null,
+          "message_id": "msg-001",
+          "status": "complete",
+          "received_text": "Hello world",
+          "error_marker": null,
+          "display_text": "Hello world",
+          "rejection_reason": null
+        }
+      ],
+      "final_output": {
+        "simulation": true,
+        "message_id": "msg-001",
+        "status": "complete",
+        "received_text": "Hello world",
+        "error_marker": null,
+        "display_text": "Hello world"
+      },
+      "invariants": {
+        "stable_message_id": true,
+        "monotonic_received_text": true,
+        "terminal_state_immutable": true,
+        "links_to_final_output": true
+      }
+    }
+  ]
+}
+```
+
+Run all scenarios (`all`) and the unit tests:
+
+```bash
+python3 11-integrating-with-function-calling/applied-labs/r40-t054/example.py
+python3 -m unittest discover -s 11-integrating-with-function-calling/applied-labs/r40-t054 -p "test_*.py"
+```
 
 ## Great Work! Continue the Journey
 
