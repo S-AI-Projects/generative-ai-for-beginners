@@ -1,0 +1,10 @@
+Task: R40-T041
+
+Operating System: Darwin (macOS)
+Python: Python 3.15.2
+Git: git version 2.55.0
+
+Dependencies:
+- Python standard library only
+- No external Python packages required
+- No API keys or external services required
