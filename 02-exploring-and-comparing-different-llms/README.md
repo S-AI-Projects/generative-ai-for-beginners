@@ -15,6 +15,7 @@ This lesson will cover:
 - Different types of LLMs in the current landscape.
 - Testing, iterating, and comparing different models for your use case in Azure.
 - How to deploy an LLM.
+- Preflight whitespace-token budget check and controlled configuration comparison (simulation).
 
 ## Learning Goals
 
@@ -195,6 +196,65 @@ A: All three can help. Start with prompt engineering and context for quick impro
 ## 🚀 Challenge
 
 Read up more on how you can [use RAG](https://learn.microsoft.com/azure/search/retrieval-augmented-generation-overview?WT.mc_id=academic-105485-koreyst) for your business.
+
+## Whitespace-Token Budget & Controlled Comparison Simulation (Applied Lab)
+
+> **Simulation & Teaching-Approximation Notice:** The runnable lab at [example.py](./applied-labs/r40-t058/example.py?WT.mc_id=academic-105485-koreyst) (with unit tests in [test_example.py](./applied-labs/r40-t058/test_example.py?WT.mc_id=academic-105485-koreyst)) is a **local deterministic simulation** (`"simulation": true`). It uses Python whitespace splitting (`str.split()`) explicitly labeled as a **teaching approximation, not the model's real tokenizer**. Its simplifications stop at local budget truncation over synthetic strings: it downloads no model weights, calls no cloud service, and makes no claims about real hardware, latency, or trained-model accuracy.
+
+**Prerequisite tools:** Python 3.9+ (standard library only; no model download, API key, paid provider, GPU, or physical device required).
+
+### Controlled Configuration Comparison (`token_retention_ratio`)
+
+On the fixed 4-token prompt `"one two three four"`, three controlled token budgets illustrate the context-retention trade-off:
+
+| Config ID | Budget | Retained Tokens | Removed Count | Truncated | `token_retention_ratio` |
+| :--- | :---: | :--- | :---: | :---: | :---: |
+| `tight_budget_2` | `2` | `["one", "two"]` | `2` | `true` | `0.5` |
+| `fixture_budget_3` | `3` | `["one", "two", "three"]` | `1` | `true` | `0.75` |
+| `full_budget_4` | `4` | `["one", "two", "three", "four"]` | `0` | `false` | `1.0` |
+
+- **Observed trade-off:** Lowering the configured budget drops tail tokens (`0 -> 1 -> 2` removed) and lowers `token_retention_ratio` (`1.0 -> 0.75 -> 0.5`). Empty input (`""`) retains `[]` with `0` removed tokens, and negative budgets (such as `-1`) are rejected with `ValueError` (exit code `2`).
+
+### Exact Invocation and Expected Output
+
+Run the `budget=3` fixture from the repository root:
+
+```bash
+python3 02-exploring-and-comparing-different-llms/applied-labs/r40-t058/example.py --case budget3
+```
+
+Expected output:
+
+```json
+{
+  "simulation": true,
+  "tokenizer_kind": "whitespace_teaching_approximation",
+  "tokenizer_notice": "Teaching approximation only (str.split whitespace splitting), not a model's real subword/BPE tokenizer.",
+  "budget": 3,
+  "input_token_count": 4,
+  "retained_tokens": [
+    "one",
+    "two",
+    "three"
+  ],
+  "retained_count": 3,
+  "removed_tokens": [
+    "four"
+  ],
+  "removed_count": 1,
+  "truncated": true,
+  "retention_ratio": 0.75
+}
+```
+
+Run the controlled comparison, empty/negative boundary cases, and unit tests:
+
+```bash
+python3 02-exploring-and-comparing-different-llms/applied-labs/r40-t058/example.py --case compare
+python3 02-exploring-and-comparing-different-llms/applied-labs/r40-t058/example.py --case empty
+python3 02-exploring-and-comparing-different-llms/applied-labs/r40-t058/example.py --case negative
+python3 -m unittest discover -s 02-exploring-and-comparing-different-llms/applied-labs/r40-t058 -p "test_*.py"
+```
 
 ## Great Work, Continue Your Learning
 

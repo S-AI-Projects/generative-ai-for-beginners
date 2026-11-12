@@ -1,0 +1,267 @@
+{
+  "task_id": "R40-T058",
+  "tool_versions": {
+    "python": "3.14.7 (v3.14.7:823f0323ee6, Aug  5 2026, 07:07:01) [Clang 21.0.0 (clang-2100.1.1.101)]",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "unittest_runner": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3 -m unittest"
+  },
+  "cli_scenarios": [
+    {
+      "name": "budget3",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "02-exploring-and-comparing-different-llms/applied-labs/r40-t058/example.py",
+        "--case",
+        "budget3"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "tokenizer_kind": "whitespace_teaching_approximation",
+        "tokenizer_notice": "Teaching approximation only (str.split whitespace splitting), not a model's real subword/BPE tokenizer.",
+        "budget": 3,
+        "input_token_count": 4,
+        "retained_tokens": [
+          "one",
+          "two",
+          "three"
+        ],
+        "retained_count": 3,
+        "removed_tokens": [
+          "four"
+        ],
+        "removed_count": 1,
+        "truncated": true,
+        "retention_ratio": 0.75
+      }
+    },
+    {
+      "name": "empty",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "02-exploring-and-comparing-different-llms/applied-labs/r40-t058/example.py",
+        "--case",
+        "empty"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "tokenizer_kind": "whitespace_teaching_approximation",
+        "tokenizer_notice": "Teaching approximation only (str.split whitespace splitting), not a model's real subword/BPE tokenizer.",
+        "budget": 3,
+        "input_token_count": 0,
+        "retained_tokens": [],
+        "retained_count": 0,
+        "removed_tokens": [],
+        "removed_count": 0,
+        "truncated": false,
+        "retention_ratio": null
+      }
+    },
+    {
+      "name": "negative",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "02-exploring-and-comparing-different-llms/applied-labs/r40-t058/example.py",
+        "--case",
+        "negative"
+      ],
+      "expected_returncode": 2,
+      "actual_returncode": 2,
+      "actual_output": {
+        "stderr": "Error: Prompt token budget must be a non-negative integer"
+      }
+    },
+    {
+      "name": "compare",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "02-exploring-and-comparing-different-llms/applied-labs/r40-t058/example.py",
+        "--case",
+        "compare"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "tokenizer_kind": "whitespace_teaching_approximation",
+        "tokenizer_notice": "Teaching approximation only (str.split whitespace splitting), not a model's real subword/BPE tokenizer.",
+        "metric": "token_retention_ratio (retained_count / input_token_count)",
+        "all_correct": true,
+        "trade_off_summary": "Across budgets 2, 3, and 4 on the 4-token prompt 'one two three four', tightening the budget lowers token_retention_ratio (1.00 -> 0.75 -> 0.50) and drops more tail tokens (0 -> 1 -> 2). This measures whitespace-budget truncation only and makes no claim about real-world model accuracy.",
+        "configurations": [
+          {
+            "config_id": "tight_budget_2",
+            "description": "Tight preflight budget retaining 2 tokens",
+            "budget": 2,
+            "input_token_count": 4,
+            "retained_tokens": [
+              "one",
+              "two"
+            ],
+            "removed_count": 2,
+            "truncated": true,
+            "retention_ratio": 0.5,
+            "correct": true
+          },
+          {
+            "config_id": "fixture_budget_3",
+            "description": "Reference fixture budget retaining 3 tokens",
+            "budget": 3,
+            "input_token_count": 4,
+            "retained_tokens": [
+              "one",
+              "two",
+              "three"
+            ],
+            "removed_count": 1,
+            "truncated": true,
+            "retention_ratio": 0.75,
+            "correct": true
+          },
+          {
+            "config_id": "full_budget_4",
+            "description": "Sufficient budget retaining all 4 tokens",
+            "budget": 4,
+            "input_token_count": 4,
+            "retained_tokens": [
+              "one",
+              "two",
+              "three",
+              "four"
+            ],
+            "removed_count": 0,
+            "truncated": false,
+            "retention_ratio": 1.0,
+            "correct": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "all",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "02-exploring-and-comparing-different-llms/applied-labs/r40-t058/example.py"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "tokenizer_kind": "whitespace_teaching_approximation",
+        "tokenizer_notice": "Teaching approximation only (str.split whitespace splitting), not a model's real subword/BPE tokenizer.",
+        "budget3_fixture": {
+          "simulation": true,
+          "tokenizer_kind": "whitespace_teaching_approximation",
+          "tokenizer_notice": "Teaching approximation only (str.split whitespace splitting), not a model's real subword/BPE tokenizer.",
+          "budget": 3,
+          "input_token_count": 4,
+          "retained_tokens": [
+            "one",
+            "two",
+            "three"
+          ],
+          "retained_count": 3,
+          "removed_tokens": [
+            "four"
+          ],
+          "removed_count": 1,
+          "truncated": true,
+          "retention_ratio": 0.75
+        },
+        "empty_fixture": {
+          "simulation": true,
+          "tokenizer_kind": "whitespace_teaching_approximation",
+          "tokenizer_notice": "Teaching approximation only (str.split whitespace splitting), not a model's real subword/BPE tokenizer.",
+          "budget": 3,
+          "input_token_count": 0,
+          "retained_tokens": [],
+          "retained_count": 0,
+          "removed_tokens": [],
+          "removed_count": 0,
+          "truncated": false,
+          "retention_ratio": null
+        },
+        "controlled_comparison": {
+          "simulation": true,
+          "tokenizer_kind": "whitespace_teaching_approximation",
+          "tokenizer_notice": "Teaching approximation only (str.split whitespace splitting), not a model's real subword/BPE tokenizer.",
+          "metric": "token_retention_ratio (retained_count / input_token_count)",
+          "all_correct": true,
+          "trade_off_summary": "Across budgets 2, 3, and 4 on the 4-token prompt 'one two three four', tightening the budget lowers token_retention_ratio (1.00 -> 0.75 -> 0.50) and drops more tail tokens (0 -> 1 -> 2). This measures whitespace-budget truncation only and makes no claim about real-world model accuracy.",
+          "configurations": [
+            {
+              "config_id": "tight_budget_2",
+              "description": "Tight preflight budget retaining 2 tokens",
+              "budget": 2,
+              "input_token_count": 4,
+              "retained_tokens": [
+                "one",
+                "two"
+              ],
+              "removed_count": 2,
+              "truncated": true,
+              "retention_ratio": 0.5,
+              "correct": true
+            },
+            {
+              "config_id": "fixture_budget_3",
+              "description": "Reference fixture budget retaining 3 tokens",
+              "budget": 3,
+              "input_token_count": 4,
+              "retained_tokens": [
+                "one",
+                "two",
+                "three"
+              ],
+              "removed_count": 1,
+              "truncated": true,
+              "retention_ratio": 0.75,
+              "correct": true
+            },
+            {
+              "config_id": "full_budget_4",
+              "description": "Sufficient budget retaining all 4 tokens",
+              "budget": 4,
+              "input_token_count": 4,
+              "retained_tokens": [
+                "one",
+                "two",
+                "three",
+                "four"
+              ],
+              "removed_count": 0,
+              "truncated": false,
+              "retention_ratio": 1.0,
+              "correct": true
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "unittest_discover": {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "02-exploring-and-comparing-different-llms/applied-labs/r40-t058",
+      "-p",
+      "test_*.py",
+      "-v"
+    ],
+    "expected_returncode": 0,
+    "actual_returncode": 0,
+    "test_count": 5,
+    "output": "test_budget_three_truncates_fourth_token_and_labels_approximation (test_example.TestWhitespaceTokenBudget.test_budget_three_truncates_fourth_token_and_labels_approximation) ... ok\ntest_empty_and_whitespace_input_retains_none (test_example.TestWhitespaceTokenBudget.test_empty_and_whitespace_input_retains_none) ... ok\ntest_fresh_process_cli_normal_boundary_and_failure (test_example.TestWhitespaceTokenBudget.test_fresh_process_cli_normal_boundary_and_failure) ... ok\ntest_negative_or_invalid_budget_and_non_string_prompt_rejected (test_example.TestWhitespaceTokenBudget.test_negative_or_invalid_budget_and_non_string_prompt_rejected) ... ok\ntest_three_controlled_configurations_comparison_and_tradeoff (test_example.TestWhitespaceTokenBudget.test_three_controlled_configurations_comparison_and_tradeoff) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.164s\n\nOK"
+  },
+  "deliberate_wrong_result_check": {
+    "expected_returncode_nonzero": true,
+    "actual_returncode": 1,
+    "output": "test_budget_three_truncates_fourth_token_and_labels_approximation (test_example.TestWhitespaceTokenBudget.test_budget_three_truncates_fourth_token_and_labels_approximation) ... FAIL\n\n======================================================================\nFAIL: test_budget_three_truncates_fourth_token_and_labels_approximation (test_example.TestWhitespaceTokenBudget.test_budget_three_truncates_fourth_token_and_labels_approximation)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/vedlad/Desktop/snai/generative-ai-for-beginners/02-exploring-and-comparing-different-llms/applied-labs/r40-t058/test_example.py\", line 33, in test_budget_three_truncates_fourth_token_and_labels_approximation\n    self.assertEqual(report[\"removed_count\"], 1)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 0 != 1\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nFAILED (failures=1)"
+  }
+}
