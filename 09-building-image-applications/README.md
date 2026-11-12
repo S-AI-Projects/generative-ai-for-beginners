@@ -184,6 +184,63 @@ Try it yourself, then compare with the reference solutions:
 
 Also work through the notebooks in [python/](./python) (`aoai-assignment.ipynb` for Azure, `oai-assignment.ipynb` for OpenAI).
 
+## Synthetic Image Batch Normalization & Applied Questions (Applied Lab)
+
+> **Simulation & Preprocessing Scope Notice:** The runnable lab at [example.py](./applied-labs/r40-t060/example.py?WT.mc_id=academic-105485-koreyst) (with unit tests in [test_example.py](./applied-labs/r40-t060/test_example.py?WT.mc_id=academic-105485-koreyst)) is a **local deterministic preprocessing simulation** (`"simulation": true`, `"verifies": "preprocessing_only_not_model_quality"`). It validates `N x H x W` pixel grids in `0..255`, scales them to `0..1` while preserving batch shape, and rejects out-of-range pixels. **This verifies preprocessing only—not image model quality, real hardware, or cloud service behavior.**
+
+**Prerequisite tools:** Python 3.9+ (standard library only; no Pillow, NumPy, model download, API key, paid provider, GPU, or physical device required).
+
+### Three Applied Questions (With Rationales & Executable Checks)
+
+1. **Predict an output (`q1_predict_output`)**: For `[[[0, 255], [128, 64]]]`, `normalize_image_batch` preserves shape `[1, 2, 2]` with `min_value=0.0` and `max_value=1.0` because element-wise division by `255.0` keeps all `N x H x W` dimensions intact.
+2. **Diagnose a failure (`q2_diagnose_failure`)**: `[[[0, 256], [128, 64]]]` fails with `ValueError` (`"out of range 0..255"`) because pixel `256` at `[0][0][1]` exceeds the unsigned 8-bit `0..255` domain.
+3. **Choose a boundary policy (`q3_boundary_policy`)**: Reject out-of-range pixels (`-1`, `256`) with `ValueError` rather than silently clamping them, so upstream scaling/decoding bugs surface immediately.
+
+### Exact Invocation and Expected Output
+
+Run the normal batch fixture from the repository root:
+
+```bash
+python3 09-building-image-applications/applied-labs/r40-t060/example.py --case normal
+```
+
+Expected output:
+
+```json
+{
+  "simulation": true,
+  "verifies": "preprocessing_only_not_model_quality",
+  "shape": [
+    1,
+    2,
+    2
+  ],
+  "normalized_batch": [
+    [
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.5019607843137255,
+        0.25098039215686274
+      ]
+    ]
+  ],
+  "min_value": 0.0,
+  "max_value": 1.0
+}
+```
+
+Run the three applied-question checks, invalid-pixel rejection checks (exit `2`), and unit tests:
+
+```bash
+python3 09-building-image-applications/applied-labs/r40-t060/example.py --case questions
+python3 09-building-image-applications/applied-labs/r40-t060/example.py --case invalid_negative
+python3 09-building-image-applications/applied-labs/r40-t060/example.py --case invalid_over255
+python3 -m unittest discover -s 09-building-image-applications/applied-labs/r40-t060 -p "test_*.py"
+```
+
 ## Great work! Continue your learning
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to keep leveling up your Generative AI knowledge!
