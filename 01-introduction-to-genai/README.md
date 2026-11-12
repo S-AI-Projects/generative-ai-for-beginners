@@ -16,6 +16,7 @@ This lesson will cover:
 - Generative AI and how we landed on the current technology landscape.
 - Inner working of a large language model.
 - Main capabilities and practical use cases of Large Language Models.
+- Worked startup decision-table lab: evaluating prompt inputs, token limits, and human review.
 
 ## Learning Goals
 
@@ -128,6 +129,82 @@ What's true about large language models?
 1. The response may vary despite using the same prompt. It's also great at giving you a first draft of something, be it text or code. But you need to improve on the results.
 
 A: 3, an LLM is non-deterministic, the response varies, however, you can control its variance via a temperature setting. You also shouldn't expect it to do things perfectly, it's here to do the heavy-lifting for you which often means you get a good first attempt at something that you need to gradually improve.
+
+## Educational Startup Decision Table: Worked Examples (Applied Lab)
+
+> **Simulation / Synthetic Fixture Notice:** The runnable lab at [example.py](./applied-labs/r40-t057/example.py?WT.mc_id=academic-105485-koreyst) (with regression tests in [test_example.py](./applied-labs/r40-t057/test_example.py?WT.mc_id=academic-105485-koreyst)) is a **local deterministic decision-table simulation** (`"simulation": true`). It illustrates Lesson 01's _"our educational startup"_ scenario—checking whether a natural-language prompt fits inside a model's `n`-token expanding window with human review enabled—using small local fixtures only. Its simplifications stop at static rule checking: it calls no real LLM API, downloads no weights, uses no real subword tokenizer, and makes no claims about hardware, cloud services, or trained-model performance.
+
+**Prerequisite tools:** Python 3.9+ (standard library only; no model download, API key, paid provider, GPU, or physical device required).
+
+### Published Decision Table (`R1`–`R4`)
+
+| Rule | Condition on `input_facts` | Expected Decision | Lesson 01 Connection |
+| :--- | :--- | :--- | :--- |
+| `R1` | Any required fact (`role`, `task_type`, `prompt_text`, `estimated_tokens`, `max_input_tokens`, `human_review_enabled`) is `None` or blank | `request_missing_information` | Prompts require clear natural-language instructions, and educational workflows must enforce governance facts upfront rather than guessing. |
+| `R2` | All facts present and `estimated_tokens >= max_input_tokens` | `chunk_prompt_at_token_limit` | Models take up to `n` tokens and generate iteratively in an expanding window; hitting `n` leaves zero output headroom and risks stopping mid-sentence. |
+| `R3` | All facts present, `estimated_tokens < max_input_tokens`, and `human_review_enabled is False` | `require_human_review_gate` | LLM completions are non-deterministic first drafts that can contain fabrications and require human/teacher oversight. |
+| `R4` | All facts present, `estimated_tokens < max_input_tokens`, and `human_review_enabled is True` | `approve_llm_draft` | Supports our startup's personalized tutoring and feedback mission safely within token limits and human supervision. |
+
+### Worked Input-to-Output Explanation (Three Scenarios)
+
+1. **Normal (`normal`)**: `role="student"`, `task_type="concept_explanation"`, `prompt_text="Explain fractions with two everyday visual examples for a 10-year-old."`, `estimated_tokens=18`, `max_input_tokens=100`, `human_review_enabled=True` -> `R1` False -> `R2` False (`18 < 100`) -> `R3` False (`True`) -> `R4` fires -> **`approve_llm_draft`**.
+2. **Boundary (`boundary`)**: `role="teacher"`, `task_type="article_summarization"`, `prompt_text="Summarize this curriculum reading passage at the exact 100-token context limit."`, `estimated_tokens=100`, `max_input_tokens=100`, `human_review_enabled=True` -> `R1` False -> `R2` True (`100 >= 100`, exact window limit `n`) -> **`chunk_prompt_at_token_limit`**.
+3. **Missing Information (`missing_info`)**: `role="teacher"`, `task_type="essay_feedback"`, `prompt_text=""`, `estimated_tokens=None`, `max_input_tokens=100`, `human_review_enabled=None` -> `R1` True (missing `prompt_text`, `estimated_tokens`, `human_review_enabled`) -> **`request_missing_information`**.
+
+Human reviewers can verify each published `rationale` directly against the lesson sections above, while the decision-table checker executes all three worked scenarios as a regression test and fails with exit code `1` if any decision is deliberately altered.
+
+### Exact Invocation and Expected Output
+
+Run the normal scenario from the repository root:
+
+```bash
+python3 01-introduction-to-genai/applied-labs/r40-t057/example.py --scenario normal
+```
+
+Expected output:
+
+```json
+{
+  "simulation": true,
+  "checked_count": 1,
+  "all_passed": true,
+  "mismatches": [],
+  "results": [
+    {
+      "scenario_id": "normal",
+      "title": "Normal scenario: personalized concept explanation with human review",
+      "input_facts": {
+        "role": "student",
+        "task_type": "concept_explanation",
+        "prompt_text": "Explain fractions with two everyday visual examples for a 10-year-old.",
+        "estimated_tokens": 18,
+        "max_input_tokens": 100,
+        "human_review_enabled": true
+      },
+      "expected_decision": "approve_llm_draft",
+      "actual_decision": "approve_llm_draft",
+      "rule_id": "R4",
+      "trace": [
+        "R1 skipped: all required facts present",
+        "R2 skipped: estimated_tokens (18) < max_input_tokens (100)",
+        "R3 skipped: human_review_enabled is True",
+        "R4 matched: all guardrails satisfied"
+      ],
+      "worked_trace": "R1 (missing info): False (all 6 required facts present); R2 (token boundary): False (18 < 100); R3 (no human review): False (human_review_enabled=True); R4 fires -> approve_llm_draft.",
+      "rationale": "Lesson 01 frames our educational startup around accessible, personalized learning using natural-language prompts as a strong first draft checked by humans because LLMs are non-deterministic. All required facts are supplied, estimated_tokens (18) leaves headroom inside max_input_tokens (100), and human_review_enabled is True.",
+      "passed": true
+    }
+  ]
+}
+```
+
+Run all three scenarios, confirm the deliberate tamper failure exits non-zero, and run the regression test suite:
+
+```bash
+python3 01-introduction-to-genai/applied-labs/r40-t057/example.py
+python3 01-introduction-to-genai/applied-labs/r40-t057/example.py --scenario normal --tamper-decision chunk_prompt_at_token_limit
+python3 -m unittest discover -s 01-introduction-to-genai/applied-labs/r40-t057 -p "test_*.py"
+```
 
 ## Great Work! Continue the Journey
 
