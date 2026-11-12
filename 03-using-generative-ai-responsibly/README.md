@@ -104,6 +104,30 @@ We have an entire lesson dedicated to [Designing UX for AI Applications](../12-d
 
 - **Evaluate model**. Working with LLMs can be challenging because we don’t always have control over the data the model was trained on. Regardless, we should always evaluate the model’s performance and outputs. It’s still important to measure the model’s accuracy, similarity, groundedness, and relevance of the output. This helps provide transparency and trust to stakeholders and users.
 
+### Applied Lab: Validate AI-Proposed Actions
+
+This lab demonstrates a simple safety layer for validating actions proposed by an AI system before execution. It uses a local fixture and a restricted tool allowlist to demonstrate how potentially unsafe or invalid actions can be rejected.
+
+The example allows a valid `read` action with a required `path` argument, while rejecting unknown tools, missing arguments, and invalid paths. Rejected actions never reach the executor.
+
+**Files:**
+- [Example implementation](./applied-labs/r40-t042/example.py)
+- [Automated tests](./applied-labs/r40-t042/test_example.py)
+
+**Run the example:**
+
+```bash
+python3 03-using-generative-ai-responsibly/applied-labs/r40-t042/example.py
+```
+
+**Run the tests:**
+
+```bash
+python3 -m unittest discover -s 03-using-generative-ai-responsibly/applied-labs/r40-t042 -p "test_*.py"
+```
+
+This is a local demonstration of action validation, not a production security system or a connection to an actual AI model.
+
 ### Operate a Responsible Generative AI solution
 
 Building an operational practice around your AI applications is the final stage. This includes partnering with other parts of our startup like Legal and Security to ensure we are compliant with all regulatory policies. Before launching, we also want to build plans around delivery, handling incidents, and rollback to prevent any harm to our users from growing.
