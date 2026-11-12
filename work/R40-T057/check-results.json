@@ -1,0 +1,291 @@
+{
+  "task_id": "R40-T057",
+  "tool_versions": {
+    "python": "3.14.7 (v3.14.7:823f0323ee6, Aug  5 2026, 07:07:01) [Clang 21.0.0 (clang-2100.1.1.101)]",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "unittest_runner": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3 -m unittest"
+  },
+  "cli_scenarios": [
+    {
+      "name": "all",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "01-introduction-to-genai/applied-labs/r40-t057/example.py"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "checked_count": 3,
+        "all_passed": true,
+        "mismatches": [],
+        "results": [
+          {
+            "scenario_id": "normal",
+            "title": "Normal scenario: personalized concept explanation with human review",
+            "input_facts": {
+              "role": "student",
+              "task_type": "concept_explanation",
+              "prompt_text": "Explain fractions with two everyday visual examples for a 10-year-old.",
+              "estimated_tokens": 18,
+              "max_input_tokens": 100,
+              "human_review_enabled": true
+            },
+            "expected_decision": "approve_llm_draft",
+            "actual_decision": "approve_llm_draft",
+            "rule_id": "R4",
+            "trace": [
+              "R1 skipped: all required facts present",
+              "R2 skipped: estimated_tokens (18) < max_input_tokens (100)",
+              "R3 skipped: human_review_enabled is True",
+              "R4 matched: all guardrails satisfied"
+            ],
+            "worked_trace": "R1 (missing info): False (all 6 required facts present); R2 (token boundary): False (18 < 100); R3 (no human review): False (human_review_enabled=True); R4 fires -> approve_llm_draft.",
+            "rationale": "Lesson 01 frames our educational startup around accessible, personalized learning using natural-language prompts as a strong first draft checked by humans because LLMs are non-deterministic. All required facts are supplied, estimated_tokens (18) leaves headroom inside max_input_tokens (100), and human_review_enabled is True.",
+            "passed": true
+          },
+          {
+            "scenario_id": "boundary",
+            "title": "Boundary scenario: prompt hits exact max_input_tokens limit n",
+            "input_facts": {
+              "role": "teacher",
+              "task_type": "article_summarization",
+              "prompt_text": "Summarize this curriculum reading passage at the exact 100-token context limit.",
+              "estimated_tokens": 100,
+              "max_input_tokens": 100,
+              "human_review_enabled": true
+            },
+            "expected_decision": "chunk_prompt_at_token_limit",
+            "actual_decision": "chunk_prompt_at_token_limit",
+            "rule_id": "R2",
+            "trace": [
+              "R1 skipped: all required facts present",
+              "R2 matched: estimated_tokens (100) >= max_input_tokens (100)"
+            ],
+            "worked_trace": "R1 (missing info): False (all 6 required facts present); R2 (token boundary): True (estimated_tokens 100 >= max_input_tokens 100) -> chunk_prompt_at_token_limit.",
+            "rationale": "Lesson 01 explains that an LLM accepts n tokens and predicts output tokens one by one in an expanding window, which can stop mid-sentence near the limit. Because estimated_tokens (100) equals max_input_tokens (100), zero window capacity remains for generated output tokens, so the teacher prompt must be chunked or shortened first.",
+            "passed": true
+          },
+          {
+            "scenario_id": "missing_info",
+            "title": "Missing-information scenario: empty prompt and unspecified token/review facts",
+            "input_facts": {
+              "role": "teacher",
+              "task_type": "essay_feedback",
+              "prompt_text": "",
+              "estimated_tokens": null,
+              "max_input_tokens": 100,
+              "human_review_enabled": null
+            },
+            "expected_decision": "request_missing_information",
+            "actual_decision": "request_missing_information",
+            "rule_id": "R1",
+            "trace": [
+              "R1 matched: missing or blank fields ['prompt_text', 'estimated_tokens', 'human_review_enabled']"
+            ],
+            "worked_trace": "R1 (missing info): True (missing fields: ['prompt_text', 'estimated_tokens', 'human_review_enabled']) -> request_missing_information.",
+            "rationale": "Lesson 01 defines a prompt as the natural-language instruction/input required to produce a completion and warns that LLM output requires mitigation against fabrications. With prompt_text empty and estimated_tokens and human_review_enabled omitted, the startup workflow cannot check token limits or governance safeguards and must request missing facts.",
+            "passed": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "normal",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "01-introduction-to-genai/applied-labs/r40-t057/example.py",
+        "--scenario",
+        "normal"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "checked_count": 1,
+        "all_passed": true,
+        "mismatches": [],
+        "results": [
+          {
+            "scenario_id": "normal",
+            "title": "Normal scenario: personalized concept explanation with human review",
+            "input_facts": {
+              "role": "student",
+              "task_type": "concept_explanation",
+              "prompt_text": "Explain fractions with two everyday visual examples for a 10-year-old.",
+              "estimated_tokens": 18,
+              "max_input_tokens": 100,
+              "human_review_enabled": true
+            },
+            "expected_decision": "approve_llm_draft",
+            "actual_decision": "approve_llm_draft",
+            "rule_id": "R4",
+            "trace": [
+              "R1 skipped: all required facts present",
+              "R2 skipped: estimated_tokens (18) < max_input_tokens (100)",
+              "R3 skipped: human_review_enabled is True",
+              "R4 matched: all guardrails satisfied"
+            ],
+            "worked_trace": "R1 (missing info): False (all 6 required facts present); R2 (token boundary): False (18 < 100); R3 (no human review): False (human_review_enabled=True); R4 fires -> approve_llm_draft.",
+            "rationale": "Lesson 01 frames our educational startup around accessible, personalized learning using natural-language prompts as a strong first draft checked by humans because LLMs are non-deterministic. All required facts are supplied, estimated_tokens (18) leaves headroom inside max_input_tokens (100), and human_review_enabled is True.",
+            "passed": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "boundary",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "01-introduction-to-genai/applied-labs/r40-t057/example.py",
+        "--scenario",
+        "boundary"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "checked_count": 1,
+        "all_passed": true,
+        "mismatches": [],
+        "results": [
+          {
+            "scenario_id": "boundary",
+            "title": "Boundary scenario: prompt hits exact max_input_tokens limit n",
+            "input_facts": {
+              "role": "teacher",
+              "task_type": "article_summarization",
+              "prompt_text": "Summarize this curriculum reading passage at the exact 100-token context limit.",
+              "estimated_tokens": 100,
+              "max_input_tokens": 100,
+              "human_review_enabled": true
+            },
+            "expected_decision": "chunk_prompt_at_token_limit",
+            "actual_decision": "chunk_prompt_at_token_limit",
+            "rule_id": "R2",
+            "trace": [
+              "R1 skipped: all required facts present",
+              "R2 matched: estimated_tokens (100) >= max_input_tokens (100)"
+            ],
+            "worked_trace": "R1 (missing info): False (all 6 required facts present); R2 (token boundary): True (estimated_tokens 100 >= max_input_tokens 100) -> chunk_prompt_at_token_limit.",
+            "rationale": "Lesson 01 explains that an LLM accepts n tokens and predicts output tokens one by one in an expanding window, which can stop mid-sentence near the limit. Because estimated_tokens (100) equals max_input_tokens (100), zero window capacity remains for generated output tokens, so the teacher prompt must be chunked or shortened first.",
+            "passed": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "missing_info",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "01-introduction-to-genai/applied-labs/r40-t057/example.py",
+        "--scenario",
+        "missing_info"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "checked_count": 1,
+        "all_passed": true,
+        "mismatches": [],
+        "results": [
+          {
+            "scenario_id": "missing_info",
+            "title": "Missing-information scenario: empty prompt and unspecified token/review facts",
+            "input_facts": {
+              "role": "teacher",
+              "task_type": "essay_feedback",
+              "prompt_text": "",
+              "estimated_tokens": null,
+              "max_input_tokens": 100,
+              "human_review_enabled": null
+            },
+            "expected_decision": "request_missing_information",
+            "actual_decision": "request_missing_information",
+            "rule_id": "R1",
+            "trace": [
+              "R1 matched: missing or blank fields ['prompt_text', 'estimated_tokens', 'human_review_enabled']"
+            ],
+            "worked_trace": "R1 (missing info): True (missing fields: ['prompt_text', 'estimated_tokens', 'human_review_enabled']) -> request_missing_information.",
+            "rationale": "Lesson 01 defines a prompt as the natural-language instruction/input required to produce a completion and warns that LLM output requires mitigation against fabrications. With prompt_text empty and estimated_tokens and human_review_enabled omitted, the startup workflow cannot check token limits or governance safeguards and must request missing facts.",
+            "passed": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "tamper_failure",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "01-introduction-to-genai/applied-labs/r40-t057/example.py",
+        "--scenario",
+        "normal",
+        "--tamper-decision",
+        "chunk_prompt_at_token_limit"
+      ],
+      "expected_returncode": 1,
+      "actual_returncode": 1,
+      "actual_output": {
+        "simulation": true,
+        "checked_count": 1,
+        "all_passed": false,
+        "mismatches": [
+          {
+            "scenario_id": "normal",
+            "expected_decision": "chunk_prompt_at_token_limit",
+            "actual_decision": "approve_llm_draft"
+          }
+        ],
+        "results": [
+          {
+            "scenario_id": "normal",
+            "title": "Normal scenario: personalized concept explanation with human review",
+            "input_facts": {
+              "role": "student",
+              "task_type": "concept_explanation",
+              "prompt_text": "Explain fractions with two everyday visual examples for a 10-year-old.",
+              "estimated_tokens": 18,
+              "max_input_tokens": 100,
+              "human_review_enabled": true
+            },
+            "expected_decision": "chunk_prompt_at_token_limit",
+            "actual_decision": "approve_llm_draft",
+            "rule_id": "R4",
+            "trace": [
+              "R1 skipped: all required facts present",
+              "R2 skipped: estimated_tokens (18) < max_input_tokens (100)",
+              "R3 skipped: human_review_enabled is True",
+              "R4 matched: all guardrails satisfied"
+            ],
+            "worked_trace": "R1 (missing info): False (all 6 required facts present); R2 (token boundary): False (18 < 100); R3 (no human review): False (human_review_enabled=True); R4 fires -> approve_llm_draft.",
+            "rationale": "Lesson 01 frames our educational startup around accessible, personalized learning using natural-language prompts as a strong first draft checked by humans because LLMs are non-deterministic. All required facts are supplied, estimated_tokens (18) leaves headroom inside max_input_tokens (100), and human_review_enabled is True.",
+            "passed": false
+          }
+        ]
+      }
+    }
+  ],
+  "unittest_discover": {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "01-introduction-to-genai/applied-labs/r40-t057",
+      "-p",
+      "test_*.py",
+      "-v"
+    ],
+    "expected_returncode": 0,
+    "actual_returncode": 0,
+    "test_count": 5,
+    "output": "test_checker_fails_when_decision_is_deliberately_changed (test_example.TestStartupWorkedScenarios.test_checker_fails_when_decision_is_deliberately_changed) ... ok\ntest_decision_table_rules_cover_human_review_gate_and_boundaries (test_example.TestStartupWorkedScenarios.test_decision_table_rules_cover_human_review_gate_and_boundaries) ... ok\ntest_fresh_process_cli_normal_boundary_missing_and_tamper_failure (test_example.TestStartupWorkedScenarios.test_fresh_process_cli_normal_boundary_missing_and_tamper_failure) ... ok\ntest_invalid_inputs_and_missing_rationale_raise_value_error (test_example.TestStartupWorkedScenarios.test_invalid_inputs_and_missing_rationale_raise_value_error) ... ok\ntest_published_three_scenario_regression_suite (test_example.TestStartupWorkedScenarios.test_published_three_scenario_regression_suite)\nExecute the exact published three-scenario worked table as a regression test. ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.274s\n\nOK"
+  },
+  "deliberate_wrong_result_check": {
+    "expected_returncode_nonzero": true,
+    "actual_returncode": 1,
+    "output": "test_published_three_scenario_regression_suite (test_example.TestStartupWorkedScenarios.test_published_three_scenario_regression_suite)\nExecute the exact published three-scenario worked table as a regression test. ... FAIL\n\n======================================================================\nFAIL: test_published_three_scenario_regression_suite (test_example.TestStartupWorkedScenarios.test_published_three_scenario_regression_suite)\nExecute the exact published three-scenario worked table as a regression test.\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/vedlad/Desktop/snai/generative-ai-for-beginners/01-introduction-to-genai/applied-labs/r40-t057/test_example.py\", line 29, in test_published_three_scenario_regression_suite\n    report = assert_published_scenarios(WORKED_SCENARIOS)\n  File \"/Users/vedlad/Desktop/snai/generative-ai-for-beginners/01-introduction-to-genai/applied-labs/r40-t057/example.py\", line 272, in assert_published_scenarios\n    raise AssertionError(f\"Decision-table check failed: {details}\")\nAssertionError: Decision-table check failed: normal: expected 'chunk_prompt_at_token_limit' != actual 'approve_llm_draft'\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)"
+  }
+}
