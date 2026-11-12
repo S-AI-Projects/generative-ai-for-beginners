@@ -1,0 +1,21 @@
+{
+  "task": "R40-T041",
+  "program": "08-building-search-applications/applied-labs/r40-t041/example.py",
+  "tests": [
+    {
+      "command": "python3 08-building-search-applications/applied-labs/r40-t041/example.py red",
+      "expected": [
+        {"id": 1, "score": 1},
+        {"id": 2, "score": 1}
+      ]
+    },
+    {
+      "command": "python3 08-building-search-applications/applied-labs/r40-t041/example.py orange",
+      "expected": []
+    },
+    {
+      "command": "python3 08-building-search-applications/applied-labs/r40-t041/example.py red --min-score 2",
+      "expected": []
+    }
+  ]
+}

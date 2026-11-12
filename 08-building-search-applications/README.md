@@ -161,3 +161,23 @@ When you run the notebook, you'll be prompted to enter a query. The input box wi
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!
 
 Head over to Lesson 9 where we will look at how to [build image generation applications](../09-building-image-applications/README.md?WT.mc_id=academic-105485-koreyst)!
+
+## Applied Lab: Building a Local Search Application
+
+Try a beginner-friendly Python example that demonstrates keyword-based search using token overlap, scoring, and minimum-score filtering.
+
+**Lab:** [R40-T041 — Building a Local Search Application](./applied-labs/r40-t041/README.md?WT.mc_id=academic-105485-koreyst)
+
+Run the example from the repository root:
+
+```bash
+python3 08-building-search-applications/applied-labs/r40-t041/example.py red
+```
+
+Run its automated tests:
+
+```bash
+python3 -m unittest discover -s 08-building-search-applications/applied-labs/r40-t041 -p "test_*.py"
+```
+
+This lab uses a small local fixture and Python's standard library. No API keys or external services are required.
