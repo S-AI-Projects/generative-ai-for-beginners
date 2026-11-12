@@ -1,0 +1,382 @@
+{
+  "task_id": "R40-T059",
+  "tool_versions": {
+    "python": "3.14.7 (v3.14.7:823f0323ee6, Aug  5 2026, 07:07:01) [Clang 21.0.0 (clang-2100.1.1.101)]",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "unittest_runner": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3 -m unittest"
+  },
+  "cli_scenarios": [
+    {
+      "name": "normal",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "01-introduction-to-genai/applied-labs/r40-t059/example.py",
+        "--mode",
+        "normal"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "checked_count": 1,
+        "all_passed": true,
+        "mismatches": [],
+        "results": [
+          {
+            "scenario_id": "normal",
+            "title": "Normal scenario: 24/7 virtual tutor draft with teacher review gate",
+            "input_facts": {
+              "learner_level": "middle_school",
+              "learning_goal": "virtual_tutor_qa",
+              "prompt": "Explain why seasons change using two everyday observations.",
+              "prompt_tokens": 24,
+              "max_window_tokens": 256,
+              "teacher_review_gate": true
+            },
+            "expected_decision": "serve_tutor_first_draft",
+            "actual_decision": "serve_tutor_first_draft",
+            "rule_id": "N1",
+            "error_explanation": null,
+            "remediation_hint": null,
+            "rationale": "Lesson 01 sets our startup's mission around accessible, personalized learning with virtual tutors responding to natural-language prompts. Because prompt_tokens (24) fits inside max_window_tokens (256) and teacher_review_gate is True to inspect non-deterministic first-draft output, serving a tutor first draft is approved.",
+            "passed": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "boundary",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "01-introduction-to-genai/applied-labs/r40-t059/example.py",
+        "--mode",
+        "boundary"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "checked_count": 1,
+        "all_passed": true,
+        "mismatches": [],
+        "results": [
+          {
+            "scenario_id": "boundary",
+            "title": "Boundary scenario: prompt reaches exact n-token window ceiling (256 == 256)",
+            "input_facts": {
+              "learner_level": "high_school",
+              "learning_goal": "code_explanation",
+              "prompt": "Explain every line of this recursion helper at the exact 256-token limit.",
+              "prompt_tokens": 256,
+              "max_window_tokens": 256,
+              "teacher_review_gate": true
+            },
+            "expected_decision": "shorten_or_split_prompt",
+            "actual_decision": "shorten_or_split_prompt",
+            "rule_id": "B1",
+            "error_explanation": null,
+            "remediation_hint": "Reduce prompt_tokens (256) below max_window_tokens (256) to leave room in the expanding token window.",
+            "rationale": "Lesson 01 explains that an LLM accepts n tokens and predicts output tokens one by one in an expanding window, sometimes stopping mid-sentence when context fills up. At the exact boundary prompt_tokens == max_window_tokens (256), zero window headroom remains for generated output tokens, so the prompt must be shortened or split.",
+            "passed": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "missing_info",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "01-introduction-to-genai/applied-labs/r40-t059/example.py",
+        "--mode",
+        "missing_info"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "checked_count": 1,
+        "all_passed": true,
+        "mismatches": [],
+        "results": [
+          {
+            "scenario_id": "missing_info",
+            "title": "Missing-information scenario: omitted learner level, empty prompt, and missing count",
+            "input_facts": {
+              "learner_level": null,
+              "learning_goal": "quiz_drafting",
+              "prompt": "",
+              "prompt_tokens": null,
+              "max_window_tokens": 256,
+              "teacher_review_gate": true
+            },
+            "expected_decision": "halt_and_explain_missing_data",
+            "actual_decision": "halt_and_explain_missing_data",
+            "rule_id": "M1",
+            "error_explanation": "Cannot evaluate tutor request: missing or blank required field(s): learner_level, prompt, prompt_tokens.",
+            "remediation_hint": "Provide non-empty strings for 'learner_level', 'learning_goal', and 'prompt', integer token counts, and boolean 'teacher_review_gate'.",
+            "rationale": "Lesson 01 defines the prompt as the natural-language instruction needed before any completion can be generated and warns against ungrounded fabrications. With learner_level, prompt, and prompt_tokens missing, the startup must halt, explain which fields are absent, and wait for a valid follow-up request.",
+            "passed": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "recovery",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "01-introduction-to-genai/applied-labs/r40-t059/example.py",
+        "--mode",
+        "recovery"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "error_count": 2,
+        "recovered_count": 1,
+        "final_status": "recovered_valid_ok",
+        "final_decision": "serve_tutor_first_draft",
+        "steps": [
+          {
+            "step": "step_1_missing_info",
+            "status": "missing_data_error_explained",
+            "decision": "halt_and_explain_missing_data",
+            "error_explanation": "Cannot evaluate tutor request: missing or blank required field(s): learner_level, prompt, prompt_tokens.",
+            "remediation_hint": "Provide non-empty strings for 'learner_level', 'learning_goal', and 'prompt', integer token counts, and boolean 'teacher_review_gate'.",
+            "recovered_after_prior_error": false
+          },
+          {
+            "step": "step_2_negative_tokens",
+            "status": "invalid_input_error_explained",
+            "decision": "reject_invalid_input",
+            "error_explanation": "Invalid input fact rejected cleanly: 'prompt_tokens' must be a non-negative integer",
+            "recovered_after_prior_error": false
+          },
+          {
+            "step": "step_3_valid_recovery",
+            "status": "recovered_valid_ok",
+            "decision": "serve_tutor_first_draft",
+            "rule_id": "N1",
+            "error_explanation": null,
+            "recovered_after_prior_error": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "tamper",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "01-introduction-to-genai/applied-labs/r40-t059/example.py",
+        "--mode",
+        "tamper"
+      ],
+      "expected_returncode": 1,
+      "actual_returncode": 1,
+      "actual_output": {
+        "simulation": true,
+        "checked_count": 3,
+        "all_passed": false,
+        "mismatches": [
+          {
+            "scenario_id": "normal",
+            "expected_decision": "shorten_or_split_prompt",
+            "actual_decision": "serve_tutor_first_draft"
+          }
+        ],
+        "results": [
+          {
+            "scenario_id": "normal",
+            "title": "Normal scenario: 24/7 virtual tutor draft with teacher review gate",
+            "input_facts": {
+              "learner_level": "middle_school",
+              "learning_goal": "virtual_tutor_qa",
+              "prompt": "Explain why seasons change using two everyday observations.",
+              "prompt_tokens": 24,
+              "max_window_tokens": 256,
+              "teacher_review_gate": true
+            },
+            "expected_decision": "shorten_or_split_prompt",
+            "actual_decision": "serve_tutor_first_draft",
+            "rule_id": "N1",
+            "error_explanation": null,
+            "remediation_hint": null,
+            "rationale": "Lesson 01 sets our startup's mission around accessible, personalized learning with virtual tutors responding to natural-language prompts. Because prompt_tokens (24) fits inside max_window_tokens (256) and teacher_review_gate is True to inspect non-deterministic first-draft output, serving a tutor first draft is approved.",
+            "passed": false
+          },
+          {
+            "scenario_id": "boundary",
+            "title": "Boundary scenario: prompt reaches exact n-token window ceiling (256 == 256)",
+            "input_facts": {
+              "learner_level": "high_school",
+              "learning_goal": "code_explanation",
+              "prompt": "Explain every line of this recursion helper at the exact 256-token limit.",
+              "prompt_tokens": 256,
+              "max_window_tokens": 256,
+              "teacher_review_gate": true
+            },
+            "expected_decision": "shorten_or_split_prompt",
+            "actual_decision": "shorten_or_split_prompt",
+            "rule_id": "B1",
+            "error_explanation": null,
+            "remediation_hint": "Reduce prompt_tokens (256) below max_window_tokens (256) to leave room in the expanding token window.",
+            "rationale": "Lesson 01 explains that an LLM accepts n tokens and predicts output tokens one by one in an expanding window, sometimes stopping mid-sentence when context fills up. At the exact boundary prompt_tokens == max_window_tokens (256), zero window headroom remains for generated output tokens, so the prompt must be shortened or split.",
+            "passed": true
+          },
+          {
+            "scenario_id": "missing_info",
+            "title": "Missing-information scenario: omitted learner level, empty prompt, and missing count",
+            "input_facts": {
+              "learner_level": null,
+              "learning_goal": "quiz_drafting",
+              "prompt": "",
+              "prompt_tokens": null,
+              "max_window_tokens": 256,
+              "teacher_review_gate": true
+            },
+            "expected_decision": "halt_and_explain_missing_data",
+            "actual_decision": "halt_and_explain_missing_data",
+            "rule_id": "M1",
+            "error_explanation": "Cannot evaluate tutor request: missing or blank required field(s): learner_level, prompt, prompt_tokens.",
+            "remediation_hint": "Provide non-empty strings for 'learner_level', 'learning_goal', and 'prompt', integer token counts, and boolean 'teacher_review_gate'.",
+            "rationale": "Lesson 01 defines the prompt as the natural-language instruction needed before any completion can be generated and warns against ungrounded fabrications. With learner_level, prompt, and prompt_tokens missing, the startup must halt, explain which fields are absent, and wait for a valid follow-up request.",
+            "passed": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "all",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "01-introduction-to-genai/applied-labs/r40-t059/example.py",
+        "--mode",
+        "all"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "decision_table_check": {
+          "simulation": true,
+          "checked_count": 3,
+          "all_passed": true,
+          "mismatches": [],
+          "results": [
+            {
+              "scenario_id": "normal",
+              "title": "Normal scenario: 24/7 virtual tutor draft with teacher review gate",
+              "input_facts": {
+                "learner_level": "middle_school",
+                "learning_goal": "virtual_tutor_qa",
+                "prompt": "Explain why seasons change using two everyday observations.",
+                "prompt_tokens": 24,
+                "max_window_tokens": 256,
+                "teacher_review_gate": true
+              },
+              "expected_decision": "serve_tutor_first_draft",
+              "actual_decision": "serve_tutor_first_draft",
+              "rule_id": "N1",
+              "error_explanation": null,
+              "remediation_hint": null,
+              "rationale": "Lesson 01 sets our startup's mission around accessible, personalized learning with virtual tutors responding to natural-language prompts. Because prompt_tokens (24) fits inside max_window_tokens (256) and teacher_review_gate is True to inspect non-deterministic first-draft output, serving a tutor first draft is approved.",
+              "passed": true
+            },
+            {
+              "scenario_id": "boundary",
+              "title": "Boundary scenario: prompt reaches exact n-token window ceiling (256 == 256)",
+              "input_facts": {
+                "learner_level": "high_school",
+                "learning_goal": "code_explanation",
+                "prompt": "Explain every line of this recursion helper at the exact 256-token limit.",
+                "prompt_tokens": 256,
+                "max_window_tokens": 256,
+                "teacher_review_gate": true
+              },
+              "expected_decision": "shorten_or_split_prompt",
+              "actual_decision": "shorten_or_split_prompt",
+              "rule_id": "B1",
+              "error_explanation": null,
+              "remediation_hint": "Reduce prompt_tokens (256) below max_window_tokens (256) to leave room in the expanding token window.",
+              "rationale": "Lesson 01 explains that an LLM accepts n tokens and predicts output tokens one by one in an expanding window, sometimes stopping mid-sentence when context fills up. At the exact boundary prompt_tokens == max_window_tokens (256), zero window headroom remains for generated output tokens, so the prompt must be shortened or split.",
+              "passed": true
+            },
+            {
+              "scenario_id": "missing_info",
+              "title": "Missing-information scenario: omitted learner level, empty prompt, and missing count",
+              "input_facts": {
+                "learner_level": null,
+                "learning_goal": "quiz_drafting",
+                "prompt": "",
+                "prompt_tokens": null,
+                "max_window_tokens": 256,
+                "teacher_review_gate": true
+              },
+              "expected_decision": "halt_and_explain_missing_data",
+              "actual_decision": "halt_and_explain_missing_data",
+              "rule_id": "M1",
+              "error_explanation": "Cannot evaluate tutor request: missing or blank required field(s): learner_level, prompt, prompt_tokens.",
+              "remediation_hint": "Provide non-empty strings for 'learner_level', 'learning_goal', and 'prompt', integer token counts, and boolean 'teacher_review_gate'.",
+              "rationale": "Lesson 01 defines the prompt as the natural-language instruction needed before any completion can be generated and warns against ungrounded fabrications. With learner_level, prompt, and prompt_tokens missing, the startup must halt, explain which fields are absent, and wait for a valid follow-up request.",
+              "passed": true
+            }
+          ]
+        },
+        "error_and_recovery_demo": {
+          "simulation": true,
+          "error_count": 2,
+          "recovered_count": 1,
+          "final_status": "recovered_valid_ok",
+          "final_decision": "serve_tutor_first_draft",
+          "steps": [
+            {
+              "step": "step_1_missing_info",
+              "status": "missing_data_error_explained",
+              "decision": "halt_and_explain_missing_data",
+              "error_explanation": "Cannot evaluate tutor request: missing or blank required field(s): learner_level, prompt, prompt_tokens.",
+              "remediation_hint": "Provide non-empty strings for 'learner_level', 'learning_goal', and 'prompt', integer token counts, and boolean 'teacher_review_gate'.",
+              "recovered_after_prior_error": false
+            },
+            {
+              "step": "step_2_negative_tokens",
+              "status": "invalid_input_error_explained",
+              "decision": "reject_invalid_input",
+              "error_explanation": "Invalid input fact rejected cleanly: 'prompt_tokens' must be a non-negative integer",
+              "recovered_after_prior_error": false
+            },
+            {
+              "step": "step_3_valid_recovery",
+              "status": "recovered_valid_ok",
+              "decision": "serve_tutor_first_draft",
+              "rule_id": "N1",
+              "error_explanation": null,
+              "recovered_after_prior_error": true
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "unittest_discover": {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "01-introduction-to-genai/applied-labs/r40-t059",
+      "-p",
+      "test_*.py",
+      "-v"
+    ],
+    "expected_returncode": 0,
+    "actual_returncode": 0,
+    "test_count": 4,
+    "output": "test_checker_fails_when_any_decision_is_deliberately_changed (test_example.TestStartupDecisionAndRecovery.test_checker_fails_when_any_decision_is_deliberately_changed) ... ok\ntest_fresh_process_cli_scenarios_recovery_and_tamper_failure (test_example.TestStartupDecisionAndRecovery.test_fresh_process_cli_scenarios_recovery_and_tamper_failure) ... ok\ntest_invalid_and_missing_data_error_explanation_and_next_input_recovery (test_example.TestStartupDecisionAndRecovery.test_invalid_and_missing_data_error_explanation_and_next_input_recovery) ... ok\ntest_three_worked_scenarios_match_decision_table (test_example.TestStartupDecisionAndRecovery.test_three_worked_scenarios_match_decision_table) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.343s\n\nOK"
+  },
+  "deliberate_wrong_result_check": {
+    "expected_returncode_nonzero": true,
+    "actual_returncode": 1,
+    "output": "test_three_worked_scenarios_match_decision_table (test_example.TestStartupDecisionAndRecovery.test_three_worked_scenarios_match_decision_table) ... FAIL\n\n======================================================================\nFAIL: test_three_worked_scenarios_match_decision_table (test_example.TestStartupDecisionAndRecovery.test_three_worked_scenarios_match_decision_table)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/vedlad/Desktop/snai/generative-ai-for-beginners/01-introduction-to-genai/applied-labs/r40-t059/test_example.py\", line 30, in test_three_worked_scenarios_match_decision_table\n    report = assert_decision_table(WORKED_SCENARIOS)\n  File \"/Users/vedlad/Desktop/snai/generative-ai-for-beginners/01-introduction-to-genai/applied-labs/r40-t059/example.py\", line 262, in assert_decision_table\n    raise AssertionError(f\"Decision-table mismatch: {summary}\")\nAssertionError: Decision-table mismatch: normal: expected 'shorten_or_split_prompt' != actual 'serve_tutor_first_draft'\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)"
+  }
+}
