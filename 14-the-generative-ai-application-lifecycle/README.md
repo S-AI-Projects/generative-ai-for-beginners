@@ -14,6 +14,7 @@ In this chapter, you will:
 - The LLM Lifecycle
 - Lifecycle Tooling
 - Lifecycle Metrification and Evaluation
+- Preflight Launch Configuration Validation and Secret Redaction
 
 ## Understand the Paradigm Shift from MLOps to LLMOps
 
@@ -78,6 +79,64 @@ Construct, from Proof-of-Concept(POC) until large scale applications with Prompt
 - Use Microsoft Foundry to Integrate and Iterate with cloud, Push and Deploy for quick integration.
 
 ![LLMOps with PromptFlow](./images/06-llm-promptflow.png?WT.mc_id=academic-105485-koreyst)
+
+## Local Launch Configuration & Redaction Simulation (Applied Lab)
+
+> **Simulation / Synthetic Fixture Notice:** The runnable lab at [example.py](./applied-labs/r40-t056/example.py?WT.mc_id=academic-105485-koreyst) (with tests in [test_example.py](./applied-labs/r40-t056/test_example.py?WT.mc_id=academic-105485-koreyst)) is a **local in-memory preflight simulation** (`"simulation": true`, `"launched": false`). It **never launches a process** and makes no claims about real hardware, cloud service behavior, or trained-model performance. Its simplifications stop at static schema validation and redaction over synthetic fixtures and do not check binary `PATH` availability, OS permissions, open network ports, PromptFlow/Microsoft Foundry endpoints, or secret-vault integration.
+
+**Prerequisite tools:** Python 3.9+ (standard library only; no model download, API key, paid provider, GPU, or physical device required).
+
+### Baseline vs. Extracted Responsibility & Fixture Contract
+
+- **Baseline (`validate_launch_config_baseline`):** Validates `command`, argument-array `args`, and `env` keys/values in one function and returns a redacted report (`"launched": false`, values replaced by `"<REDACTED>"`).
+- **Extracted responsibility (`redact_env_values`):** Isolates explicit `env` key/value validation and redaction into a named helper called by `validate_launch_config`, preserving the exact output and `ValueError` contract across every fixture case:
+  - `valid`: `command="python3"`, `args=["-m", "http.server", "8080"]`, `env={"APP_ENV": "local-sim", "API_KEY": "synthetic-secret-value"}` -> returns redacted report with `"launched": false`.
+  - `boundary_empty_args_and_env`: `command="uvicorn"`, `args=[]`, `env={}` -> valid boundary case.
+  - `invalid_missing_command`: missing `command` -> fails with `ValueError("Missing or empty 'command'")`.
+  - `invalid_string_args`: `args="--port 8080"` (single string instead of array) -> fails with `ValueError`.
+
+### Exact Invocation and Expected Output
+
+Run the valid fixture case from the repository root:
+
+```bash
+python3 14-the-generative-ai-application-lifecycle/applied-labs/r40-t056/example.py --case valid
+```
+
+Expected output:
+
+```json
+{
+  "simulation": true,
+  "case": "valid",
+  "equivalent": true,
+  "report": {
+    "simulation": true,
+    "launched": false,
+    "command": "python3",
+    "args": [
+      "-m",
+      "http.server",
+      "8080"
+    ],
+    "env_keys": [
+      "APP_ENV",
+      "API_KEY"
+    ],
+    "redacted_env": {
+      "APP_ENV": "<REDACTED>",
+      "API_KEY": "<REDACTED>"
+    }
+  }
+}
+```
+
+Run the full before/after equivalence suite across all 4 fixtures and the unit tests:
+
+```bash
+python3 14-the-generative-ai-application-lifecycle/applied-labs/r40-t056/example.py
+python3 -m unittest discover -s 14-the-generative-ai-application-lifecycle/applied-labs/r40-t056 -p "test_*.py"
+```
 
 ## Great! Continue your Learning!
 
