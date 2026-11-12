@@ -1,0 +1,36 @@
+{
+  "valid_read": {
+    "input": {
+      "tool": "read",
+      "arguments": {
+        "path": "notes.txt"
+      }
+    },
+    "expected": "This is a sample local file."
+  },
+  "unknown_delete_tool": {
+    "input": {
+      "tool": "delete",
+      "arguments": {
+        "path": "notes.txt"
+      }
+    },
+    "expected": "Tool not allowed"
+  },
+  "missing_required_argument": {
+    "input": {
+      "tool": "read",
+      "arguments": {}
+    },
+    "expected": "Missing required argument: path"
+  },
+  "invalid_path": {
+    "input": {
+      "tool": "read",
+      "arguments": {
+        "path": "unknown.txt"
+      }
+    },
+    "expected": "Invalid path"
+  }
+}
