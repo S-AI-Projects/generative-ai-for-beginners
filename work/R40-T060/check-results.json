@@ -1,0 +1,283 @@
+{
+  "task_id": "R40-T060",
+  "tool_versions": {
+    "python": "3.14.7 (v3.14.7:823f0323ee6, Aug  5 2026, 07:07:01) [Clang 21.0.0 (clang-2100.1.1.101)]",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "unittest_runner": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3 -m unittest"
+  },
+  "cli_scenarios": [
+    {
+      "name": "normal",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "09-building-image-applications/applied-labs/r40-t060/example.py",
+        "--case",
+        "normal"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "verifies": "preprocessing_only_not_model_quality",
+        "shape": [
+          1,
+          2,
+          2
+        ],
+        "normalized_batch": [
+          [
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.5019607843137255,
+              0.25098039215686274
+            ]
+          ]
+        ],
+        "min_value": 0.0,
+        "max_value": 1.0
+      }
+    },
+    {
+      "name": "boundary_edges",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "09-building-image-applications/applied-labs/r40-t060/example.py",
+        "--case",
+        "boundary_edges"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "verifies": "preprocessing_only_not_model_quality",
+        "shape": [
+          1,
+          1,
+          2
+        ],
+        "normalized_batch": [
+          [
+            [
+              0.0,
+              1.0
+            ]
+          ]
+        ],
+        "min_value": 0.0,
+        "max_value": 1.0
+      }
+    },
+    {
+      "name": "invalid_negative",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "09-building-image-applications/applied-labs/r40-t060/example.py",
+        "--case",
+        "invalid_negative"
+      ],
+      "expected_returncode": 2,
+      "actual_returncode": 2,
+      "actual_output": {
+        "stderr": "Error: Pixel value -1 at [0][0][0] is out of range 0..255"
+      }
+    },
+    {
+      "name": "invalid_over255",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "09-building-image-applications/applied-labs/r40-t060/example.py",
+        "--case",
+        "invalid_over255"
+      ],
+      "expected_returncode": 2,
+      "actual_returncode": 2,
+      "actual_output": {
+        "stderr": "Error: Pixel value 256 at [0][0][1] is out of range 0..255"
+      }
+    },
+    {
+      "name": "questions",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "09-building-image-applications/applied-labs/r40-t060/example.py",
+        "--case",
+        "questions"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "verifies": "preprocessing_only_not_model_quality",
+        "all_passed": true,
+        "questions": [
+          {
+            "question_id": "q1_predict_output",
+            "category": "predict_output",
+            "question": "For batch [[[0, 255], [128, 64]]], what output shape, min_value, and max_value does normalize_image_batch produce?",
+            "rationale": "Element-wise division by 255.0 preserves all N x H x W dimensions (1, 2, 2) and maps 0 -> 0.0 and 255 -> 1.0.",
+            "observed_check_result": {
+              "shape": [
+                1,
+                2,
+                2
+              ],
+              "min_value": 0.0,
+              "max_value": 1.0
+            },
+            "passed": true
+          },
+          {
+            "question_id": "q2_diagnose_failure",
+            "category": "diagnose_failure",
+            "question": "Why does [[[0, 256], [128, 64]]] fail, and what does the error indicate?",
+            "rationale": "Pixel 256 at [0][0][1] exceeds the 0..255 unsigned 8-bit domain; allowing it would yield 1.0039... outside 0..1, so validation raises ValueError.",
+            "observed_check_result": {
+              "raises": "ValueError",
+              "error_message": "Pixel value 256 at [0][0][1] is out of range 0..255"
+            },
+            "passed": true
+          },
+          {
+            "question_id": "q3_boundary_policy",
+            "category": "boundary_policy",
+            "question": "Should out-of-range pixels (-1 or 256) be silently clamped or rejected with ValueError?",
+            "rationale": "Silent clamping hides upstream scaling or decoding bugs. Rejecting invalid pixels with ValueError enforces the 0..255 precondition for preprocessing only.",
+            "observed_check_result": {
+              "policy": "reject_out_of_range_with_value_error",
+              "rejected_out_of_range": [
+                -1,
+                256
+              ],
+              "valid_edges_normalized": [
+                [
+                  [
+                    0.0,
+                    1.0
+                  ]
+                ]
+              ]
+            },
+            "passed": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "all",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "09-building-image-applications/applied-labs/r40-t060/example.py"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "actual_output": {
+        "simulation": true,
+        "verifies": "preprocessing_only_not_model_quality",
+        "normal_batch": {
+          "simulation": true,
+          "verifies": "preprocessing_only_not_model_quality",
+          "shape": [
+            1,
+            2,
+            2
+          ],
+          "normalized_batch": [
+            [
+              [
+                0.0,
+                1.0
+              ],
+              [
+                0.5019607843137255,
+                0.25098039215686274
+              ]
+            ]
+          ],
+          "min_value": 0.0,
+          "max_value": 1.0
+        },
+        "applied_questions": {
+          "simulation": true,
+          "verifies": "preprocessing_only_not_model_quality",
+          "all_passed": true,
+          "questions": [
+            {
+              "question_id": "q1_predict_output",
+              "category": "predict_output",
+              "question": "For batch [[[0, 255], [128, 64]]], what output shape, min_value, and max_value does normalize_image_batch produce?",
+              "rationale": "Element-wise division by 255.0 preserves all N x H x W dimensions (1, 2, 2) and maps 0 -> 0.0 and 255 -> 1.0.",
+              "observed_check_result": {
+                "shape": [
+                  1,
+                  2,
+                  2
+                ],
+                "min_value": 0.0,
+                "max_value": 1.0
+              },
+              "passed": true
+            },
+            {
+              "question_id": "q2_diagnose_failure",
+              "category": "diagnose_failure",
+              "question": "Why does [[[0, 256], [128, 64]]] fail, and what does the error indicate?",
+              "rationale": "Pixel 256 at [0][0][1] exceeds the 0..255 unsigned 8-bit domain; allowing it would yield 1.0039... outside 0..1, so validation raises ValueError.",
+              "observed_check_result": {
+                "raises": "ValueError",
+                "error_message": "Pixel value 256 at [0][0][1] is out of range 0..255"
+              },
+              "passed": true
+            },
+            {
+              "question_id": "q3_boundary_policy",
+              "category": "boundary_policy",
+              "question": "Should out-of-range pixels (-1 or 256) be silently clamped or rejected with ValueError?",
+              "rationale": "Silent clamping hides upstream scaling or decoding bugs. Rejecting invalid pixels with ValueError enforces the 0..255 precondition for preprocessing only.",
+              "observed_check_result": {
+                "policy": "reject_out_of_range_with_value_error",
+                "rejected_out_of_range": [
+                  -1,
+                  256
+                ],
+                "valid_edges_normalized": [
+                  [
+                    [
+                      0.0,
+                      1.0
+                    ]
+                  ]
+                ]
+              },
+              "passed": true
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "unittest_discover": {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "09-building-image-applications/applied-labs/r40-t060",
+      "-p",
+      "test_*.py",
+      "-v"
+    ],
+    "expected_returncode": 0,
+    "actual_returncode": 0,
+    "test_count": 5,
+    "output": "test_boundary_edges_and_structural_validation (test_example.TestImageBatchNormalizationAndQuestions.test_boundary_edges_and_structural_validation) ... ok\ntest_fresh_process_cli_normal_questions_and_failures (test_example.TestImageBatchNormalizationAndQuestions.test_fresh_process_cli_normal_questions_and_failures) ... ok\ntest_negative_and_over_255_pixels_rejected (test_example.TestImageBatchNormalizationAndQuestions.test_negative_and_over_255_pixels_rejected) ... ok\ntest_normal_batch_preserves_shape_and_scales_to_unit_interval (test_example.TestImageBatchNormalizationAndQuestions.test_normal_batch_preserves_shape_and_scales_to_unit_interval) ... ok\ntest_three_applied_questions_have_rationales_and_pass_checks (test_example.TestImageBatchNormalizationAndQuestions.test_three_applied_questions_have_rationales_and_pass_checks) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.344s\n\nOK"
+  },
+  "deliberate_wrong_result_check": {
+    "expected_returncode_nonzero": true,
+    "actual_returncode": 1,
+    "output": "test_normal_batch_preserves_shape_and_scales_to_unit_interval (test_example.TestImageBatchNormalizationAndQuestions.test_normal_batch_preserves_shape_and_scales_to_unit_interval) ... FAIL\n\n======================================================================\nFAIL: test_normal_batch_preserves_shape_and_scales_to_unit_interval (test_example.TestImageBatchNormalizationAndQuestions.test_normal_batch_preserves_shape_and_scales_to_unit_interval)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/vedlad/Desktop/snai/generative-ai-for-beginners/09-building-image-applications/applied-labs/r40-t060/test_example.py\", line 29, in test_normal_batch_preserves_shape_and_scales_to_unit_interval\n    self.assertEqual(result[\"shape\"], [1, 2, 2])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: [2, 2] != [1, 2, 2]\n\nFirst differing element 0:\n2\n1\n\nSecond list contains 1 additional elements.\nFirst extra element 2:\n2\n\n- [2, 2]\n+ [1, 2, 2]\n?  +++\n\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nFAILED (failures=1)"
+  }
+}
