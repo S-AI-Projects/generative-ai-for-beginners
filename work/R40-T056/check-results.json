@@ -1,0 +1,249 @@
+{
+  "tool_versions": {
+    "python": "3.14.7",
+    "python_implementation": "CPython",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "git": "git version 2.55.0",
+    "unittest": "stdlib"
+  },
+  "scenarios": [
+    {
+      "name": "normal_valid_redacted",
+      "category": "normal",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/14-the-generative-ai-application-lifecycle/applied-labs/r40-t056/example.py",
+        "--case",
+        "valid"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "expected": {
+        "launched": false,
+        "equivalent": true,
+        "command": "python3",
+        "args": [
+          "-m",
+          "http.server",
+          "8080"
+        ],
+        "env_keys": [
+          "APP_ENV",
+          "API_KEY"
+        ],
+        "redacted_env": {
+          "APP_ENV": "<REDACTED>",
+          "API_KEY": "<REDACTED>"
+        }
+      },
+      "actual": {
+        "simulation": true,
+        "case": "valid",
+        "equivalent": true,
+        "report": {
+          "simulation": true,
+          "launched": false,
+          "command": "python3",
+          "args": [
+            "-m",
+            "http.server",
+            "8080"
+          ],
+          "env_keys": [
+            "APP_ENV",
+            "API_KEY"
+          ],
+          "redacted_env": {
+            "APP_ENV": "<REDACTED>",
+            "API_KEY": "<REDACTED>"
+          }
+        }
+      }
+    },
+    {
+      "name": "boundary_empty_args_and_env",
+      "category": "boundary",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/14-the-generative-ai-application-lifecycle/applied-labs/r40-t056/example.py",
+        "--case",
+        "boundary_empty_args_and_env"
+      ],
+      "expected_returncode": 0,
+      "actual_returncode": 0,
+      "expected": {
+        "launched": false,
+        "equivalent": true,
+        "command": "uvicorn",
+        "args": [],
+        "env_keys": [],
+        "redacted_env": {}
+      },
+      "actual": {
+        "simulation": true,
+        "case": "boundary_empty_args_and_env",
+        "equivalent": true,
+        "report": {
+          "simulation": true,
+          "launched": false,
+          "command": "uvicorn",
+          "args": [],
+          "env_keys": [],
+          "redacted_env": {}
+        }
+      }
+    },
+    {
+      "name": "failure_missing_command",
+      "category": "failure",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/14-the-generative-ai-application-lifecycle/applied-labs/r40-t056/example.py",
+        "--case",
+        "invalid_missing_command"
+      ],
+      "expected_returncode": 2,
+      "actual_returncode": 2,
+      "expected": {
+        "stderr_contains": "Missing or empty 'command'"
+      },
+      "actual": {
+        "stderr": "Error: Missing or empty 'command'"
+      }
+    },
+    {
+      "name": "failure_single_string_args",
+      "category": "failure",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/14-the-generative-ai-application-lifecycle/applied-labs/r40-t056/example.py",
+        "--case",
+        "invalid_string_args"
+      ],
+      "expected_returncode": 2,
+      "actual_returncode": 2,
+      "expected": {
+        "stderr_contains": "not a single string"
+      },
+      "actual": {
+        "stderr": "Error: 'args' must be an argument array (list/tuple of strings), not a single string"
+      }
+    }
+  ],
+  "all_equivalence_invocation": {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "/Users/vedlad/Desktop/snai/generative-ai-for-beginners/14-the-generative-ai-application-lifecycle/applied-labs/r40-t056/example.py"
+    ],
+    "expected_returncode": 0,
+    "actual_returncode": 0,
+    "actual": {
+      "simulation": true,
+      "all_equivalent": true,
+      "cases": [
+        {
+          "case": "valid",
+          "equivalent": true,
+          "baseline_result": {
+            "simulation": true,
+            "launched": false,
+            "command": "python3",
+            "args": [
+              "-m",
+              "http.server",
+              "8080"
+            ],
+            "env_keys": [
+              "APP_ENV",
+              "API_KEY"
+            ],
+            "redacted_env": {
+              "APP_ENV": "<REDACTED>",
+              "API_KEY": "<REDACTED>"
+            }
+          },
+          "refactored_result": {
+            "simulation": true,
+            "launched": false,
+            "command": "python3",
+            "args": [
+              "-m",
+              "http.server",
+              "8080"
+            ],
+            "env_keys": [
+              "APP_ENV",
+              "API_KEY"
+            ],
+            "redacted_env": {
+              "APP_ENV": "<REDACTED>",
+              "API_KEY": "<REDACTED>"
+            }
+          },
+          "baseline_error": null,
+          "refactored_error": null
+        },
+        {
+          "case": "boundary_empty_args_and_env",
+          "equivalent": true,
+          "baseline_result": {
+            "simulation": true,
+            "launched": false,
+            "command": "uvicorn",
+            "args": [],
+            "env_keys": [],
+            "redacted_env": {}
+          },
+          "refactored_result": {
+            "simulation": true,
+            "launched": false,
+            "command": "uvicorn",
+            "args": [],
+            "env_keys": [],
+            "redacted_env": {}
+          },
+          "baseline_error": null,
+          "refactored_error": null
+        },
+        {
+          "case": "invalid_missing_command",
+          "equivalent": true,
+          "baseline_result": null,
+          "refactored_result": null,
+          "baseline_error": "Missing or empty 'command'",
+          "refactored_error": "Missing or empty 'command'"
+        },
+        {
+          "case": "invalid_string_args",
+          "equivalent": true,
+          "baseline_result": null,
+          "refactored_result": null,
+          "baseline_error": "'args' must be an argument array (list/tuple of strings), not a single string",
+          "refactored_error": "'args' must be an argument array (list/tuple of strings), not a single string"
+        }
+      ]
+    }
+  },
+  "unittest_discover": {
+    "command": [
+      "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "14-the-generative-ai-application-lifecycle/applied-labs/r40-t056",
+      "-p",
+      "test_*.py",
+      "-v"
+    ],
+    "expected_returncode": 0,
+    "actual_returncode": 0,
+    "test_count": 7,
+    "output": "test_before_after_baseline_equivalence_across_all_fixtures (test_example.TestLaunchConfigValidationAndRedaction.test_before_after_baseline_equivalence_across_all_fixtures) ... ok\ntest_boundary_empty_args_array_and_empty_env (test_example.TestLaunchConfigValidationAndRedaction.test_boundary_empty_args_array_and_empty_env) ... ok\ntest_extracted_redact_env_values_and_invalid_env_cases (test_example.TestLaunchConfigValidationAndRedaction.test_extracted_redact_env_values_and_invalid_env_cases) ... ok\ntest_failure_missing_command_raises_value_error (test_example.TestLaunchConfigValidationAndRedaction.test_failure_missing_command_raises_value_error) ... ok\ntest_failure_single_string_args_raises_value_error (test_example.TestLaunchConfigValidationAndRedaction.test_failure_single_string_args_raises_value_error) ... ok\ntest_fresh_process_cli_normal_and_failure_exits (test_example.TestLaunchConfigValidationAndRedaction.test_fresh_process_cli_normal_and_failure_exits) ... ok\ntest_valid_config_redacts_secrets_and_never_launches_process (test_example.TestLaunchConfigValidationAndRedaction.test_valid_config_redacts_secrets_and_never_launches_process) ... ok\n\n----------------------------------------------------------------------\nRan 7 tests in 0.231s\n\nOK"
+  },
+  "deliberate_wrong_result_check": {
+    "expected_returncode_nonzero": true,
+    "actual_returncode": 1,
+    "output": "test_valid_config_redacts_secrets_and_never_launches_process (test_example.TestLaunchConfigValidationAndRedaction.test_valid_config_redacts_secrets_and_never_launches_process) ... FAIL\n\n======================================================================\nFAIL: test_valid_config_redacts_secrets_and_never_launches_process (test_example.TestLaunchConfigValidationAndRedaction.test_valid_config_redacts_secrets_and_never_launches_process)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/vedlad/Desktop/snai/generative-ai-for-beginners/14-the-generative-ai-application-lifecycle/applied-labs/r40-t056/test_example.py\", line 40, in test_valid_config_redacts_secrets_and_never_launches_process\n    self.assertEqual(\n    ~~~~~~~~~~~~~~~~^\n        report[\"redacted_env\"],\n        ^^^^^^^^^^^^^^^^^^^^^^^\n        {\"APP_ENV\": REDACTED_MARKER, \"API_KEY\": REDACTED_MARKER},\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: {'APP_ENV': 'local-sim', 'API_KEY': 'synthetic-secret-value'} != {'APP_ENV': '<REDACTED>', 'API_KEY': '<REDACTED>'}\n- {'API_KEY': 'synthetic-secret-value', 'APP_ENV': 'local-sim'}\n+ {'API_KEY': '<REDACTED>', 'APP_ENV': '<REDACTED>'}\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)"
+  }
+}
