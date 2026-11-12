@@ -16,6 +16,7 @@ This lesson will cover:
 - Generative AI and how we landed on the current technology landscape.
 - Inner working of a large language model.
 - Main capabilities and practical use cases of Large Language Models.
+- Educational startup decision-table lab with invalid/missing-data error explanation and recovery.
 
 ## Learning Goals
 
@@ -128,6 +129,75 @@ What's true about large language models?
 1. The response may vary despite using the same prompt. It's also great at giving you a first draft of something, be it text or code. But you need to improve on the results.
 
 A: 3, an LLM is non-deterministic, the response varies, however, you can control its variance via a temperature setting. You also shouldn't expect it to do things perfectly, it's here to do the heavy-lifting for you which often means you get a good first attempt at something that you need to gradually improve.
+
+## Educational Startup Decision Table, Error Explanation & Recovery (Applied Lab)
+
+> **Simulation / Synthetic Fixture Notice:** The runnable lab at [example.py](./applied-labs/r40-t059/example.py?WT.mc_id=academic-105485-koreyst) (with tests in [test_example.py](./applied-labs/r40-t059/test_example.py?WT.mc_id=academic-105485-koreyst)) is a **local deterministic simulation** (`"simulation": true`). It illustrates Lesson 01's _"our educational startup"_ scenario—checking natural-language prompts, the `n`-token expanding window, human review against non-determinism/fabrications, and graceful recovery after bad inputs—using small local fixtures only. Its simplifications stop at static rule checking and session-state tracking: it calls no real LLM API, downloads no weights, and makes no claims about real hardware, cloud service behavior, or trained-model performance.
+
+**Prerequisite tools:** Python 3.9+ (standard library only; no model download, API key, paid provider, GPU, or physical device required).
+
+### Three Worked Scenarios (`WORKED_SCENARIOS`)
+
+| Scenario | Key `input_facts` | Expected Decision | Rule | Lesson 01 Rationale Summary |
+| :--- | :--- | :--- | :---: | :--- |
+| `normal` | `learner_level="middle_school"`, `prompt_tokens=24`, `max_window_tokens=256`, `teacher_review_gate=True` | `serve_tutor_first_draft` | `N1` | Personalized virtual-tutor draft safely inside window `n`, reviewed for non-determinism. |
+| `boundary` | `learner_level="high_school"`, `prompt_tokens=256`, `max_window_tokens=256`, `teacher_review_gate=True` | `shorten_or_split_prompt` | `B1` | Reaches exact `n`-token window boundary (`256 == 256`), leaving zero output headroom. |
+| `missing_info` | `learner_level=None`, `prompt=""`, `prompt_tokens=None`, `max_window_tokens=256` | `halt_and_explain_missing_data` | `M1` | Halts safely, names missing prompt/context fields, and avoids ungrounded guesses. |
+
+Changing any expected decision causes the checker (`--mode tamper` or `assert_decision_table`) to fail with exit code `1`. `StartupSessionProcessor` also exercises documented missing (`missing_info`) and invalid (`prompt_tokens=-5`) inputs, explains both errors clearly, and recovers cleanly to `serve_tutor_first_draft` on the next valid input.
+
+### Exact Invocation and Expected Output
+
+Run the invalid/missing-data error explanation and next-input recovery sequence from the repository root:
+
+```bash
+python3 01-introduction-to-genai/applied-labs/r40-t059/example.py --mode recovery
+```
+
+Expected output:
+
+```json
+{
+  "simulation": true,
+  "error_count": 2,
+  "recovered_count": 1,
+  "final_status": "recovered_valid_ok",
+  "final_decision": "serve_tutor_first_draft",
+  "steps": [
+    {
+      "step": "step_1_missing_info",
+      "status": "missing_data_error_explained",
+      "decision": "halt_and_explain_missing_data",
+      "error_explanation": "Cannot evaluate tutor request: missing or blank required field(s): learner_level, prompt, prompt_tokens.",
+      "remediation_hint": "Provide non-empty strings for 'learner_level', 'learning_goal', and 'prompt', integer token counts, and boolean 'teacher_review_gate'.",
+      "recovered_after_prior_error": false
+    },
+    {
+      "step": "step_2_negative_tokens",
+      "status": "invalid_input_error_explained",
+      "decision": "reject_invalid_input",
+      "error_explanation": "Invalid input fact rejected cleanly: 'prompt_tokens' must be a non-negative integer",
+      "recovered_after_prior_error": false
+    },
+    {
+      "step": "step_3_valid_recovery",
+      "status": "recovered_valid_ok",
+      "decision": "serve_tutor_first_draft",
+      "rule_id": "N1",
+      "error_explanation": null,
+      "recovered_after_prior_error": true
+    }
+  ]
+}
+```
+
+Run the three-scenario table check, deliberate tamper failure (exits `1`), and unit tests:
+
+```bash
+python3 01-introduction-to-genai/applied-labs/r40-t059/example.py --mode all
+python3 01-introduction-to-genai/applied-labs/r40-t059/example.py --mode tamper
+python3 -m unittest discover -s 01-introduction-to-genai/applied-labs/r40-t059 -p "test_*.py"
+```
 
 ## Great Work! Continue the Journey
 
