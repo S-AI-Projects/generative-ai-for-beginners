@@ -10,6 +10,161 @@ The lesson will cover the following areas:
 - Exploring five different AI Agent Frameworks - What makes them unique?
 - Applying these AI Agents to different use cases - When should we use AI Agents?
 
+### Applied Lab: Typed Tool Dispatch and Boundary Validation (R40-T022)
+
+To understand how agents interact with tools, explore the local hands-on fixture:
+[Applied Lab — Typed Tool Dispatch and Boundary Validation](./applied-labs/r40-t022/README.md?WT.mc_id=academic-105485-koreyst).
+
+In AI agent frameworks, an LLM emits a structured JSON payload proposing a tool call (such as a function name and arguments). Before any underlying function or external API executes, the agent runtime must validate the request against an explicit tool allowlist and verify argument types.
+
+This local contract fixture demonstrates defensive tool dispatch using Python's standard library:
+- **Explicit Tool Allowlist:** Only `add(a, b)` and `multiply(a, b)` are permitted; unknown tools return a structured `UnknownToolError`.
+- **Strict Numeric Validation:** Arguments `a` and `b` must be finite numbers (`int` or `float`). Strings (e.g., `"2"`), booleans (`True`/`False`), and non-finite floats (`NaN`, `inf`) are rejected with a structured `ValidationError`.
+- **Failure Isolation:** A failed call halts the execution pipeline immediately—a failed call cannot execute another tool.
+- **Contract Boundary Decision:** Booleans (`True`/`False`) subclass `int` in Python, but in JSON schemas they represent distinct primitives; thus, booleans are strictly rejected. String arguments are not coerced into numbers.
+- **Scope Note (Simulation/Mock):** This is a simulated local contract fixture illustrating dispatch and validation mechanics; it is not a full Model Context Protocol (MCP) transport implementation (no JSON-RPC 2.0 framing, stdio/SSE socket transport, or network daemon) and requires no model download or cloud credentials.
+
+#### Exact Invocations and Expected Output
+
+1. **Successful Addition:**
+   ```bash
+   python3 17-ai-agents/applied-labs/r40-t022/example.py --call '{"tool": "add", "arguments": {"a": 2, "b": 3}}'
+   ```
+   Expected output (`exit 0`):
+   ```json
+   {
+     "status": "success",
+     "tool": "add",
+     "arguments": {
+       "a": 2,
+       "b": 3
+     },
+     "result": 5
+   }
+   ```
+
+2. **Successful Multiplication:**
+   ```bash
+   python3 17-ai-agents/applied-labs/r40-t022/example.py --call '{"tool": "multiply", "arguments": {"a": 2, "b": 3}}'
+   ```
+   Expected output (`exit 0`):
+   ```json
+   {
+     "status": "success",
+     "tool": "multiply",
+     "arguments": {
+       "a": 2,
+       "b": 3
+     },
+     "result": 6
+   }
+   ```
+
+3. **Structured Error (Unknown Tool):**
+   ```bash
+   python3 17-ai-agents/applied-labs/r40-t022/example.py --call '{"tool": "divide", "arguments": {"a": 6, "b": 2}}'
+   ```
+   Expected output (`exit 1`):
+   ```json
+   {
+     "status": "error",
+     "error": {
+       "type": "UnknownToolError",
+       "code": "TOOL_NOT_ALLOWED",
+       "message": "Tool 'divide' is not permitted in allowlist. Allowed tools: ['add', 'multiply']",
+       "details": {
+         "tool": "divide",
+         "allowed_tools": [
+           "add",
+           "multiply"
+         ]
+       }
+     },
+     "tool": "divide",
+     "arguments": {
+       "a": 6,
+       "b": 2
+     }
+   }
+   ```
+
+4. **Structured Error (String Argument `a`):**
+   ```bash
+   python3 17-ai-agents/applied-labs/r40-t022/example.py --call '{"tool": "add", "arguments": {"a": "2", "b": 3}}'
+   ```
+   Expected output (`exit 1`):
+   ```json
+   {
+     "status": "error",
+     "error": {
+       "type": "ValidationError",
+       "code": "INVALID_ARGUMENT_TYPE",
+       "message": "Argument 'a' must be a finite number (int or float), got str: \"2\"",
+       "details": {
+         "parameter": "a",
+         "expected": "number (int or float)",
+         "received_type": "str",
+         "received_value": "2"
+       }
+     },
+     "tool": "add",
+     "arguments": {
+       "a": "2",
+       "b": 3
+     }
+   }
+   ```
+
+5. **Failure Halting (A Failed Call Cannot Execute Another Tool):**
+   ```bash
+   python3 17-ai-agents/applied-labs/r40-t022/example.py --pipeline '[{"tool": "add", "arguments": {"a": "invalid", "b": 3}}, {"tool": "multiply", "arguments": {"a": 2, "b": 3}}]'
+   ```
+   Expected output (`exit 1`):
+   ```json
+   {
+     "status": "error",
+     "pipeline_halted": true,
+     "failed_step_index": 0,
+     "completed_steps": 0,
+     "total_steps": 2,
+     "executed_results": [],
+     "failed_call": {
+       "status": "error",
+       "error": {
+         "type": "ValidationError",
+         "code": "INVALID_ARGUMENT_TYPE",
+         "message": "Argument 'a' must be a finite number (int or float), got str: \"invalid\"",
+         "details": {
+           "parameter": "a",
+           "expected": "number (int or float)",
+           "received_type": "str",
+           "received_value": "invalid"
+         }
+       },
+       "tool": "add",
+       "arguments": {
+         "a": "invalid",
+         "b": 3
+       }
+     },
+     "aborted_calls": [
+       {
+         "tool": "multiply",
+         "arguments": {
+           "a": 2,
+           "b": 3
+         }
+       }
+     ],
+     "message": "Pipeline halted: a failed call cannot execute another tool."
+   }
+   ```
+
+Run the unit tests:
+```bash
+python3 -m unittest discover -s 17-ai-agents/applied-labs/r40-t022 -p "test_*.py" -v
+```
+
 ## Learning goals
 
 After taking this lesson, you'll be able to:
