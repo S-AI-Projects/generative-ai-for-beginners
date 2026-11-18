@@ -1,0 +1,66 @@
+{
+  "task": "R40-T023",
+  "program": "16-open-source-models/applied-labs/r40-t023/example.py",
+  "scenarios": [
+    {
+      "id": "SCENARIO_NORMAL",
+      "type": "normal",
+      "command": "python3 16-open-source-models/applied-labs/r40-t023/example.py --scenario normal",
+      "facts": {
+        "model_weights_public": true,
+        "training_datasets_public": true,
+        "evaluation_code_public": true,
+        "fine_tuning_code_public": true,
+        "training_metrics_public": true,
+        "osi_approved_license": true
+      },
+      "expected_decision": "OPEN_SOURCE",
+      "expected_exit_code": 0
+    },
+    {
+      "id": "SCENARIO_BOUNDARY",
+      "type": "boundary",
+      "command": "python3 16-open-source-models/applied-labs/r40-t023/example.py --scenario boundary",
+      "facts": {
+        "model_weights_public": true,
+        "training_datasets_public": false,
+        "evaluation_code_public": true,
+        "fine_tuning_code_public": true,
+        "training_metrics_public": false,
+        "osi_approved_license": false
+      },
+      "expected_decision": "OPEN_WEIGHTS",
+      "expected_exit_code": 0
+    },
+    {
+      "id": "SCENARIO_MISSING_INFO",
+      "type": "missing_information",
+      "command": "python3 16-open-source-models/applied-labs/r40-t023/example.py --scenario missing_info",
+      "facts": {
+        "model_weights_public": true,
+        "training_datasets_public": null,
+        "evaluation_code_public": true,
+        "fine_tuning_code_public": null,
+        "training_metrics_public": null,
+        "osi_approved_license": null
+      },
+      "expected_decision": "UNDETERMINED",
+      "expected_exit_code": 0
+    },
+    {
+      "id": "FULL_CHECK",
+      "type": "checker",
+      "command": "python3 16-open-source-models/applied-labs/r40-t023/example.py --check",
+      "expected_status": "success",
+      "expected_all_passed": true,
+      "expected_exit_code": 0
+    },
+    {
+      "id": "DELIBERATE_TAMPER",
+      "type": "tamper_verification",
+      "command": "python3 16-open-source-models/applied-labs/r40-t023/example.py --tamper-test",
+      "expected_error": "DecisionMismatchError",
+      "expected_exit_code": 1
+    }
+  ]
+}
