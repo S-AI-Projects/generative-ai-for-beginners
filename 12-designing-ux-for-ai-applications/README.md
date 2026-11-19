@@ -99,6 +99,95 @@ System errors are common with applications where the user might need assistance 
 
 AI applications are not perfect, therefore, they are bound to make mistakes. When designing your applications, you should ensure you create room for feedback from users and error handling in a way that is simple and easily explainable.
 
+### Applied Lab: Chat-View State Lifecycle & Scenario Assessment (R40-T030)
+
+To understand how AI chat applications maintain user trust through responsive state management, stable view identity, partial text preservation during stream drops, and boundary protections against late corrupted packets, explore the local hands-on lab:
+[Applied Lab — Chat-View State Lifecycle & Scenario Assessment (R40-T030)](./applied-labs/r40-t030/README.md?WT.mc_id=academic-105485-koreyst).
+
+**Classification & Scope Note (Simulation / Test Double):** This component is strictly a **local client-side chat-view state test double**, not a live cloud streaming service. It executes entirely locally using Python's standard library. It requires zero cloud credentials, no paid API keys, no local weights download, and no GPU hardware.
+
+#### Fixture and State Lifecycle Contract
+The local test fixture models:
+- **Stable Message ID:** `'msg-resp-001'` (persists unchanged through all state transitions).
+- **Sequential Streaming:** Chunk 1 (`"Hello, "`) and Chunk 2 (`"how can I assist you today?"`) append strictly in order to complete `"Hello, how can I assist you today?"`.
+- **Error Recovery:** An interruption during streaming preserves already-received text and appends `[ERROR: <reason>]`.
+- **Terminal State Invariant:** Any chunk arriving after stream completion or failure is rejected with `ChunkRejectedError`.
+- **Scenario Assessment:** Three applied questions evaluating output prediction under failure, diagnostic failure root-cause analysis, and boundary policy selection.
+
+#### Exact Invocations and Expected Output
+
+Run the decision table check across all canonical scenarios:
+
+```bash
+python3 12-designing-ux-for-ai-applications/applied-labs/r40-t030/example.py --check
+```
+
+Expected output (`exit 0`):
+
+```json
+{
+  "status": "success",
+  "total_scenarios": 3,
+  "passed_scenarios": 3,
+  "failed_scenarios": 0,
+  "all_passed": true,
+  "classification": "chat_view_state_simulation",
+  "scenarios": [
+    {
+      "scenario_id": "SCENARIO_NORMAL",
+      "scenario_type": "normal",
+      "expected_decision": "STATE_COMPLETE_SUCCESS",
+      "actual_decision": "STATE_COMPLETE_SUCCESS",
+      "expected_state": "complete",
+      "actual_state": "complete",
+      "matches_table": true,
+      "status": "PASS",
+      "message_id": "msg-resp-001",
+      "content": "Hello, how can I assist you today?",
+      "rationale": "Response 'msg-resp-001' initialized in PENDING state, sequentially appended 2 chunks in arrival order, and completed successfully with stable ID."
+    },
+    {
+      "scenario_id": "SCENARIO_ERROR",
+      "scenario_type": "error_recovery",
+      "expected_decision": "STATE_ERROR_RECOVERED",
+      "actual_decision": "STATE_ERROR_RECOVERED",
+      "expected_state": "error",
+      "actual_state": "error",
+      "matches_table": true,
+      "status": "PASS",
+      "message_id": "msg-resp-001",
+      "content": "Hello, [ERROR: Stream connection dropped]",
+      "rationale": "Response 'msg-resp-001' received chunk 1 ('Hello, ') before stream failed. The error preserved previously received text intact and appended error marker."
+    },
+    {
+      "scenario_id": "SCENARIO_BOUNDARY",
+      "scenario_type": "boundary_rejection",
+      "expected_decision": "CHUNK_AFTER_COMPLETION_REJECTED",
+      "actual_decision": "CHUNK_AFTER_COMPLETION_REJECTED",
+      "expected_state": "complete",
+      "actual_state": "complete",
+      "matches_table": true,
+      "status": "PASS",
+      "message_id": "msg-resp-001",
+      "content": "Hello, how can I assist you today?",
+      "rationale": "Response 'msg-resp-001' reached COMPLETE state. Incoming late chunk ' [Late chunk arriving after stream close]' was rejected with ChunkRejectedError, preserving the finalized response buffer without corruption."
+    }
+  ]
+}
+```
+
+Run the three applied scenario assessment questions:
+
+```bash
+python3 12-designing-ux-for-ai-applications/applied-labs/r40-t030/example.py --questions
+```
+
+Run the automated test suite:
+
+```bash
+python3 -m unittest discover -s 12-designing-ux-for-ai-applications/applied-labs/r40-t030 -p "test_*.py"
+```
+
 ## Assignment
 
 Take any AI apps you've built so far, consider implementing the below steps in your app:
