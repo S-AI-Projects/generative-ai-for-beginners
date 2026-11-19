@@ -1,0 +1,72 @@
+{
+  "task": "R40-T027",
+  "program": "07-building-chat-applications/applied-labs/r40-t027/example.py",
+  "test_module": "07-building-chat-applications/applied-labs/r40-t027/test_example.py",
+  "focus": "Model local pending, streaming, complete and error states for one response with a stable message ID. Two chunks append in order; an error preserves received text with an error marker; chunks after completion are rejected.",
+  "classification": "chat_view_state_simulation",
+  "fixture": {
+    "message_id": "msg-resp-001",
+    "chunks": [
+      "Hello, ",
+      "how can I assist you today?"
+    ],
+    "error_message": "Stream connection dropped",
+    "late_chunk": " [Late chunk arriving after stream close]"
+  },
+  "scenarios": [
+    {
+      "id": "SCENARIO_NORMAL",
+      "type": "normal",
+      "command": "python3 07-building-chat-applications/applied-labs/r40-t027/example.py --scenario normal",
+      "expected_decision": "STATE_COMPLETE_SUCCESS",
+      "expected_exit_code": 0,
+      "expected_state": "complete",
+      "expected_chunks_received": 2,
+      "expected_content": "Hello, how can I assist you today?",
+      "stable_id_verified": true,
+      "order_verified": true
+    },
+    {
+      "id": "SCENARIO_ERROR",
+      "type": "error_recovery",
+      "command": "python3 07-building-chat-applications/applied-labs/r40-t027/example.py --scenario error",
+      "expected_decision": "STATE_ERROR_RECOVERED",
+      "expected_exit_code": 0,
+      "expected_state": "error",
+      "expected_chunks_received": 1,
+      "expected_content": "Hello, [ERROR: Stream connection dropped]",
+      "preserved_prefix": "Hello, ",
+      "error_marker": "[ERROR: Stream connection dropped]",
+      "text_preserved": true
+    },
+    {
+      "id": "SCENARIO_BOUNDARY",
+      "type": "boundary_rejection",
+      "command": "python3 07-building-chat-applications/applied-labs/r40-t027/example.py --scenario boundary",
+      "expected_decision": "CHUNK_AFTER_COMPLETION_REJECTED",
+      "expected_exit_code": 0,
+      "expected_state": "complete",
+      "expected_chunks_received": 2,
+      "expected_content": "Hello, how can I assist you today?",
+      "rejection_verified": true,
+      "rejection_exception": "ChunkRejectedError"
+    },
+    {
+      "id": "SCENARIO_CHECK",
+      "type": "canonical_check",
+      "command": "python3 07-building-chat-applications/applied-labs/r40-t027/example.py --check",
+      "expected_exit_code": 0,
+      "expected_status": "success",
+      "expected_total_scenarios": 3,
+      "expected_passed_scenarios": 3,
+      "expected_failed_scenarios": 0,
+      "expected_all_passed": true
+    }
+  ],
+  "deliberate_tamper_config": {
+    "command": "python3 07-building-chat-applications/applied-labs/r40-t027/example.py --tamper",
+    "tampered_scenario": "SCENARIO_NORMAL",
+    "expected_exit_code": 1,
+    "expected_error_type": "DecisionMismatchError"
+  }
+}
