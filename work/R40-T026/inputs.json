@@ -1,0 +1,98 @@
+{
+  "task": "R40-T026",
+  "program": "20-mistral/applied-labs/r40-t026/example.py",
+  "test_module": "20-mistral/applied-labs/r40-t026/test_example.py",
+  "focus": "Implement a correct baseline, then extract one named responsibility. Keep the same contract and prove before/after equivalence on the fixture.",
+  "classification": "lexical_test_double",
+  "corpus_fixture": [
+    {
+      "doc_id": "A",
+      "text": "red apple"
+    },
+    {
+      "doc_id": "B",
+      "text": "green apple"
+    },
+    {
+      "doc_id": "C",
+      "text": "blue sky"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "SCENARIO_NORMAL",
+      "type": "normal",
+      "command": "python3 20-mistral/applied-labs/r40-t026/example.py --scenario normal",
+      "query": "red apple",
+      "expected_decision": "RETRIEVAL_SUCCESS_RANKED",
+      "expected_exit_code": 0,
+      "expected_doc_ids": [
+        "A",
+        "B"
+      ],
+      "expected_scores": [
+        2,
+        1
+      ],
+      "source_attribution_verified": true,
+      "tie_breaking_applied": false
+    },
+    {
+      "id": "SCENARIO_BOUNDARY",
+      "type": "boundary",
+      "command": "python3 20-mistral/applied-labs/r40-t026/example.py --scenario boundary",
+      "query": "ocean",
+      "expected_decision": "EMPTY_RESULT_NO_MATCH",
+      "expected_exit_code": 0,
+      "expected_doc_ids": [],
+      "expected_scores": [],
+      "source_attribution_verified": true,
+      "tie_breaking_applied": false
+    },
+    {
+      "id": "SCENARIO_TIEBREAK",
+      "type": "boundary",
+      "command": "python3 20-mistral/applied-labs/r40-t026/example.py --scenario tiebreak",
+      "query": "apple",
+      "expected_decision": "RETRIEVAL_TIEBREAK_RESOLVED",
+      "expected_exit_code": 0,
+      "expected_doc_ids": [
+        "A",
+        "B"
+      ],
+      "expected_scores": [
+        1,
+        1
+      ],
+      "source_attribution_verified": true,
+      "tie_breaking_applied": true
+    },
+    {
+      "id": "SCENARIO_EQUIVALENCE",
+      "type": "equivalence",
+      "command": "python3 20-mistral/applied-labs/r40-t026/example.py --prove-equivalence",
+      "queries": [
+        "red apple",
+        "ocean",
+        "apple",
+        "green apple",
+        "blue sky",
+        "red",
+        "green",
+        "blue",
+        "apple sky",
+        ""
+      ],
+      "expected_decision": "REFACTORING_EQUIVALENCE_PROVEN",
+      "expected_exit_code": 0,
+      "extracted_responsibility": "WordSetOverlapScorer",
+      "baseline_class": "BaselineLexicalRetriever",
+      "refactored_class": "RefactoredLexicalRetriever"
+    }
+  ],
+  "deliberate_tamper_config": {
+    "command": "python3 20-mistral/applied-labs/r40-t026/example.py --tamper",
+    "tampered_scenario": "SCENARIO_NORMAL",
+    "expected_exit_code": 1
+  }
+}
