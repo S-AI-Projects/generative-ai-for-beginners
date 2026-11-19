@@ -133,6 +133,110 @@ chat_response = client.complete(
 print(chat_response.choices[0].message.content)
 ```
 
+### Applied Lab: Lexical Retriever with Source Attribution and Equivalence Refactoring (R40-T026)
+
+To understand how retrieval systems normalize queries, assign document-level source attribution, deterministically resolve ranking ties, and handle empty search boundaries before generating prompts, explore the local hands-on lab:
+[Applied Lab — Lexical Retriever with Source Attribution and Equivalence Refactoring](./applied-labs/r40-t026/README.md?WT.mc_id=academic-105485-koreyst).
+
+**Classification & Scope Note (Lexical Test Double):** This component is strictly a **lexical test double**, not a production vector search. It executes entirely locally with Python's standard library using exact lowercase word-set overlap. It requires no vector embeddings, no vector database (FAISS/Chroma), no API keys, and no GPU hardware.
+
+#### Fixture and Retrieval Contract
+The local test fixture consists of three documents:
+- Document A: `"red apple"`
+- Document B: `"green apple"`
+- Document C: `"blue sky"`
+
+Retrieval contract rules:
+1. Normal query `"red apple"` matches Doc A (score 2) and Doc B (score 1), ranking A before B with source attribution; Doc C (0 overlap) is omitted.
+2. Boundary query `"ocean"` returns no match (`[]`), preventing hallucinated context.
+3. Tie-breaking query `"apple"` matches Doc A (score 1) and Doc B (score 1), deterministically ranking A before B by document ID.
+4. Refactoring focus: A monolithic `BaselineLexicalRetriever` is refactored by extracting `WordSetOverlapScorer`, with mathematical equivalence proven across all test queries.
+
+#### Exact Invocations and Expected Output
+
+Run the decision table check across all canonical scenarios:
+
+```bash
+python3 20-mistral/applied-labs/r40-t026/example.py --check
+```
+
+Expected output (`exit 0`):
+
+```json
+{
+  "status": "success",
+  "total_scenarios": 4,
+  "passed_scenarios": 4,
+  "failed_scenarios": 0,
+  "all_passed": true,
+  "classification": "lexical_test_double",
+  "scenarios": [
+    {
+      "scenario_id": "SCENARIO_NORMAL",
+      "scenario_type": "normal",
+      "expected_decision": "RETRIEVAL_SUCCESS_RANKED",
+      "actual_decision": "RETRIEVAL_SUCCESS_RANKED",
+      "matches_table": true,
+      "status": "PASS",
+      "doc_ids": [
+        "A",
+        "B"
+      ],
+      "scores": [
+        2,
+        1
+      ],
+      "rationale": "Query 'red apple' overlaps Doc A on {'red', 'apple'} (score 2) and Doc B on {'apple'} (score 1). Ranks A before B with source attribution; Doc C ('blue sky') has 0 overlap and is omitted."
+    },
+    {
+      "scenario_id": "SCENARIO_BOUNDARY",
+      "scenario_type": "boundary",
+      "expected_decision": "EMPTY_RESULT_NO_MATCH",
+      "actual_decision": "EMPTY_RESULT_NO_MATCH",
+      "matches_table": true,
+      "status": "PASS",
+      "doc_ids": [],
+      "scores": [],
+      "rationale": "Query 'ocean' has zero word overlap with any document in the corpus. The retriever cleanly returns an empty match set [], avoiding hallucination or irrelevant prompt context."
+    },
+    {
+      "scenario_id": "SCENARIO_TIEBREAK",
+      "scenario_type": "boundary",
+      "expected_decision": "RETRIEVAL_TIEBREAK_RESOLVED",
+      "actual_decision": "RETRIEVAL_TIEBREAK_RESOLVED",
+      "matches_table": true,
+      "status": "PASS",
+      "doc_ids": [
+        "A",
+        "B"
+      ],
+      "scores": [
+        1,
+        1
+      ],
+      "rationale": "Query 'apple' matches Doc A and Doc B with identical score 1. The tie-breaking rule deterministically ranks Doc A before Doc B using document ID order ('A' < 'B')."
+    },
+    {
+      "scenario_id": "SCENARIO_EQUIVALENCE",
+      "scenario_type": "equivalence",
+      "expected_decision": "REFACTORING_EQUIVALENCE_PROVEN",
+      "actual_decision": "REFACTORING_EQUIVALENCE_PROVEN",
+      "matches_table": true,
+      "status": "PASS",
+      "doc_ids": null,
+      "scores": null,
+      "rationale": "BaselineLexicalRetriever and RefactoredLexicalRetriever (with extracted WordSetOverlapScorer) produce 100% identical ranked results, document IDs, and scores across all fixture queries."
+    }
+  ]
+}
+```
+
+Run the automated test suite:
+
+```bash
+python3 -m unittest discover -s 20-mistral/applied-labs/r40-t026 -p "test_*.py"
+```
+
 ## Mistral Small 
 Mistral Small is another model in the Mistral family of models under the premier/enterprise category. As the name implies, this model is a Small Language Model (SLM). The advantages of using Mistral Small are that it is: 
 - Cost Saving compared to Mistral LLMs like Mistral Large and NeMo - 80% price drop
