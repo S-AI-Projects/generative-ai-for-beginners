@@ -174,6 +174,88 @@ Microsoft's approach to Responsible AI has identified six principles that should
 | Transparency           | AI systems should be understandable.                  | Provide clear documentation and reasoning for AI responses.            | Users are more likely to trust a system if they can understand how decisions are made. |
 | Accountability         | People should be accountable for AI systems.          | Establish a clear process for auditing and improving AI decisions.     | Enables ongoing improvement and corrective measures in case of mistakes.               |
 
+### Applied Lab: Chat-View State Lifecycle and Streaming Recovery (R40-T027)
+
+To understand how real-world chat interfaces manage the lifecycle of streamed responses, maintain stable DOM/view identity, preserve partial text during connection failures, and protect against late corrupted chunks, explore the local hands-on lab:
+[Applied Lab — Chat-View State Lifecycle and Streaming Recovery](./applied-labs/r40-t027/README.md?WT.mc_id=academic-105485-koreyst).
+
+**Classification & Scope Note (Simulation / Test Double):** This component is strictly a **local chat-view state test double**, not a live cloud streaming service. It executes entirely locally with Python's standard library. It requires no vector embeddings, no cloud credentials, no paid API keys, and no GPU hardware.
+
+#### Fixture and State Lifecycle Contract
+The local test fixture models:
+- Stable Message ID: `'msg-resp-001'` (persists through all state transitions).
+- Sequential Streaming: Chunk 1 (`"Hello, "`) and Chunk 2 (`"how can I assist you today?"`) append strictly in order to complete `"Hello, how can I assist you today?"`.
+- Error Recovery: An interruption during streaming preserves already-received text and appends `[ERROR: <reason>]`.
+- Terminal State Invariant: Any chunk arriving after stream completion is rejected with `ChunkRejectedError`.
+
+#### Exact Invocations and Expected Output
+
+Run the decision table check across all canonical scenarios:
+
+```bash
+python3 07-building-chat-applications/applied-labs/r40-t027/example.py --check
+```
+
+Expected output (`exit 0`):
+
+```json
+{
+  "status": "success",
+  "total_scenarios": 3,
+  "passed_scenarios": 3,
+  "failed_scenarios": 0,
+  "all_passed": true,
+  "classification": "chat_view_state_simulation",
+  "scenarios": [
+    {
+      "scenario_id": "SCENARIO_NORMAL",
+      "scenario_type": "normal",
+      "expected_decision": "STATE_COMPLETE_SUCCESS",
+      "actual_decision": "STATE_COMPLETE_SUCCESS",
+      "expected_state": "complete",
+      "actual_state": "complete",
+      "matches_table": true,
+      "status": "PASS",
+      "message_id": "msg-resp-001",
+      "content": "Hello, how can I assist you today?",
+      "rationale": "Response 'msg-resp-001' initialized in PENDING state, sequentially appended 2 chunks in arrival order, and completed successfully with stable ID."
+    },
+    {
+      "scenario_id": "SCENARIO_ERROR",
+      "scenario_type": "error_recovery",
+      "expected_decision": "STATE_ERROR_RECOVERED",
+      "actual_decision": "STATE_ERROR_RECOVERED",
+      "expected_state": "error",
+      "actual_state": "error",
+      "matches_table": true,
+      "status": "PASS",
+      "message_id": "msg-resp-001",
+      "content": "Hello, [ERROR: Stream connection dropped]",
+      "rationale": "Response 'msg-resp-001' received chunk 1 ('Hello, ') before stream failed. The error preserved previously received text intact and appended error marker."
+    },
+    {
+      "scenario_id": "SCENARIO_BOUNDARY",
+      "scenario_type": "boundary_rejection",
+      "expected_decision": "CHUNK_AFTER_COMPLETION_REJECTED",
+      "actual_decision": "CHUNK_AFTER_COMPLETION_REJECTED",
+      "expected_state": "complete",
+      "actual_state": "complete",
+      "matches_table": true,
+      "status": "PASS",
+      "message_id": "msg-resp-001",
+      "content": "Hello, how can I assist you today?",
+      "rationale": "Response 'msg-resp-001' reached COMPLETE state. Incoming late chunk ' [Late chunk arriving after stream close]' was rejected with ChunkRejectedError, preserving the finalized response buffer without corruption."
+    }
+  ]
+}
+```
+
+Run the automated test suite:
+
+```bash
+python3 -m unittest discover -s 07-building-chat-applications/applied-labs/r40-t027 -p "test_*.py"
+```
+
 ## Assignment
 
 See [assignment](./python?WT.mc_id=academic-105485-koreyst). It will take you through a series of exercises from running your first chat prompts, to classifying and summarizing text and more. Notice that the assignments are available in different programming languages!
