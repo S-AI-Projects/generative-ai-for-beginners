@@ -16,6 +16,94 @@ In this chapter, you will:
 - Build a text generation app using openai.
 - Understand how to use concepts like prompt, temperature, and tokens to build a text generation app.
 
+### Applied Lab: Text Generation Pipeline Decisions, State Tracing, and Invariant Verification (R40-T024)
+
+To understand how text generation applications manage request configuration, parameter compatibility, and multi-step prompt chaining, explore the local hands-on lab:
+[Applied Lab — Text Generation Pipeline Governance, State Tracing, and Invariant Verification](./applied-labs/r40-t024/README.md?WT.mc_id=academic-105485-koreyst).
+
+This lab implements a worked three-scenario decision framework with step-by-step state tracing:
+1. **Discrete State Machine:** Records intermediate states across 5 pipeline stages (Validation & Config, Prompt Construction, Primary Generation, Context Chaining, and Final Assembly).
+2. **Formal Invariant Verification:** Tests mathematical and logical invariants linking intermediate state to final output (Token Conservation, Allergen Exclusion, Context Chaining Lineage, and Terminal State Monotonicity).
+3. **Decision Table Checker:** Validates a canonical decision table covering a **normal scenario** (Microsoft Foundry reasoning model `gpt-5-mini` using prompt engineering without temperature sampling), a **boundary scenario** (open sampling model `Llama-3.3-70B-Instruct` operating at maximum `temperature=1.0` and tight token capacity), and a **missing-information scenario** (missing environment secrets, invalid parameters, and missing prompt facts).
+
+**Scope Note (Simulation/Mock):** This is a simulated local contract fixture running entirely with Python's standard library. It requires no model downloads, paid provider credentials, or GPU hardware.
+
+#### Exact Invocations and Expected Output
+
+Run the decision table checker across all canonical scenarios:
+
+```bash
+python3 06-text-generation-apps/applied-labs/r40-t024/example.py --check
+```
+
+Expected output (`exit 0`):
+
+```json
+{
+  "status": "success",
+  "total_scenarios": 3,
+  "passed_scenarios": 3,
+  "failed_scenarios": 0,
+  "all_passed": true,
+  "scenarios": [
+    {
+      "scenario_id": "SCENARIO_NORMAL",
+      "scenario_type": "normal",
+      "model_id": "gpt-5-mini",
+      "expected_decision": "EXECUTE_REASONING_PIPELINE",
+      "actual_decision": "EXECUTE_REASONING_PIPELINE",
+      "matches_table": true,
+      "rationale_valid": true,
+      "missing_keywords": [],
+      "invariants_hold": true,
+      "total_tokens_consumed": 350,
+      "token_budget": 1200,
+      "status": "PASS",
+      "rationale": "Successfully executed reasoning model 'gpt-5-mini' pipeline. In accordance with Lesson 06, temperature sampling was omitted, API credentials were authenticated via environment variables, and two-step context chaining safely synthesized recipes and shopping list within the 1200 token budget. Negative filter 'garlic' was strictly maintained across all intermediate states.",
+      "state_trace_steps": 5
+    },
+    {
+      "scenario_id": "SCENARIO_BOUNDARY",
+      "scenario_type": "boundary",
+      "model_id": "Llama-3.3-70B-Instruct",
+      "expected_decision": "EXECUTE_SAMPLING_BOUNDARY_PIPELINE",
+      "actual_decision": "EXECUTE_SAMPLING_BOUNDARY_PIPELINE",
+      "matches_table": true,
+      "rationale_valid": true,
+      "missing_keywords": [],
+      "invariants_hold": true,
+      "total_tokens_consumed": 150,
+      "token_budget": 150,
+      "status": "PASS",
+      "rationale": "Successfully executed sampling model 'Llama-3.3-70B-Instruct' at the creative temperature boundary of 1.0. Under the tight token budget limit of 150 tokens, primary generation consumed 150 tokens (100% capacity), reaching the boundary threshold. In accordance with Lesson 06 token budgeting, secondary context chaining was safely bypassed to prevent quota overflow, and intermediate states confirm full invariant satisfaction.",
+      "state_trace_steps": 5
+    },
+    {
+      "scenario_id": "SCENARIO_MISSING_INFO",
+      "scenario_type": "missing_information",
+      "model_id": "gpt-5-mini",
+      "expected_decision": "HALT_MISSING_PREREQUISITES",
+      "actual_decision": "HALT_MISSING_PREREQUISITES",
+      "matches_table": true,
+      "rationale_valid": true,
+      "missing_keywords": [],
+      "invariants_hold": true,
+      "total_tokens_consumed": 0,
+      "token_budget": null,
+      "status": "PASS",
+      "rationale": "Execution safely halted at Step 1 due to missing or incompatible prerequisites: missing fields=['AZURE_OPENAI_API_KEY / OPENAI_API_KEY', 'AZURE_OPENAI_ENDPOINT', 'max_output_tokens', 'prompt_inputs.no_recipes', 'prompt_inputs.ingredients']; incompatible parameters=['temperature (reasoning models do not support temperature)']. Lesson 06 strictly requires separating secrets and API credentials via environment variables, specifying valid token limits, and avoiding sampling controls (temperature) on reasoning models.",
+      "state_trace_steps": 5
+    }
+  ]
+}
+```
+
+Run the automated test suite:
+
+```bash
+python3 -m unittest discover -s 06-text-generation-apps/applied-labs/r40-t024 -p "test_*.py"
+```
+
 ## Learning goals
 
 At the end of this lesson, you'll be able to:

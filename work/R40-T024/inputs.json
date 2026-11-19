@@ -1,0 +1,93 @@
+{
+  "task": "R40-T024",
+  "program": "06-text-generation-apps/applied-labs/r40-t024/example.py",
+  "test_module": "06-text-generation-apps/applied-labs/r40-t024/test_example.py",
+  "focus": "Record the intermediate state after each step and test the invariant linking that state to the final output",
+  "scenarios": [
+    {
+      "id": "SCENARIO_NORMAL",
+      "type": "normal",
+      "command": "python3 06-text-generation-apps/applied-labs/r40-t024/example.py --scenario normal",
+      "model_id": "gpt-5-mini",
+      "model_family": "reasoning",
+      "facts": {
+        "api_key_env_var_set": true,
+        "api_endpoint_env_var_set": true,
+        "temperature": null,
+        "max_output_tokens": 1200,
+        "prompt_inputs": {
+          "no_recipes": 3,
+          "ingredients": [
+            "chicken",
+            "potatoes",
+            "carrots"
+          ],
+          "filter_exclusion": "garlic"
+        },
+        "chain_shopping_list": true
+      },
+      "expected_decision": "EXECUTE_REASONING_PIPELINE",
+      "expected_exit_code": 0
+    },
+    {
+      "id": "SCENARIO_BOUNDARY",
+      "type": "boundary",
+      "command": "python3 06-text-generation-apps/applied-labs/r40-t024/example.py --scenario boundary",
+      "model_id": "Llama-3.3-70B-Instruct",
+      "model_family": "sampling",
+      "facts": {
+        "api_key_env_var_set": true,
+        "api_endpoint_env_var_set": true,
+        "temperature": 1.0,
+        "max_output_tokens": 150,
+        "prompt_inputs": {
+          "no_recipes": 1,
+          "ingredients": [
+            "apple",
+            "flour"
+          ],
+          "filter_exclusion": "sugar"
+        },
+        "chain_shopping_list": true
+      },
+      "expected_decision": "EXECUTE_SAMPLING_BOUNDARY_PIPELINE",
+      "expected_exit_code": 0
+    },
+    {
+      "id": "SCENARIO_MISSING_INFO",
+      "type": "missing_information",
+      "command": "python3 06-text-generation-apps/applied-labs/r40-t024/example.py --scenario missing",
+      "model_id": "gpt-5-mini",
+      "model_family": "reasoning",
+      "facts": {
+        "api_key_env_var_set": false,
+        "api_endpoint_env_var_set": false,
+        "temperature": 0.7,
+        "max_output_tokens": null,
+        "prompt_inputs": {
+          "no_recipes": null,
+          "ingredients": null,
+          "filter_exclusion": null
+        },
+        "chain_shopping_list": false
+      },
+      "expected_decision": "HALT_MISSING_PREREQUISITES",
+      "expected_exit_code": 0
+    },
+    {
+      "id": "FULL_CHECK",
+      "type": "checker",
+      "command": "python3 06-text-generation-apps/applied-labs/r40-t024/example.py --check",
+      "expected_status": "success",
+      "expected_all_passed": true,
+      "expected_exit_code": 0
+    },
+    {
+      "id": "DELIBERATE_TAMPER",
+      "type": "tamper_verification",
+      "command": "python3 06-text-generation-apps/applied-labs/r40-t024/example.py --deliberate-tamper SCENARIO_NORMAL",
+      "expected_error": "DecisionMismatchError",
+      "expected_exit_code": 1
+    }
+  ]
+}
