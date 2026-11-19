@@ -156,6 +156,89 @@ When you run the notebook, you'll be prompted to enter a query. The input box wi
 
 ![Input box for the user to input a query](./images/notebook-search.png?WT.mc_id=academic-105485-koreyst)
 
+### Applied Lab: Ranked Search with Stable Ties (R40-T028)
+
+To explore the mechanics of token overlap scoring, source ID provenance attribution, minimum-score threshold filtering, and deterministic stable tie-breaking on tied relevance scores, see the self-contained local lab:
+[Applied Lab — Ranked Search with Stable Ties (R40-T028)](./applied-labs/r40-t028/README.md?WT.mc_id=academic-105485-koreyst).
+
+**Classification & Scope Note (Simulation / Test Double):** This component is strictly a **local ranked retrieval test double**, not a cloud vector search service. It executes entirely locally with Python's standard library. It requires no vector embeddings, no cloud credentials, no paid API keys, and no GPU hardware.
+
+#### Fixture and Retrieval Contract
+The local test fixture models:
+- Small Local Corpus:
+  - `doc-01`: `"red apple"`
+  - `doc-02`: `"red berry"`
+  - `doc-03`: `"blue sky"`
+- Scoring & Ties: Query `"red"` matches `"red apple"` and `"red berry"` equally (`score = 1.0`). Stable ID order (`doc-01` before `doc-02`) breaks the tie deterministically.
+- Threshold Cutoff: `min_score = 0.1` ensures `"blue sky"` (score `0.0`) is strictly omitted.
+- Provenance: Returned results return the source ID (`id`), retrieval score (`score`), and document text (`text`).
+- Error Resilience & Recovery: Missing/invalid query inputs raise structured `InvalidQueryError` with remediation guidance, leaving engine state intact and enabling clean recovery on the next valid query.
+
+#### Exact Invocations and Expected Output
+
+Run the decision table check across all canonical scenarios:
+
+```bash
+python3 08-building-search-applications/applied-labs/r40-t028/example.py --check
+```
+
+Expected output (`exit 0`):
+
+```json
+{
+  "status": "success",
+  "total_scenarios": 4,
+  "passed_scenarios": 4,
+  "failed_scenarios": 0,
+  "all_passed": true,
+  "classification": "ranked_search_simulation",
+  "scenarios": [
+    {
+      "scenario_id": "SCENARIO_NORMAL",
+      "scenario_type": "normal",
+      "expected_decision": "RANKED_SEARCH_SUCCESS",
+      "actual_decision": "RANKED_SEARCH_SUCCESS",
+      "matches_table": true,
+      "status": "PASS",
+      "rationale": "Query 'red' matched 'red apple' (doc-01) and 'red berry' (doc-02) equally with score 1.0. Stable ID order ('doc-01' < 'doc-02') broke the tie deterministically. 'blue sky' (doc-03) scored 0.0 and was omitted below min_score 0.1."
+    },
+    {
+      "scenario_id": "SCENARIO_FAILURE",
+      "scenario_type": "invalid_data_rejection",
+      "expected_decision": "INVALID_DATA_REJECTED",
+      "actual_decision": "INVALID_DATA_REJECTED",
+      "matches_table": true,
+      "status": "PASS",
+      "rationale": "Missing search query '' was safely rejected with InvalidQueryError. A structured diagnostic reason and recovery suggestion were provided, and the internal search index remained intact without state corruption."
+    },
+    {
+      "scenario_id": "SCENARIO_RECOVERY",
+      "scenario_type": "failure_and_recovery",
+      "expected_decision": "ERROR_RECOVERY_SUCCESS",
+      "actual_decision": "ERROR_RECOVERY_SUCCESS",
+      "matches_table": true,
+      "status": "PASS",
+      "rationale": "Engine intercepted invalid empty query with documented InvalidQueryError, maintained internal state consistency, and cleanly recovered on next valid query 'red', returning accurate ranked results with stable tie-breaking."
+    },
+    {
+      "scenario_id": "SCENARIO_BOUNDARY",
+      "scenario_type": "boundary_invariants",
+      "expected_decision": "BOUNDARY_INVARIANTS_VERIFIED",
+      "actual_decision": "BOUNDARY_INVARIANTS_VERIFIED",
+      "matches_table": true,
+      "status": "PASS",
+      "rationale": "All boundary invariants verified: exact score tie (1.0 == 1.0), insertion order invariance ('doc-01' precedes 'doc-02' even when indexed second), strict zero-score omission below threshold, and graceful empty list for zero matches."
+    }
+  ]
+}
+```
+
+Run the automated test suite:
+
+```bash
+python3 -m unittest discover -s 08-building-search-applications/applied-labs/r40-t028 -p "test_*.py"
+```
+
 ## Great Work! Continue Your Learning
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!
