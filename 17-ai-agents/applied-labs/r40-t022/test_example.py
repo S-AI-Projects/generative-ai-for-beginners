@@ -20,6 +20,9 @@ import sys
 import unittest
 from typing import Any, Dict, List
 
+# Ensure lab directory is on path for direct test execution and unittest discovery
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from example import (
     ALLOWED_TOOLS,
     TOOL_REGISTRY,

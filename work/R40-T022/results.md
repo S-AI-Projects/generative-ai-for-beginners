@@ -387,7 +387,7 @@ test_allowed_tools_pass (test_example.TestToolAllowlist.test_allowed_tools_pass)
 test_unknown_tools_raise_unknown_tool_error (test_example.TestToolAllowlist.test_unknown_tools_raise_unknown_tool_error) ... ok
 
 ----------------------------------------------------------------------
-Ran 29 tests in 0.150s
+Ran 29 tests in 0.184s
 
 OK
 ```
