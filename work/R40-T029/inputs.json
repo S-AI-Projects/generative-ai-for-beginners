@@ -1,0 +1,89 @@
+{
+  "task": "R40-T029",
+  "program": "21-meta/applied-labs/r40-t029/example.py",
+  "test_module": "21-meta/applied-labs/r40-t029/test_example.py",
+  "focus": "Select eligible entries from a local synthetic model manifest using explicit RAM and context requirements; report why excluded entries fail. Fixture A needs RAM4/context2048, B RAM8/context4096; budget RAM6 and requested context1024 admits only A. Values are invented teaching fixtures, not claims about the named real models. Focus: Compare three small controlled configurations or input sizes using a metric appropriate to this contract. Report correctness and the observed trade-off without claiming real-world model accuracy.",
+  "classification": "synthetic_model_manifest_selection_simulation",
+  "manifest_fixtures": [
+    {
+      "model_id": "model-a",
+      "name": "Synthetic Llama Edge 4B (Fixture A)",
+      "min_ram_gb": 4.0,
+      "max_context_tokens": 2048,
+      "description": "Invented teaching fixture A: needs RAM 4 GB and context 2048 tokens."
+    },
+    {
+      "model_id": "model-b",
+      "name": "Synthetic Llama Mid 8B (Fixture B)",
+      "min_ram_gb": 8.0,
+      "max_context_tokens": 4096,
+      "description": "Invented teaching fixture B: needs RAM 8 GB and context 4096 tokens."
+    }
+  ],
+  "canonical_budget": {
+    "budget_ram_gb": 6.0,
+    "requested_context_tokens": 1024
+  },
+  "scenarios": [
+    {
+      "id": "SCENARIO_NORMAL",
+      "type": "normal",
+      "command": "python3 21-meta/applied-labs/r40-t029/example.py --scenario normal",
+      "expected_decision": "SELECTIVE_ADMISSION_SUCCESS",
+      "expected_exit_code": 0,
+      "expected_admitted_models": [
+        "model-a"
+      ],
+      "expected_excluded_models": [
+        "model-b"
+      ],
+      "expected_admission_rate_pct": 50.0,
+      "fixture_b_exclusion_reason_code": "RAM_EXCEEDS_BUDGET"
+    },
+    {
+      "id": "SCENARIO_BOUNDARY",
+      "type": "boundary",
+      "command": "python3 21-meta/applied-labs/r40-t029/example.py --scenario boundary",
+      "expected_decision": "BOUNDARY_VERIFICATION_SUCCESS",
+      "expected_exit_code": 0,
+      "exact_equality_admitted": [
+        "model-a"
+      ],
+      "stepoff_admitted": []
+    },
+    {
+      "id": "SCENARIO_FAILURE",
+      "type": "input_validation_failure",
+      "command": "python3 21-meta/applied-labs/r40-t029/example.py --scenario failure",
+      "expected_decision": "INPUT_VALIDATION_HANDLED_CLEANLY",
+      "expected_exit_code": 0,
+      "expected_errors_caught": 3
+    },
+    {
+      "id": "SCENARIO_EXPERIMENT",
+      "type": "evaluation_experiment",
+      "command": "python3 21-meta/applied-labs/r40-t029/example.py --experiment",
+      "expected_decision": "EXPERIMENT_EVALUATION_SUCCESS",
+      "expected_exit_code": 0,
+      "total_configs_compared": 3,
+      "expected_all_correct": true
+    },
+    {
+      "id": "SCENARIO_CHECK",
+      "type": "canonical_check",
+      "command": "python3 21-meta/applied-labs/r40-t029/example.py --check",
+      "expected_exit_code": 0,
+      "expected_status": "success",
+      "expected_total_scenarios": 4,
+      "expected_passed_scenarios": 4,
+      "expected_failed_scenarios": 0,
+      "expected_all_passed": true
+    }
+  ],
+  "deliberate_tamper_config": {
+    "command": "python3 21-meta/applied-labs/r40-t029/example.py --tamper",
+    "tampered_scenario": "SCENARIO_NORMAL",
+    "expected_exit_code": 1,
+    "expected_error_type": "DecisionMismatchError"
+  }
+}
