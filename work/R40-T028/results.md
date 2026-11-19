@@ -356,7 +356,7 @@ test_zero_match_query (test_example.TestRankedSearchEngine.test_zero_match_query
 Query matching zero documents returns an empty list without error. ... ok
 
 ----------------------------------------------------------------------
-Ran 39 tests in 0.288s
+Ran 39 tests in 0.151s
 
 OK
 ```
