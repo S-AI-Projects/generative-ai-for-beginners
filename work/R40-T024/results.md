@@ -392,7 +392,7 @@ test_missing_info_scenario_decision_and_rationale (test_example.TestThreeScenari
 test_normal_scenario_decision_and_rationale (test_example.TestThreeScenarios.test_normal_scenario_decision_and_rationale) ... ok
 
 ----------------------------------------------------------------------
-Ran 28 tests in 0.143s
+Ran 28 tests in 0.139s
 
 OK
 ```
