@@ -1,0 +1,111 @@
+{
+  "task": "R40-T030",
+  "lesson": "12-designing-ux-for-ai-applications",
+  "classification": "chat_view_state_simulation",
+  "scope_note": "Local client-side chat-view state test double. Zero external cloud APIs, no weights download, no GPU requirements.",
+  "fixtures": {
+    "message_id": "msg-resp-001",
+    "chunk_1": "Hello, ",
+    "chunk_2": "how can I assist you today?",
+    "error_reason": "Stream connection dropped",
+    "late_chunk": " [Late chunk arriving after stream close]"
+  },
+  "invariants": [
+    "Stable Message Identity: message_id is immutable across all transitions.",
+    "Four Local States: pending -> streaming -> complete or error.",
+    "Ordered Concatenation: chunks append strictly in arrival order.",
+    "Error Preservation: previously received text is preserved with [ERROR: <reason>] appended.",
+    "Terminal State Immutability: chunks arriving after complete or error raise ChunkRejectedError."
+  ],
+  "scenarios": {
+    "normal": {
+      "scenario_id": "SCENARIO_NORMAL",
+      "cli_flag": "--scenario normal",
+      "expected_decision": "STATE_COMPLETE_SUCCESS",
+      "expected_state": "complete",
+      "expected_content": "Hello, how can I assist you today?",
+      "expected_chunks_received": 2,
+      "expected_exit_code": 0
+    },
+    "error": {
+      "scenario_id": "SCENARIO_ERROR",
+      "cli_flag": "--scenario error",
+      "expected_decision": "STATE_ERROR_RECOVERED",
+      "expected_state": "error",
+      "expected_content": "Hello, [ERROR: Stream connection dropped]",
+      "expected_chunks_received": 1,
+      "expected_exit_code": 0
+    },
+    "boundary": {
+      "scenario_id": "SCENARIO_BOUNDARY",
+      "cli_flag": "--scenario boundary",
+      "expected_decision": "CHUNK_AFTER_COMPLETION_REJECTED",
+      "expected_state": "complete",
+      "expected_content": "Hello, how can I assist you today?",
+      "expected_rejection_exception": "ChunkRejectedError",
+      "expected_exit_code": 0
+    }
+  },
+  "applied_questions": {
+    "question_1": {
+      "question_id": "Q1_PREDICT_OUTPUT",
+      "focus_area": "predict_an_output",
+      "title": "Predict Output Under Mid-Stream Network Interruption",
+      "prompt": "A response is initiated with message ID 'msg-resp-001' in PENDING state. Chunk 1 ('Hello, ') arrives successfully. Before Chunk 2 can be received, the stream aborts with error 'Stream connection dropped'. What is the exact final state and content buffer of 'msg-resp-001'?",
+      "options": {
+        "A": "state='error', content='' (Buffer cleared to avoid showing incomplete text)",
+        "B": "state='error', content='Hello, [ERROR: Stream connection dropped]' (Text preserved + marker appended)",
+        "C": "state='complete', content='Hello, ' (Truncated stream coerced to complete)",
+        "D": "state='pending', content='Hello, ' (State remains pending awaiting reconnect)"
+      },
+      "correct_option": "B",
+      "factual_answer": {
+        "message_id": "msg-resp-001",
+        "state": "error",
+        "content": "Hello, [ERROR: Stream connection dropped]",
+        "chunks_received": 1
+      },
+      "rationale": "In AI user experience design (Lesson 12: Reliability & Transparency), partial stream failures must never discard already-rendered tokens. Preserving previously received text retains immediate utility for the user, while an explicit in-place error marker explains the failure without silent data loss or disruptive layout collapse."
+    },
+    "question_2": {
+      "question_id": "Q2_DIAGNOSE_FAILURE",
+      "focus_area": "diagnose_a_failure",
+      "title": "Diagnose Late Chunk Arrival on Finalized Message",
+      "prompt": "A client chat-view component successfully finalizes 'msg-resp-001' after receiving Chunk 1 ('Hello, ') and Chunk 2 ('how can I assist you today?'), entering COMPLETE state. A delayed network packet subsequently attempts to deliver ' [Late chunk arriving after stream close]'. The application raises ChunkRejectedError. What is the root cause of this failure and what UX invariant does it enforce?",
+      "options": {
+        "A": "Root Cause: Network packet payload size exceeded max buffer limit.",
+        "B": "Root Cause: Attempted mutation of a sealed message in terminal COMPLETE state; enforces transcript immutability.",
+        "C": "Root Cause: HTTP 404 stream endpoint not found on server.",
+        "D": "Root Cause: Message ID mismatch between client session and server socket."
+      },
+      "correct_option": "B",
+      "factual_answer": {
+        "exception_type": "ChunkRejectedError",
+        "root_cause": "Attempted buffer append on message already in terminal COMPLETE state",
+        "invariant_enforced": "Terminal state immutability protects finalized conversation history from out-of-order race conditions.",
+        "final_buffer_preserved": "Hello, how can I assist you today?"
+      },
+      "rationale": "In asynchronous streaming architectures, network retries or lagged transport packets can arrive after a completion event. Permitting post-completion appends causes text flickering, transcript corruption, and broken user trust. The state machine must enforce terminal sealing: once COMPLETE or ERROR is reached, the buffer is immutable."
+    },
+    "question_3": {
+      "question_id": "Q3_CHOOSE_BOUNDARY_POLICY",
+      "focus_area": "choose_boundary_policy",
+      "title": "Choose Boundary Policy for Terminal State Chunk Interceptions",
+      "prompt": "When designing the client chat-view state manager, how should incoming chunks arriving after a terminal state (COMPLETE or ERROR) be handled at the system boundary? Choose the most robust boundary policy.",
+      "options": {
+        "A": "POLICY_SILENT_DISCARD: Discard late chunks silently without raising exceptions or logging.",
+        "B": "POLICY_UNCONDITIONAL_APPEND: Append all arriving chunks unconditionally whenever they arrive.",
+        "C": "POLICY_EXPLICIT_REJECTION: Raise ChunkRejectedError immediately (fail-fast) while preserving finalized buffer.",
+        "D": "POLICY_RESET_PENDING: Reset message state back to PENDING and resume streaming from scratch."
+      },
+      "correct_option": "C",
+      "factual_answer": {
+        "chosen_policy": "POLICY_EXPLICIT_REJECTION",
+        "exception": "ChunkRejectedError",
+        "buffer_action": "NO_MUTATION",
+        "system_behavior": "Fail-fast notification to monitoring/telemetry while preserving user-visible transcript integrity."
+      },
+      "rationale": "Silent discard (Policy A) masks transport protocol bugs and duplicate delivery defects from telemetry. Unconditional append (Policy B) causes race condition corruptions. Resetting (Policy D) destroys existing conversational context. Explicit rejection (Policy C) enforces fail-fast boundaries, guarantees buffer immutability, and provides observable diagnostic signals."
+    }
+  }
+}
