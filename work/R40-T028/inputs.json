@@ -1,0 +1,98 @@
+{
+  "task": "R40-T028",
+  "program": "08-building-search-applications/applied-labs/r40-t028/example.py",
+  "test_module": "08-building-search-applications/applied-labs/r40-t028/test_example.py",
+  "focus": "Rank a small local corpus by token overlap, return score and source ID, and apply a minimum-score threshold. Query red matches red apple and red berry equally; stable ID order breaks the tie; blue sky scores zero and is omitted. Focus: Exercise a documented invalid/missing-data case, explain the error, and demonstrate recovery on the next valid input.",
+  "classification": "ranked_search_simulation",
+  "fixture": {
+    "corpus": [
+      {
+        "id": "doc-01",
+        "text": "red apple"
+      },
+      {
+        "id": "doc-02",
+        "text": "red berry"
+      },
+      {
+        "id": "doc-03",
+        "text": "blue sky"
+      }
+    ],
+    "query": "red",
+    "min_score": 0.1
+  },
+  "scenarios": [
+    {
+      "id": "SCENARIO_NORMAL",
+      "type": "normal",
+      "command": "python3 08-building-search-applications/applied-labs/r40-t028/example.py --scenario normal",
+      "expected_decision": "RANKED_SEARCH_SUCCESS",
+      "expected_exit_code": 0,
+      "expected_query": "red",
+      "expected_min_score": 0.1,
+      "expected_results_count": 2,
+      "expected_omitted_count": 1,
+      "expected_top_id": "doc-01",
+      "expected_top_score": 1.0,
+      "expected_second_id": "doc-02",
+      "expected_second_score": 1.0,
+      "expected_omitted_ids": [
+        "doc-03"
+      ],
+      "tie_broken_by_stable_id": true,
+      "zero_score_omitted": true
+    },
+    {
+      "id": "SCENARIO_FAILURE",
+      "type": "invalid_data_rejection",
+      "command": "python3 08-building-search-applications/applied-labs/r40-t028/example.py --scenario failure",
+      "expected_decision": "INVALID_DATA_REJECTED",
+      "expected_exit_code": 0,
+      "query": "",
+      "expected_error_type": "InvalidQueryError",
+      "expected_reason": "empty_query_string",
+      "rejection_verified": true,
+      "engine_state_preserved": true
+    },
+    {
+      "id": "SCENARIO_RECOVERY",
+      "type": "failure_and_recovery",
+      "command": "python3 08-building-search-applications/applied-labs/r40-t028/example.py --scenario recovery",
+      "expected_decision": "ERROR_RECOVERY_SUCCESS",
+      "expected_exit_code": 0,
+      "recovery_verified": true,
+      "state_consistency_maintained": true,
+      "expected_top_id": "doc-01",
+      "expected_second_id": "doc-02"
+    },
+    {
+      "id": "SCENARIO_BOUNDARY",
+      "type": "boundary_invariants",
+      "command": "python3 08-building-search-applications/applied-labs/r40-t028/example.py --scenario boundary",
+      "expected_decision": "BOUNDARY_INVARIANTS_VERIFIED",
+      "expected_exit_code": 0,
+      "tie_score_equality_verified": true,
+      "order_invariance_verified": true,
+      "zero_score_exclusion_verified": true,
+      "zero_match_query_handled": true
+    },
+    {
+      "id": "SCENARIO_CHECK",
+      "type": "canonical_check",
+      "command": "python3 08-building-search-applications/applied-labs/r40-t028/example.py --check",
+      "expected_exit_code": 0,
+      "expected_status": "success",
+      "expected_total_scenarios": 4,
+      "expected_passed_scenarios": 4,
+      "expected_failed_scenarios": 0,
+      "expected_all_passed": true
+    }
+  ],
+  "deliberate_tamper_config": {
+    "command": "python3 08-building-search-applications/applied-labs/r40-t028/example.py --tamper",
+    "tampered_scenario": "SCENARIO_NORMAL",
+    "expected_exit_code": 1,
+    "expected_error_type": "DecisionMismatchError"
+  }
+}
