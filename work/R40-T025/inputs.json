@@ -1,0 +1,145 @@
+{
+  "task": "R40-T025",
+  "name": "typed tool dispatch — offline service adapter [17-ai-agents]",
+  "program": "17-ai-agents/applied-labs/r40-t025/example.py",
+  "test_suite": "17-ai-agents/applied-labs/r40-t025/test_example.py",
+  "contract": {
+    "allowed_tools": [
+      "add",
+      "multiply"
+    ],
+    "argument_validation": "Strict numeric typing (finite int or float). Booleans, strings, non-finite floats, missing, and extraneous arguments are strictly rejected.",
+    "service_interface": "External dependency abstracted behind callable interface (ServiceBackend / ArithmeticServiceProtocol).",
+    "offline_adapter": "Deterministic in-memory local adapter (DeterministicOfflineAdapter) with zero network/cloud dependencies.",
+    "failure_isolation": "A failed call halts pipeline execution immediately; subsequent calls cannot execute another tool.",
+    "simulation_boundaries": "Explicit identification of 8 categories of real-service behaviors not established by this local offline mock."
+  },
+  "tests": [
+    {
+      "id": "1_normal_add",
+      "name": "Normal addition add(2, 3) -> 5",
+      "command": "python3 17-ai-agents/applied-labs/r40-t025/example.py --call '{\"tool\": \"add\", \"arguments\": {\"a\": 2, \"b\": 3}}'",
+      "expected": {
+        "status": "success",
+        "tool": "add",
+        "arguments": {
+          "a": 2,
+          "b": 3
+        },
+        "result": 5
+      },
+      "expected_exit_code": 0
+    },
+    {
+      "id": "2_normal_multiply",
+      "name": "Normal multiplication multiply(2, 3) -> 6",
+      "command": "python3 17-ai-agents/applied-labs/r40-t025/example.py --call '{\"tool\": \"multiply\", \"arguments\": {\"a\": 2, \"b\": 3}}'",
+      "expected": {
+        "status": "success",
+        "tool": "multiply",
+        "arguments": {
+          "a": 2,
+          "b": 3
+        },
+        "result": 6
+      },
+      "expected_exit_code": 0
+    },
+    {
+      "id": "3_unknown_tool",
+      "name": "Unknown tool structured error (divide)",
+      "command": "python3 17-ai-agents/applied-labs/r40-t025/example.py --call '{\"tool\": \"divide\", \"arguments\": {\"a\": 6, \"b\": 2}}'",
+      "expected": {
+        "status": "error",
+        "tool": "divide",
+        "error": {
+          "type": "UnknownToolError",
+          "code": "TOOL_NOT_ALLOWED"
+        }
+      },
+      "expected_exit_code": 1
+    },
+    {
+      "id": "4_string_argument_a",
+      "name": "String argument 'a' structured error (a = '2')",
+      "command": "python3 17-ai-agents/applied-labs/r40-t025/example.py --call '{\"tool\": \"add\", \"arguments\": {\"a\": \"2\", \"b\": 3}}'",
+      "expected": {
+        "status": "error",
+        "tool": "add",
+        "error": {
+          "type": "ValidationError",
+          "code": "INVALID_ARGUMENT_TYPE"
+        }
+      },
+      "expected_exit_code": 1
+    },
+    {
+      "id": "5_pipeline_failure_halting",
+      "name": "Pipeline failure halting and subsequent tool isolation",
+      "command": "python3 17-ai-agents/applied-labs/r40-t025/example.py --pipeline '[{\"tool\": \"add\", \"arguments\": {\"a\": \"invalid\", \"b\": 3}}, {\"tool\": \"multiply\", \"arguments\": {\"a\": 2, \"b\": 3}}]'",
+      "expected": {
+        "status": "error",
+        "pipeline_halted": true,
+        "completed_steps": 0,
+        "failed_step_index": 0,
+        "aborted_calls_count": 1
+      },
+      "expected_exit_code": 1
+    },
+    {
+      "id": "6_boundary_zeros",
+      "name": "Boundary case: Zeros add(0, 0) -> 0",
+      "command": "python3 17-ai-agents/applied-labs/r40-t025/example.py --call '{\"tool\": \"add\", \"arguments\": {\"a\": 0, \"b\": 0}}'",
+      "expected": {
+        "status": "success",
+        "tool": "add",
+        "result": 0
+      },
+      "expected_exit_code": 0
+    },
+    {
+      "id": "7_boundary_negative_numbers",
+      "name": "Boundary case: Negative arithmetic multiply(-2, 3) -> -6",
+      "command": "python3 17-ai-agents/applied-labs/r40-t025/example.py --call '{\"tool\": \"multiply\", \"arguments\": {\"a\": -2, \"b\": 3}}'",
+      "expected": {
+        "status": "success",
+        "tool": "multiply",
+        "result": -6
+      },
+      "expected_exit_code": 0
+    },
+    {
+      "id": "8_boundary_booleans_rejected",
+      "name": "Boundary decision: Booleans strictly rejected",
+      "command": "python3 17-ai-agents/applied-labs/r40-t025/example.py --call '{\"tool\": \"add\", \"arguments\": {\"a\": true, \"b\": 3}}'",
+      "expected": {
+        "status": "error",
+        "error": {
+          "type": "ValidationError",
+          "code": "INVALID_ARGUMENT_TYPE"
+        }
+      },
+      "expected_exit_code": 1
+    },
+    {
+      "id": "9_real_service_gaps_introspection",
+      "name": "Real-service gaps introspection (--show-service-gaps)",
+      "command": "python3 17-ai-agents/applied-labs/r40-t025/example.py --show-service-gaps",
+      "expected": {
+        "scope": "offline_service_adapter_contract_fixture",
+        "categories_count": 8
+      },
+      "expected_exit_code": 0
+    },
+    {
+      "id": "10_deliberate_wrong_result_verification",
+      "name": "Deliberate wrong result adapter assertion failure check",
+      "command": "python3 17-ai-agents/applied-labs/r40-t025/example.py --adapter deliberate-wrong --call '{\"tool\": \"add\", \"arguments\": {\"a\": 2, \"b\": 3}}'",
+      "expected": {
+        "status": "success",
+        "result": 999
+      },
+      "expected_exit_code": 0
+    }
+  ]
+}

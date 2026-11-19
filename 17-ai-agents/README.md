@@ -10,6 +10,154 @@ The lesson will cover the following areas:
 - Exploring five different AI Agent Frameworks - What makes them unique?
 - Applying these AI Agents to different use cases - When should we use AI Agents?
 
+### Applied Lab: Typed Tool Dispatch — Offline Service Adapter (R40-T025)
+
+To explore how agents safely interface with external dependencies and enforce runtime security boundaries, see the hands-on contract fixture:
+[Applied Lab — Typed Tool Dispatch: Offline Service Adapter](./applied-labs/r40-t025/README.md?WT.mc_id=academic-105485-koreyst).
+
+In AI agent frameworks (such as LangChain, AutoGen, and Microsoft Agent Framework), models propose actions via structured JSON tool requests. Before calling any backend, the agent runtime must enforce defensive dispatch:
+- **Explicit Allowlist:** Only declared tools (`add` and `multiply`) are permitted; unpermitted tools return a structured `UnknownToolError` (`TOOL_NOT_ALLOWED`).
+- **Strict Numeric Argument Validation:** Parameters `a` and `b` must be finite numbers (`int` or `float`). Strings (`"2"`), booleans (`True`/`False`), and non-finite floats (`NaN`, `Infinity`) are rejected with a structured `ValidationError`.
+- **Execution Halting & Failure Isolation:** In multi-step agent plans, a failed call immediately halts execution—a failed call cannot execute another tool.
+- **Callable Interface & Offline Service Adapter:** External dependencies (e.g. remote calculator services or MCP tools) are placed behind a callable interface (`ServiceBackend` / `ArithmeticServiceProtocol`). A deterministic local adapter (`DeterministicOfflineAdapter`) executes arithmetic in-memory without network, cloud credentials, or GPU dependencies.
+- **Simulation / Mock Boundaries:** This is a local contract fixture demonstrating dispatch and adapter mechanics; it is **not** a full Model Context Protocol (MCP) transport implementation. This deterministic offline mock executes in-process and does **not** establish real-service characteristics such as network latency/jitter, packet drops, cloud authentication/IAM, rate limits (HTTP 429), distributed state consistency, downstream 5xx outages, or stochastic LLM hallucination drift.
+
+#### Exact Invocations and Expected Output
+
+1. **Successful Addition (`add(2, 3) -> 5`):**
+   ```bash
+   python3 17-ai-agents/applied-labs/r40-t025/example.py --call '{"tool": "add", "arguments": {"a": 2, "b": 3}}'
+   ```
+   Expected output (`exit 0`):
+   ```json
+   {
+     "status": "success",
+     "tool": "add",
+     "arguments": {
+       "a": 2,
+       "b": 3
+     },
+     "result": 5
+   }
+   ```
+
+2. **Successful Multiplication (`multiply(2, 3) -> 6`):**
+   ```bash
+   python3 17-ai-agents/applied-labs/r40-t025/example.py --call '{"tool": "multiply", "arguments": {"a": 2, "b": 3}}'
+   ```
+   Expected output (`exit 0`):
+   ```json
+   {
+     "status": "success",
+     "tool": "multiply",
+     "arguments": {
+       "a": 2,
+       "b": 3
+     },
+     "result": 6
+   }
+   ```
+
+3. **Unknown Tool Error:**
+   ```bash
+   python3 17-ai-agents/applied-labs/r40-t025/example.py --call '{"tool": "divide", "arguments": {"a": 6, "b": 2}}'
+   ```
+   Expected output (`exit 1`):
+   ```json
+   {
+     "status": "error",
+     "error": {
+       "type": "UnknownToolError",
+       "code": "TOOL_NOT_ALLOWED",
+       "message": "Tool 'divide' is not permitted in allowlist. Allowed tools: ['add', 'multiply']",
+       "details": {
+         "tool": "divide",
+         "allowed_tools": [
+           "add",
+           "multiply"
+         ]
+       }
+     },
+     "tool": "divide",
+     "arguments": {
+       "a": 6,
+       "b": 2
+     }
+   }
+   ```
+
+4. **String Argument Validation Error:**
+   ```bash
+   python3 17-ai-agents/applied-labs/r40-t025/example.py --call '{"tool": "add", "arguments": {"a": "2", "b": 3}}'
+   ```
+   Expected output (`exit 1`):
+   ```json
+   {
+     "status": "error",
+     "error": {
+       "type": "ValidationError",
+       "code": "INVALID_ARGUMENT_TYPE",
+       "message": "Argument 'a' must be a finite number (int or float), got str: \"2\"",
+       "details": {
+         "parameter": "a",
+         "expected": "finite number (int or float)",
+         "received_type": "str",
+         "received_value": "2"
+       }
+     },
+     "tool": "add",
+     "arguments": {
+       "a": "2",
+       "b": 3
+     }
+   }
+   ```
+
+5. **Pipeline Failure Halting & Isolation:**
+   ```bash
+   python3 17-ai-agents/applied-labs/r40-t025/example.py --pipeline '[{"tool": "add", "arguments": {"a": "invalid", "b": 3}}, {"tool": "multiply", "arguments": {"a": 2, "b": 3}}]'
+   ```
+   Expected output (`exit 1`):
+   ```json
+   {
+     "status": "error",
+     "pipeline_halted": true,
+     "failed_step_index": 0,
+     "completed_steps": 0,
+     "total_steps": 2,
+     "executed_results": [],
+     "failed_call": {
+       "status": "error",
+       "error": {
+         "type": "ValidationError",
+         "code": "INVALID_ARGUMENT_TYPE",
+         "message": "Argument 'a' must be a finite number (int or float), got str: \"invalid\"",
+         "details": {
+           "parameter": "a",
+           "expected": "finite number (int or float)",
+           "received_type": "str",
+           "received_value": "invalid"
+         }
+       },
+       "tool": "add",
+       "arguments": {
+         "a": "invalid",
+         "b": 3
+       }
+     },
+     "aborted_calls": [
+       {
+         "tool": "multiply",
+         "arguments": {
+           "a": 2,
+           "b": 3
+         }
+       }
+     ],
+     "message": "Pipeline halted: a failed call cannot execute another tool."
+   }
+   ```
+
 ## Learning goals
 
 After taking this lesson, you'll be able to:
