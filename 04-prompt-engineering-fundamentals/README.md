@@ -402,3 +402,30 @@ Want to learn more about different Prompt Engineering concepts? Go to the [conti
 
 Head over to Lesson 5 where we will look at [advanced prompting techniques](../05-advanced-prompts/README.md?WT.mc_id=academic-105485-koreyst)!
 
+## Applied Lab: Safe Prompt Template Rendering and Validation
+
+Try a beginner-friendly Python example that demonstrates safe prompt template variable rendering, input schema validation, and instruction/data boundary separation.
+
+**Lab:** [R40-T021 — Prompt Template Escaping and Validation](./applied-labs/r40-t021/README.md?WT.mc_id=academic-105485-koreyst)
+
+Run the example from the repository root:
+
+```bash
+python3 04-prompt-engineering-fundamentals/applied-labs/r40-t021/example.py --name "Alice" --topic "Photosynthesis"
+```
+
+Expected output:
+
+```json
+{
+  "rendered_prompt": "### INSTRUCTION\nYou are an AI educational tutor assisting students with customized study plans.\n\n### CONTEXT (USER DATA)\n- Student Name: Alice\n- Topic: Photosynthesis"
+}
+```
+
+Run its automated tests:
+
+```bash
+python3 -m unittest discover -s 04-prompt-engineering-fundamentals/applied-labs/r40-t021 -p "test_*.py"
+```
+
+This lab uses a small local fixture and Python's standard library. No API keys, models, or external services are required. Note: Templating and boundary delimiters enforce structural formatting, but templating alone does not prevent semantic prompt injection.

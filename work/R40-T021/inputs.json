@@ -1,0 +1,26 @@
+{
+  "task": "R40-T021",
+  "program": "04-prompt-engineering-fundamentals/applied-labs/r40-t021/example.py",
+  "tests": [
+    {
+      "command": "python3 04-prompt-engineering-fundamentals/applied-labs/r40-t021/example.py --name \"Alice\" --topic \"Photosynthesis\"",
+      "expected": {
+        "rendered_prompt": "### INSTRUCTION\nYou are an AI educational tutor assisting students with customized study plans.\n\n### CONTEXT (USER DATA)\n- Student Name: Alice\n- Topic: Photosynthesis"
+      }
+    },
+    {
+      "command": "python3 04-prompt-engineering-fundamentals/applied-labs/r40-t021/example.py --name \"Alice\"",
+      "expected": "ValueError: Missing required template variable(s): 'topic'"
+    },
+    {
+      "command": "python3 04-prompt-engineering-fundamentals/applied-labs/r40-t021/example.py --name \"Alice {student_id}\" --topic \"Sets: {x | x > 0}\"",
+      "expected": {
+        "rendered_prompt": "### INSTRUCTION\nYou are an AI educational tutor assisting students with customized study plans.\n\n### CONTEXT (USER DATA)\n- Student Name: Alice {student_id}\n- Topic: Sets: {x | x > 0}"
+      }
+    },
+    {
+      "command": "python3 04-prompt-engineering-fundamentals/applied-labs/r40-t021/example.py --data '{\"name\": \"Alice\", \"topic\": \"Photosynthesis\", \"role\": \"admin\"}'",
+      "expected": "ValueError: Unknown variable(s) provided: 'role'"
+    }
+  ]
+}
