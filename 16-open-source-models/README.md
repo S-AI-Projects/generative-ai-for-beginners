@@ -4,6 +4,82 @@
 
 The world of open-source LLMs is exciting and constantly evolving. This lesson aims to provide an in-depth look at open source models. If you are looking for information on how proprietary models compare to open source models, go to the ["Exploring and Comparing Different LLMs" lesson](../02-exploring-and-comparing-different-llms/README.md?WT.mc_id=academic-105485-koreyst). This lesson will also cover the topic of fine-tuning but a more detailed explanation can be found in the ["Fine-Tuning LLMs" lesson](../18-fine-tuning/README.md?WT.mc_id=academic-105485-koreyst).
 
+### Applied Lab: Evaluating Open Source Models and Decision Checking (R40-T023)
+
+To explore how the criteria for open source models translate into actionable governance decisions, explore the local hands-on lab:
+[Applied Lab — Evaluating Open Source Models and Decision Checking](./applied-labs/r40-t023/README.md?WT.mc_id=academic-105485-koreyst).
+
+This lab implements a worked three-scenario decision framework comparing two independent approaches:
+1. **Direct Rule Engine:** Evaluates transparency disclosures (training data, weights, evaluation/fine-tuning code, metrics, and license) and outputs structured decisions with educational rationales.
+2. **Simpler Independent Calculation:** A minimalist boolean baseline that cross-verifies the primary engine's decisions on identical inputs.
+3. **Decision Table Checker:** Verifies a canonical table covering a **normal scenario** (fully open model such as AllenAI OLMo), a **boundary scenario** (open weights with withheld pre-training assets such as Llama 2 or Mistral), and a **missing-information scenario** (unverified disclosures), ensuring that deliberate changes to expected decisions immediately trigger a non-zero failure.
+
+**Scope Note (Simulation/Mock):** This is a simulated local contract fixture running with Python's standard library. It requires no model downloads, paid provider credentials, or GPU hardware.
+
+#### Exact Invocations and Expected Output
+
+Run the comparison checker across all canonical scenarios:
+
+```bash
+python3 16-open-source-models/applied-labs/r40-t023/example.py --check
+```
+
+Expected output (`exit 0`):
+
+```json
+{
+  "status": "success",
+  "total_scenarios": 3,
+  "passed_scenarios": 3,
+  "failed_scenarios": 0,
+  "all_passed": true,
+  "scenarios": [
+    {
+      "scenario_id": "SCENARIO_NORMAL",
+      "scenario_type": "normal",
+      "model_id": "allenai-olmo-7b-fixture",
+      "expected_decision": "OPEN_SOURCE",
+      "direct_decision": "OPEN_SOURCE",
+      "independent_decision": "OPEN_SOURCE",
+      "approaches_agree": true,
+      "matches_table": true,
+      "rationale_valid": true,
+      "status": "PASS"
+    },
+    {
+      "scenario_id": "SCENARIO_BOUNDARY",
+      "scenario_type": "boundary",
+      "model_id": "llama-2-chat-fixture",
+      "expected_decision": "OPEN_WEIGHTS",
+      "direct_decision": "OPEN_WEIGHTS",
+      "independent_decision": "OPEN_WEIGHTS",
+      "approaches_agree": true,
+      "matches_table": true,
+      "rationale_valid": true,
+      "status": "PASS"
+    },
+    {
+      "scenario_id": "SCENARIO_MISSING_INFO",
+      "scenario_type": "missing_information",
+      "model_id": "unverified-candidate-v1",
+      "expected_decision": "UNDETERMINED",
+      "direct_decision": "UNDETERMINED",
+      "independent_decision": "UNDETERMINED",
+      "approaches_agree": true,
+      "matches_table": true,
+      "rationale_valid": true,
+      "status": "PASS"
+    }
+  ]
+}
+```
+
+Run the automated test suite:
+
+```bash
+python3 -m unittest discover -s 16-open-source-models/applied-labs/r40-t023 -p "test_*.py"
+```
+
 ## Learning goals
 
 - Gain an understanding of open source Models
