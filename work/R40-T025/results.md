@@ -498,7 +498,7 @@ test_unexpected_argument (test_example.TestTypeValidationAndErrors.test_unexpect
 Extraneous parameters must return UNEXPECTED_ARGUMENT. ... ok
 
 ----------------------------------------------------------------------
-Ran 31 tests in 0.176s
+Ran 31 tests in 0.197s
 
 OK
 ```
