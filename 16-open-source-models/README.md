@@ -74,6 +74,13 @@ If working on a specific use case, searching for fine-tuned versions that are fo
 
 The best part about open models is that you can get started working with them pretty quickly. Check out the [Microsoft Foundry model catalog](https://ai.azure.com?WT.mc_id=academic-105485-koreyst), which features a specific Hugging Face collection with these models we discussed here.
 
+## Applied Lab: Open Source Model Assessment & Questions (R40-T040)
+
+For an executable worked decision example covering model classification (strict open source vs. open weights vs. proprietary) and three applied assessment questions with automated checks, see:
+- [Applied Lab R40-T040](./applied-labs/r40-t040/README.md)
+
+*Scope note*: Standard library offline implementation illustrating model governance taxonomies without external model downloads or cloud services.
+
 ## Learning does not stop here, continue the Journey
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!
