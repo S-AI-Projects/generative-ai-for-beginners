@@ -1,0 +1,17 @@
+test_boundary_scenario (test_example.TestLowCodeWorkflow.test_boundary_scenario)
+Test boundary scenario: low urgency monitored service routed to standard queue. ... ok
+test_broken_intermediate_state_invariant_fails (test_example.TestLowCodeWorkflow.test_broken_intermediate_state_invariant_fails)
+Tampering with an intermediate state must be caught by invariant verification. ... ok
+test_decision_table_validation (test_example.TestLowCodeWorkflow.test_decision_table_validation)
+Published decision table must validate with zero errors. ... ok
+test_deliberate_wrong_decision_fails (test_example.TestLowCodeWorkflow.test_deliberate_wrong_decision_fails)
+Checker must fail when a decision is deliberately tampered. ... ok
+test_missing_info_scenario (test_example.TestLowCodeWorkflow.test_missing_info_scenario)
+Test missing-info scenario: missing department triggers clarification prompt. ... ok
+test_normal_scenario (test_example.TestLowCodeWorkflow.test_normal_scenario)
+Test normal scenario: critical outage routed to emergency oncall. ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.000s
+
+OK

@@ -264,6 +264,13 @@ For example, you can build flows to automatically generate text for a variety of
 
 To learn how to use this AI Model in Power Automate, go through the [Add intelligence with AI Builder and GPT](https://learn.microsoft.com/training/modules/ai-builder-text-generation/?WT.mc_id=academic-109639-somelezediko) module.
 
+## Applied Lab: Flow State Trace & Invariants (R40-T034)
+
+For an executable local example demonstrating low-code flow step execution, intermediate state trace logging, and invariant verification across normal, boundary, and missing-information scenarios, see:
+- [Applied Lab R40-T034](./applied-labs/r40-t034/README.md)
+
+*Scope note*: Implemented in standard Python to demonstrate pipeline invariants and step state recording without requiring Power Platform or cloud tenant credentials.
+
 ## Great Work! Continue Your Learning
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!
