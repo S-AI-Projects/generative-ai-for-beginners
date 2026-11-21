@@ -126,6 +126,74 @@ The following resources provide step-by-step tutorials that walk you through a r
 |              |                                                                                                                                                                                |                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | 🦥 Unsloth | [Fine-tuning LLMs with Unsloth](https://github.com/unslothai/unsloth?WT.mc_id=academic-105485-koreyst)                                                         | Unsloth is an open-source framework that supports LLM fine-tuning and reinforcement learning (RL). Unsloth streamlines local training, evaluation, and deployment with ready to use [notebooks](https://github.com/unslothai/notebooks?WT.mc_id=academic-105485-koreyst). It also supports text-to-speech (TTS), BERT and multimodal models. To get started, read their step-by-step [Fine-tuning LLMs Guide](https://docs.unsloth.ai/get-started/fine-tuning-llms-guide).                                                                          |
 |              |                                                                                                                                                                                |                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+## Applied Lab: R40-T047 — Parameter Budget & Prefix-Based Layer Freezing
+
+> [!NOTE]
+> **[SIMULATION / MOCK]** This lab operates locally on a named-parameter manifest. No GPU, model weights download, or paid cloud fine-tuning provider is required. It verifies parameter budgeting and prefix-based layer freeze logic deterministically.
+
+This applied lab extends Lesson 18 by illustrating parameter-efficient fine-tuning preflight checks. Rather than retraining all parameters at high computational cost, selective fine-tuning freezes designated base-model layers (such as transformer encoders) while keeping specific target layers (such as prediction heads or adapters) trainable.
+
+### Worked Input-to-Output Explanation
+
+Given the input manifest:
+- `encoder: 100` parameters
+- `head: 20` parameters
+- Configured freeze prefix: `["encoder"]`
+
+Evaluation steps:
+1. `encoder` starts with `"encoder"` -> **FROZEN** (100 parameters).
+2. `head` does not start with `"encoder"` -> **TRAINABLE** (20 parameters).
+3. **Total Parameters**: $100 + 20 = 120$.
+4. **Trainable Parameters**: $20$.
+5. **Frozen Parameters**: $100$.
+6. Any unmatched freeze prefix (e.g., `"decoder"`) is flagged as a configuration mistake in `unmatched_prefixes`.
+
+### Exact Fixture & Regression Scenarios
+
+| Scenario | Manifest | Freeze Prefixes | Total | Trainable | Unmatched Prefixes | Status |
+|---|---|---|---|---|---|---|
+| **Normal / Regression** | `{"encoder": 100, "head": 20}` | `["encoder"]` | `120` | `20` | `()` | Matches specification |
+| **Unmatched Prefix** | `{"encoder": 100, "head": 20}` | `["encoder", "decoder"]` | `120` | `20` | `("decoder",)` | Unmatched prefix reported |
+| **Boundary (No Freeze)** | `{"encoder": 100, "head": 20}` | `[]` | `120` | `120` | `()` | All trainable |
+| **Boundary (All Frozen)** | `{"encoder": 100, "head": 20}` | `["encoder", "head"]` | `120` | `0` | `()` | All frozen |
+| **Boundary (Empty)** | `{}` | `["encoder"]` | `0` | `0` | `("encoder",)` | Empty manifest handled |
+| **Failure (Negative)** | `{"encoder": -10}` | `[]` | N/A | N/A | N/A | Raises `ValueError` |
+
+### Invocation and Test Suite
+
+Execute the test suite using Python's standard library:
+
+```bash
+# Run from repository root
+python3 -m unittest discover -s 18-fine-tuning/applied-labs/r40-t047 -p "test_*.py" -v
+```
+
+Expected output (**20 tests**, exit code 0):
+
+```
+test_total_parameters_is_120 (test_example.TestRegressionExactExample.test_total_parameters_is_120) ... ok
+test_trainable_parameters_is_20 (test_example.TestRegressionExactExample.test_trainable_parameters_is_20) ... ok
+test_unmatched_prefix_reported (test_example.TestUnmatchedFreezePrefix.test_unmatched_prefix_reported) ... ok
+test_explanation_contains_worked_steps (test_example.TestWorkedExplanation.test_explanation_contains_worked_steps) ... ok
+...
+----------------------------------------------------------------------
+Ran 20 tests in 0.001s
+
+OK
+```
+
+> [!IMPORTANT]
+> The checker exits non-zero if assertions fail. Deliberate failure tests (`test_deliberate_wrong_*_fails`) confirm that incorrect total or trainable counts trigger an `AssertionError`.
+
+### Simplification Boundary
+
+This local exercise isolates parameter-counting and freeze configuration:
+- It does **not** evaluate model loss, backward gradients, or optimizer state memory.
+- It does **not** call cloud fine-tuning services (Microsoft Foundry / OpenAI).
+- It makes no claims about trained-model convergence or hardware throughput.
+
+---
+
 ## Assignment
 
 Select one of the tutorials above and walk through them. _We may replicate a version of these tutorials in Jupyter Notebooks in this repo for reference only. Please use the original sources directly to get the latest versions_.

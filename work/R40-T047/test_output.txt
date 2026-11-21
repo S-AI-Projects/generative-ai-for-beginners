@@ -1,0 +1,29 @@
+test_all_layers_frozen (test_example.TestBoundaryScenarios.test_all_layers_frozen) ... ok
+test_empty_manifest (test_example.TestBoundaryScenarios.test_empty_manifest) ... ok
+test_no_freeze_prefixes_all_trainable (test_example.TestBoundaryScenarios.test_no_freeze_prefixes_all_trainable) ... ok
+test_deliberate_wrong_total_fails (test_example.TestRegressionExactExample.test_deliberate_wrong_total_fails)
+Deliberate wrong assertion must fail to prove checker verification. ... ok
+test_deliberate_wrong_trainable_fails (test_example.TestRegressionExactExample.test_deliberate_wrong_trainable_fails)
+Deliberate wrong assertion for trainable parameter count. ... ok
+test_frozen_parameters_is_100 (test_example.TestRegressionExactExample.test_frozen_parameters_is_100) ... ok
+test_layer_states_correct (test_example.TestRegressionExactExample.test_layer_states_correct) ... ok
+test_no_unmatched_prefixes (test_example.TestRegressionExactExample.test_no_unmatched_prefixes) ... ok
+test_total_parameters_is_120 (test_example.TestRegressionExactExample.test_total_parameters_is_120) ... ok
+test_trainable_parameters_is_20 (test_example.TestRegressionExactExample.test_trainable_parameters_is_20) ... ok
+test_pure_deterministic_calculation (test_example.TestSimulationContract.test_pure_deterministic_calculation) ... ok
+test_counts_still_accurate (test_example.TestUnmatchedFreezePrefix.test_counts_still_accurate) ... ok
+test_deliberate_wrong_unmatched_fails (test_example.TestUnmatchedFreezePrefix.test_deliberate_wrong_unmatched_fails) ... ok
+test_explanation_contains_warning (test_example.TestUnmatchedFreezePrefix.test_explanation_contains_warning) ... ok
+test_matched_prefix_recorded (test_example.TestUnmatchedFreezePrefix.test_matched_prefix_recorded) ... ok
+test_strict_mode_raises_on_unmatched (test_example.TestUnmatchedFreezePrefix.test_strict_mode_raises_on_unmatched)
+In strict mode, unmatched prefixes raise ValueError. ... ok
+test_unmatched_prefix_reported (test_example.TestUnmatchedFreezePrefix.test_unmatched_prefix_reported) ... ok
+test_deliberate_no_exception_fails (test_example.TestValidationFailures.test_deliberate_no_exception_fails)
+Deliberately assert that no exception is raised on invalid input. ... ok
+test_negative_parameter_count_raises (test_example.TestValidationFailures.test_negative_parameter_count_raises) ... ok
+test_explanation_contains_worked_steps (test_example.TestWorkedExplanation.test_explanation_contains_worked_steps) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.000s
+
+OK
