@@ -629,6 +629,77 @@ A: 1, because chain-of-thought is about showing the LLM how to solve a problem b
 
 You just used the self-refine technique in the assignment. Take any program you built and consider what improvements you would want to apply to it. Now use the self-refine technique to apply the proposed changes. What did you think the result, better or worse?
 
+## Applied Lab: Prompt Template Validation and Data Boundary Separation (R40-T039)
+
+This applied lab extends the templating concepts introduced in this lesson by demonstrating how to validate declared template variables, keep untrusted user data structurally distinct from fixed instruction fields, and safely handle literal braces in user inputs.
+
+The implementation is located at:
+- Implementation: [example.py](./applied-labs/r40-t039/example.py)
+- Test Suite: [test_example.py](./applied-labs/r40-t039/test_example.py)
+
+### Core Contract & Boundary Rules
+
+1. **Declared Variable Validation**: The template specifies declared variables (e.g., `("name", "topic")`). All declared variables must be supplied. Missing a declared variable (e.g. missing `topic`) raises `MissingVariableError`. Supplying undeclared or unknown keys raises `UnknownVariableError`. Non-string variable types raise `InvalidVariableTypeError`.
+2. **Literal Brace Preservation**: Braces within user data (e.g. `{code: true}` or `{{variable}}`) remain strictly literal and are not evaluated, escaped, or parsed as template syntax.
+3. **Instruction / Data Distinction**: Fixed instruction fields are kept structurally distinct from dynamic user data via configurable delimiters (`RAW`, `TAGGED` XML blocks, or JSON `ENVELOPE`).
+4. **Prompt Injection Boundary**: Templating alone enforces structural boundary integrity and prevents template syntax injection, but **does not prevent semantic prompt injection**. An instruction override (e.g., *"Ignore previous instructions..."*) in user data is faithfully rendered inside the data boundary; semantic defense requires downstream model guardrails and system-level prompt hardening.
+
+### Focus: Controlled Configurations & Input Size Comparison
+
+Three controlled configurations were evaluated across test fixtures:
+
+| Configuration | Delimitation Style | Correctness | Braces Preserved | Structural Overhead | Trade-off Description |
+|---|---|---|---|---|---|
+| **`RAW`** | Header labels (`=== USER DATA ===`) | 100% | 100% | +78 chars | Lowest token overhead, but weaker visual demarcation for the model. |
+| **`TAGGED`** (Default) | XML tags (`<instruction>`, `<user_data>`) | 100% | 100% | +139 chars | Explicit boundary tags easily parsed by LLMs to distinguish instructions from untrusted data at modest token cost. |
+| **`ENVELOPE`** | JSON object (`instruction`, `user_data`) | 100% | 100% | +101 chars | Strict machine-parseable schema structure, suited for API pipelines. |
+
+Three input sizes evaluated under `TAGGED` configuration:
+- **Small** (26 chars input): 165 chars output (6.35x expansion ratio, 100% correctness).
+- **Medium** (90 chars input with braces `{...}`): 231 chars output (2.57x expansion ratio, 100% brace preservation).
+- **Large** (651 chars input with nested braces and adversarial override): 785 chars output (1.21x expansion ratio, 100% brace preservation).
+
+### Invocation and Test Suite
+
+Run the tests using standard library `unittest`:
+
+```bash
+# Run from repository root
+python3 -m unittest discover -s 05-advanced-prompts/applied-labs/r40-t039 -p "test_*.py" -v
+```
+
+Expected output (**13 tests**, exit code 0):
+
+```
+test_three_configurations_comparison (test_example.TestControlledConfigurationsAndSizes.test_three_configurations_comparison) ... ok
+test_three_input_sizes_benchmark (test_example.TestControlledConfigurationsAndSizes.test_three_input_sizes_benchmark) ... ok
+test_deliberate_wrong_missing_key_assertion_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_missing_key_assertion_fails) ... ok
+test_deliberate_wrong_result_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_result_fails) ... ok
+test_braces_inside_user_data_remain_literal (test_example.TestPromptTemplateContract.test_braces_inside_user_data_remain_literal) ... ok
+test_instruction_and_data_boundaries_remain_distinct (test_example.TestPromptTemplateContract.test_instruction_and_data_boundaries_remain_distinct) ... ok
+test_invalid_variable_type_fails (test_example.TestPromptTemplateContract.test_invalid_variable_type_fails) ... ok
+test_missing_name_fails (test_example.TestPromptTemplateContract.test_missing_name_fails) ... ok
+test_missing_topic_fails (test_example.TestPromptTemplateContract.test_missing_topic_fails) ... ok
+test_none_value_fails_as_missing (test_example.TestPromptTemplateContract.test_none_value_fails_as_missing) ... ok
+test_render_supplied_values (test_example.TestPromptTemplateContract.test_render_supplied_values) ... ok
+test_templating_alone_does_not_prevent_prompt_injection (test_example.TestPromptTemplateContract.test_templating_alone_does_not_prevent_prompt_injection) ... ok
+test_unknown_variable_fails (test_example.TestPromptTemplateContract.test_unknown_variable_fails) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.001s
+
+OK
+```
+
+> [!IMPORTANT]
+> The test suite includes deliberate wrong assertions (`test_deliberate_wrong_result_fails` and `test_deliberate_wrong_missing_key_assertion_fails`) verifying that any assertion discrepancy immediately produces a nonzero exit code.
+
+### Simplification & Simulation Boundary
+
+This local lab isolates prompt template validation and string interpolation:
+- It runs purely in-memory using the standard Python library; no physical GPU, neural network weights, or paid cloud provider (e.g., Azure OpenAI) are required.
+- It makes no unsupported claims regarding real-world LLM accuracy, model reasoning capabilities, or semantic jailbreak immunity.
+
 ## Great Work! Continue Your Learning
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!
