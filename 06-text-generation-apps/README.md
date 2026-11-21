@@ -659,6 +659,13 @@ What does the concept temperature do?
 
 When working on the assignment, try to vary the temperature, try setting it to 0, 0.5, and 1. Remember that 0 is the least varied and 1 is the most. What value works best for your app?
 
+## Applied Lab: Worked Decision Example (R40-T031)
+
+For an executable decision preflight example demonstrating parameter selection (`temperature`, `max_tokens`) across normal, boundary, and missing-information scenarios, see:
+- [Applied Lab R40-T031](./applied-labs/r40-t031/README.md)
+
+*Scope note*: Implemented using standard library Python with approximate whitespace tokenization for local, offline reproducibility.
+
 ## Great Work! Continue Your Learning
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!
