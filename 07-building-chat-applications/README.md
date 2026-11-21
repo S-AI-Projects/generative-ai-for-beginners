@@ -174,6 +174,90 @@ Microsoft's approach to Responsible AI has identified six principles that should
 | Transparency           | AI systems should be understandable.                  | Provide clear documentation and reasoning for AI responses.            | Users are more likely to trust a system if they can understand how decisions are made. |
 | Accountability         | People should be accountable for AI systems.          | Establish a clear process for auditing and improving AI decisions.     | Enables ongoing improvement and corrective measures in case of mistakes.               |
 
+## Applied Lab: R40-T045 — Streaming Response State Machine
+
+> [!NOTE]
+> **[SIMULATION / MOCK]** This lab runs entirely locally with no API key, model download, GPU, or network access required. The `MockStreamingAdapter` returns deterministic fixture event sequences. See [example.py](./applied-labs/r40-t045/example.py) for the explicit list of real-service behaviours the mock does **not** establish.
+
+This applied lab extends Lesson 07 through a **streaming chat response state machine** — modelling the PENDING → STREAMING → COMPLETE / ERROR lifecycle of a single message, with a stable message ID throughout.
+
+### How this illustrates the lesson
+
+Lesson 07 explains that AI-powered chat applications must:
+1. Assign each response a **stable message ID** so the UI can track it.
+2. Stream tokens progressively (the OpenAI streaming API pattern).
+3. Handle **errors** gracefully — preserving already-received text and surfacing an error marker (Reliability & Safety, Transparency from the responsible-AI principles table).
+
+The `ChatMessage` state machine captures all three requirements. The external dependency sits behind a `StreamingChatClient` Protocol; the `MockStreamingAdapter` supplies deterministic fixture chunks.
+
+### State transitions
+
+```
+PENDING  --chunk-->  STREAMING  --chunk-->  STREAMING  --complete-->  COMPLETE
+PENDING  --error-->  ERROR
+STREAMING --error-->  ERROR          (text so far is preserved)
+COMPLETE  --chunk-->  ValueError     (chunk after completion rejected)
+ERROR     --chunk-->  ValueError     (chunk after error rejected)
+```
+
+### Three scenarios
+
+| # | Scenario | Input tag | Fixture events | Expected state | Expected text |
+|---|---|---|---|---|---|
+| 1 | **Normal** | `__normal__` | `chunk("Hello, ")`, `chunk("world!")`, `complete` | `COMPLETE` | `"Hello, world!"` |
+| 2 | **Boundary** | `__boundary__` | `chunk("")`, `complete` | `COMPLETE` | `""` |
+| 3 | **Error** | `__error__` | `chunk("Partial ")`, `error("…timeout…")` | `ERROR` | `"Partial "` (preserved) |
+
+### Invalid / missing-data case and recovery
+
+`ChatMessage.apply_chunk()` raises `ValueError` with an explanation when a chunk arrives after COMPLETE or ERROR:
+
+```
+[R40-T045] Chunk rejected: message '…' is already COMPLETE.
+Start a new ChatMessage for the next turn.
+```
+
+**Recovery**: create a new `ChatMessage` for the next conversation turn. The errored message's text and `error_detail` remain available for display.
+
+### Run the lab
+
+```bash
+# From the repo root — no virtual environment or API key needed
+python3 -m unittest discover -s 07-building-chat-applications/applied-labs/r40-t045 -p "test_*.py" -v
+```
+
+Expected output (**22 tests**, exit 0):
+
+```
+test_state_is_complete (test_example.TestBoundaryScenario...) ... ok
+test_text_is_empty_string (test_example.TestBoundaryScenario...) ... ok
+test_error_and_recovery_have_different_message_ids (test_example.TestErrorRecovery...) ... ok
+test_recovery_on_next_valid_input (test_example.TestErrorRecovery...) ... ok
+test_error_detail_is_set (test_example.TestErrorScenario...) ... ok
+test_received_text_is_preserved (test_example.TestErrorScenario...) ... ok
+test_state_is_error (test_example.TestErrorScenario...) ... ok
+...
+----------------------------------------------------------------------
+Ran 22 tests in 0.001s
+OK
+```
+
+> [!IMPORTANT]
+> The checker **exits non-zero** on any assertion failure. Deliberate-wrong-result tests (e.g. asserting `state == ERROR` when it is `COMPLETE`) each verify the checker catches mistakes by using `assertRaises(AssertionError)`.
+
+### Where the simplification stops
+
+The mock establishes the *state-machine contract* only. It does **not** establish:
+
+- **Non-determinism** — a real model returns different tokens every call.
+- **Network errors / HTTP 429** — the mock never raises `openai.APIError`.
+- **Token-budget truncation** — the mock never cuts off mid-chunk.
+- **Safety-filter refusals** — the mock always yields its fixture.
+- **Server-assigned IDs** — the mock uses `uuid4()` generated locally.
+- **True concurrent streaming** — the mock is synchronous.
+
+---
+
 ## Assignment
 
 See [assignment](./python?WT.mc_id=academic-105485-koreyst). It will take you through a series of exercises from running your first chat prompts, to classifying and summarizing text and more. Notice that the assignments are available in different programming languages!
