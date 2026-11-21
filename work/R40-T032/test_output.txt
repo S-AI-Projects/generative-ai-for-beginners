@@ -1,0 +1,17 @@
+test_budget_three_truncation (test_example.TestTokenBudgetPreflight.test_budget_three_truncation)
+Budget 3 with 'one two three four' retains [one, two, three] and reports 1 removed. ... ok
+test_deliberate_wrong_assertion_fails (test_example.TestTokenBudgetPreflight.test_deliberate_wrong_assertion_fails)
+Verifies that asserting incorrect retained tokens fails. ... ok
+test_empty_input_retains_none (test_example.TestTokenBudgetPreflight.test_empty_input_retains_none)
+Empty input retains no tokens. ... ok
+test_exact_budget_boundary (test_example.TestTokenBudgetPreflight.test_exact_budget_boundary)
+Exact budget boundary: total tokens == budget. ... ok
+test_failure_and_recovery (test_example.TestTokenBudgetPreflight.test_failure_and_recovery)
+Exercise documented invalid/missing-data case, explain error, demonstrate recovery on valid input. ... ok
+test_reject_negative_budget (test_example.TestTokenBudgetPreflight.test_reject_negative_budget)
+Reject negative budget with ValueError. ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.000s
+
+OK

@@ -196,6 +196,13 @@ A: All three can help. Start with prompt engineering and context for quick impro
 
 Read up more on how you can [use RAG](https://learn.microsoft.com/azure/search/retrieval-augmented-generation-overview?WT.mc_id=academic-105485-koreyst) for your business.
 
+## Applied Lab: Token Budget Preflight & Recovery (R40-T032)
+
+For an executable local example demonstrating token budgeting, explicit truncation reporting, and recovery after an invalid input error, see:
+- [Applied Lab R40-T032](./applied-labs/r40-t032/README.md)
+
+*Scope note*: Uses an offline whitespace-token teaching approximation to demonstrate context budget constraints without requiring external API dependencies or GPU resources.
+
 ## Great Work, Continue Your Learning
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!
