@@ -344,6 +344,67 @@ while not generator.is_done():
 In addition to ONNX Runtime, Ollama, and Foundry Local reference methods, we can also complete the reference of quantitative models based on the model reference methods provided by different manufacturers. Such as Apple MLX framework with Apple Metal, Qualcomm QNN with NPU, Intel OpenVINO with CPU/GPU, etc. You can also get more content from [Phi-3 Cookbook](https://github.com/microsoft/phi-3cookbook?WT.mc_id=academic-105485-koreyst)
 
 
+## Applied Lab: R40-T046 — Prompt Token Budget Preflight Checker
+
+> [!NOTE]
+> **[TEACHING APPROXIMATION / SIMULATION]** This lab runs entirely locally with no model download, GPU, paid provider, or physical device required. The `WhitespaceTokenizer` is a teaching approximation using whitespace splitting and is **not** the real tokenizer of Phi-3/3.5/4 or any production SLM. Real SLMs use sub-word tokenizers (such as SentencePiece or BPE) that handle morphemes, Unicode, and special tokens differently.
+
+This applied lab extends Lesson 19 by implementing a **prompt-budget preflight checker** (`TokenBudgetChecker`) for resource-constrained SLM deployments:
+1. **Tokenize** prompt text using a modular tokenizer protocol (`TokenizerInterface`).
+2. **Check & Truncate** prompt tokens against a configured token budget limit.
+3. **Report** retained tokens, truncation counts, and tokenizer approximation status.
+
+### Baseline and Extracted Responsibility
+
+- **Baseline (`_baseline_check`)**: A monolithic function combining tokenization, budget evaluation, and reporting.
+- **Extracted Responsibility (`TokenizerInterface` + `WhitespaceTokenizer`)**: Decouples tokenization behind a protocol so tokenizers can be swapped without modifying budget enforcement. Equivalence between the baseline and the refactored architecture is proved across all test fixtures.
+
+### Scenarios and Fixtures
+
+| Scenario | Input Prompt | Budget | Expected Retained Tokens | Removed Count | Expected Behavior |
+|---|---|---|---|---|---|
+| **Normal** | `"one two three four"` | `3` | `["one", "two", "three"]` | `1` | Truncates to budget, reports 1 removed token |
+| **Boundary (Empty)** | `""` | `3` | `[]` | `0` | Empty input retains none, 0 removed |
+| **Boundary (Zero Budget)**| `"one two three"` | `0` | `[]` | `3` | Retains none, reports all tokens removed |
+| **Failure (Negative Budget)** | `"any prompt"` | `-1` | N/A | N/A | Rejects negative budget with `ValueError` |
+
+### Invocation and Testing
+
+Run the test suite directly with standard library `unittest`:
+
+```bash
+# From the repository root
+python3 -m unittest discover -s 19-slm/applied-labs/r40-t046 -p "test_*.py" -v
+```
+
+Expected output (**31 tests**, exit code 0):
+
+```
+test_all_fixtures (test_example.TestBaselineEquivalence.test_all_fixtures) ... ok
+test_equivalence_normal (test_example.TestBaselineEquivalence.test_equivalence_normal) ... ok
+test_retained_tokens (test_example.TestNormalScenario.test_retained_tokens) ... ok
+test_removed_count (test_example.TestNormalScenario.test_removed_count) ... ok
+test_negative_budget_raises_at_construction (test_example.TestNegativeBudgetRejected.test_negative_budget_raises_at_construction) ... ok
+test_tokenizer_label_present (test_example.TestNormalScenario.test_tokenizer_label_present) ... ok
+...
+----------------------------------------------------------------------
+Ran 31 tests in 0.001s
+
+OK
+```
+
+> [!IMPORTANT]
+> A check exits non-zero if an assertion fails. The test suite includes deliberate-failure tests (`test_deliberate_wrong_*_fails`) confirming that any modified decision or altered expected count causes immediate test failure.
+
+### Simplification Boundary
+
+This local teaching fixture does **not**:
+- Emulate hardware acceleration (NPU/GPU), memory footprints, or KV-cache constraints.
+- Emulate actual BPE/SentencePiece vocabulary tokenization or multi-lingual token expansions.
+- Emulate real SLM inference or text generation performance.
+
+---
+
 ## More
 
 We have learned the basics of Phi-3/3.5 Family, but to learn more about SLM we need more knowledge. You can find the answers in the Phi-3 Cookbook. If you want to learn more, please visit the [Phi-3 Cookbook](https://github.com/microsoft/phi-3cookbook?WT.mc_id=academic-105485-koreyst).

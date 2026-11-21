@@ -1,0 +1,42 @@
+test_all_fixtures (test_example.TestBaselineEquivalence.test_all_fixtures)
+Run all equivalence fixtures in one sweep. ... ok
+test_equivalence_budget_exceeds_tokens (test_example.TestBaselineEquivalence.test_equivalence_budget_exceeds_tokens) ... ok
+test_equivalence_empty_prompt (test_example.TestBaselineEquivalence.test_equivalence_empty_prompt) ... ok
+test_equivalence_exact_budget (test_example.TestBaselineEquivalence.test_equivalence_exact_budget) ... ok
+test_equivalence_normal (test_example.TestBaselineEquivalence.test_equivalence_normal) ... ok
+test_equivalence_single_token (test_example.TestBaselineEquivalence.test_equivalence_single_token) ... ok
+test_equivalence_zero_budget (test_example.TestBaselineEquivalence.test_equivalence_zero_budget) ... ok
+test_all_tokens_retained (test_example.TestBoundaryBudgetExceedsTokens.test_all_tokens_retained) ... ok
+test_removed_is_zero (test_example.TestBoundaryBudgetExceedsTokens.test_removed_is_zero) ... ok
+test_deliberate_wrong_retained_fails (test_example.TestBoundaryEmptyPrompt.test_deliberate_wrong_retained_fails) ... ok
+test_removed_is_zero (test_example.TestBoundaryEmptyPrompt.test_removed_is_zero) ... ok
+test_retained_is_empty (test_example.TestBoundaryEmptyPrompt.test_retained_is_empty) ... ok
+test_tokenizer_label_present (test_example.TestBoundaryEmptyPrompt.test_tokenizer_label_present) ... ok
+test_deliberate_wrong_removed_fails (test_example.TestBoundaryZeroBudget.test_deliberate_wrong_removed_fails) ... ok
+test_removed_equals_token_count (test_example.TestBoundaryZeroBudget.test_removed_equals_token_count) ... ok
+test_retained_is_empty (test_example.TestBoundaryZeroBudget.test_retained_is_empty) ... ok
+test_baseline_also_rejects_negative (test_example.TestNegativeBudgetRejected.test_baseline_also_rejects_negative)
+_baseline_check must also reject negative budget. ... ok
+test_deliberate_no_error_fails (test_example.TestNegativeBudgetRejected.test_deliberate_no_error_fails)
+Checker MUST fail when we incorrectly expect no ValueError. ... ok
+test_error_message_explains_constraint (test_example.TestNegativeBudgetRejected.test_error_message_explains_constraint) ... ok
+test_negative_budget_raises_at_construction (test_example.TestNegativeBudgetRejected.test_negative_budget_raises_at_construction) ... ok
+test_budget_recorded (test_example.TestNormalScenario.test_budget_recorded) ... ok
+test_deliberate_wrong_removed_fails (test_example.TestNormalScenario.test_deliberate_wrong_removed_fails) ... ok
+test_deliberate_wrong_retained_fails (test_example.TestNormalScenario.test_deliberate_wrong_retained_fails) ... ok
+test_removed_count (test_example.TestNormalScenario.test_removed_count) ... ok
+test_retained_tokens (test_example.TestNormalScenario.test_retained_tokens) ... ok
+test_tokenizer_label_present (test_example.TestNormalScenario.test_tokenizer_label_present)
+Every report must carry the TEACHING APPROXIMATION label. ... ok
+test_label_contains_teaching_approximation (test_example.TestTokenizerLabel.test_label_contains_teaching_approximation) ... ok
+test_label_says_not_real_tokenizer (test_example.TestTokenizerLabel.test_label_says_not_real_tokenizer) ... ok
+test_report_label_matches_constant (test_example.TestTokenizerLabel.test_report_label_matches_constant) ... ok
+test_whitespace_tokenizer_does_not_subword_split (test_example.TestTokenizerLabel.test_whitespace_tokenizer_does_not_subword_split)
+[TEACHING APPROXIMATION] documents: real tokenizers may split ... ok
+test_whitespace_tokenizer_is_deterministic (test_example.TestTokenizerLabel.test_whitespace_tokenizer_is_deterministic)
+Same input → same tokens every call (not a real model). ... ok
+
+----------------------------------------------------------------------
+Ran 31 tests in 0.001s
+
+OK
