@@ -1,0 +1,24 @@
+test_decision_is_suggest_minimal (test_example.TestBoundaryScenario.test_decision_is_suggest_minimal) ... ok
+test_deliberate_wrong_decision_fails (test_example.TestBoundaryScenario.test_deliberate_wrong_decision_fails)
+The checker MUST fail when the expected decision is wrong. ... ok
+test_response_has_at_least_one_recipe (test_example.TestBoundaryScenario.test_response_has_at_least_one_recipe) ... ok
+test_boundary_decision_is_not_cannot_suggest (test_example.TestDecisionTableIntegrity.test_boundary_decision_is_not_cannot_suggest) ... ok
+test_missing_decision_is_not_suggest (test_example.TestDecisionTableIntegrity.test_missing_decision_is_not_suggest) ... ok
+test_normal_decision_is_not_suggest_minimal (test_example.TestDecisionTableIntegrity.test_normal_decision_is_not_suggest_minimal) ... ok
+test_decision_is_cannot_suggest (test_example.TestMissingInformationScenario.test_decision_is_cannot_suggest) ... ok
+test_deliberate_wrong_decision_fails (test_example.TestMissingInformationScenario.test_deliberate_wrong_decision_fails)
+The checker MUST fail when the expected decision is wrong. ... ok
+test_response_has_no_recipes (test_example.TestMissingInformationScenario.test_response_has_no_recipes) ... ok
+test_mock_does_not_raise_on_any_input (test_example.TestMockIsNotRealService.test_mock_does_not_raise_on_any_input)
+Mock never raises network or API errors. ... ok
+test_mock_is_deterministic (test_example.TestMockIsNotRealService.test_mock_is_deterministic)
+Same prompt → same response every call (unlike a real model). ... ok
+test_decision_is_suggest (test_example.TestNormalScenario.test_decision_is_suggest) ... ok
+test_deliberate_wrong_decision_fails (test_example.TestNormalScenario.test_deliberate_wrong_decision_fails)
+The checker MUST fail when the expected decision is wrong. ... ok
+test_response_has_recipes (test_example.TestNormalScenario.test_response_has_recipes) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.000s
+
+OK
