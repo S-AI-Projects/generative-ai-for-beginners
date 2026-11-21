@@ -396,6 +396,74 @@ A: 2, it's the best prompt as it provides details on "what" and goes into specif
 
 See if you can leverage the "cue" technique with the prompt: Complete the sentence "Show me an image of red car of make Volvo and ". What does it respond with, and how would you improve it?
 
+## Applied Lab: Prompt-Template Escaping & Worked Example with Checks (R40-T037)
+
+This applied lab extends this lesson by demonstrating how to build robust prompt templates that validate declared input variables, keep untrusted user data distinct from system instructions, and preserve literal braces in user inputs without escaping bugs or format-string exceptions.
+
+The implementation is located at:
+- Implementation: [example.py](./applied-labs/r40-t037/example.py)
+- Test Suite: [test_example.py](./applied-labs/r40-t037/test_example.py)
+
+### Core Contract & Boundary Rules
+
+1. **Declared Variable Validation**: The template declares required variables (e.g., `("name", "topic")`). All declared variables must be supplied. Missing a declared variable (e.g. missing `topic`) raises `MissingVariableError`. Undeclared or unknown keys raise `UnknownVariableError`. Non-string inputs raise `InvalidVariableTypeError`.
+2. **Literal Brace Preservation**: Braces within user data (e.g. `{Class of 2026}` or `{6CO2 + 6H2O -> C6H12O6 + 6O2}`) remain strictly literal and are not evaluated, escaped, or parsed as template syntax.
+3. **Instruction / Data Distinction**: Fixed instructions are kept strictly distinct from user data via structural XML tags (`<instruction>` and `<user_data>`).
+4. **Prompt Injection Boundary**: Templating alone enforces structural boundary integrity and prevents template syntax injection, but **does not prevent semantic prompt injection**. An instruction override (e.g., *"Ignore previous instructions..."*) inside user data is faithfully rendered within the data boundary; semantic defense requires downstream model guardrails and system-level prompt hardening.
+
+### Focus: Worked Input-to-Output Explanation & Regression Test
+
+The module provides `run_worked_example()`: an audited step-by-step trace showing the transformation from raw inputs to validated boundary-isolated prompt text:
+- **Input Fixture**: `name = "Alice {Curious Student}"`, `topic = "Photosynthesis {Chlorophyll & Light Reactions: 6CO2 + 6H2O -> C6H12O6 + 6O2}"`
+- **Steps**:
+  1. Declared Variable Contract Check: `("name", "topic")` matched.
+  2. Type Validation: String type asserted.
+  3. Literal Brace Preservation: Curly braces in user inputs preserved verbatim.
+  4. Boundary Isolation: Demarcated into `<instruction>` and `<user_data>` blocks.
+  5. Prompt Injection Disclaimer: `semantic_injection_prevented_by_templating_alone` set to `False`.
+- **Regression Test**: The exact output is asserted byte-for-byte against `PINNED_WORKED_EXAMPLE_OUTPUT`.
+
+### Invocation and Test Suite
+
+Run the tests using standard library `unittest`:
+
+```bash
+# Run from repository root
+python3 -m unittest discover -s 04-prompt-engineering-fundamentals/applied-labs/r40-t037 -p "test_*.py" -v
+```
+
+Expected output (**13 tests**, exit code 0):
+
+```
+test_deliberate_wrong_missing_key_assertion_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_missing_key_assertion_fails) ... ok
+test_deliberate_wrong_output_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_output_fails) ... ok
+test_exact_worked_example_regression (test_example.TestFocusWorkedExampleAndRegression.test_exact_worked_example_regression) ... ok
+test_worked_example_walkthrough_pipeline (test_example.TestFocusWorkedExampleAndRegression.test_worked_example_walkthrough_pipeline) ... ok
+test_braces_inside_user_data_remain_literal (test_example.TestPromptTemplateContract.test_braces_inside_user_data_remain_literal) ... ok
+test_instruction_and_data_boundaries_remain_distinct (test_example.TestPromptTemplateContract.test_instruction_and_data_boundaries_remain_distinct) ... ok
+test_invalid_variable_type_fails (test_example.TestPromptTemplateContract.test_invalid_variable_type_fails) ... ok
+test_missing_name_fails (test_example.TestPromptTemplateContract.test_missing_name_fails) ... ok
+test_missing_topic_fails (test_example.TestPromptTemplateContract.test_missing_topic_fails) ... ok
+test_none_value_fails_as_missing (test_example.TestPromptTemplateContract.test_none_value_fails_as_missing) ... ok
+test_render_supplied_values (test_example.TestPromptTemplateContract.test_render_supplied_values) ... ok
+test_templating_alone_does_not_prevent_prompt_injection (test_example.TestPromptTemplateContract.test_templating_alone_does_not_prevent_prompt_injection) ... ok
+test_unknown_variable_fails (test_example.TestPromptTemplateContract.test_unknown_variable_fails) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.001s
+
+OK
+```
+
+> [!IMPORTANT]
+> The test suite includes deliberate wrong assertions (`test_deliberate_wrong_output_fails` and `test_deliberate_wrong_missing_key_assertion_fails`) verifying that any discrepancy immediately produces a nonzero exit code.
+
+### Simplification & Simulation Boundary
+
+This local lab isolates prompt template validation and string interpolation:
+- It runs purely in-memory using Python standard library types; no physical GPU, neural network weights, or paid cloud provider (e.g., Azure OpenAI) are required.
+- It makes no unsupported claims regarding real-world LLM accuracy, model reasoning capabilities, or semantic jailbreak immunity.
+
 ## Great Work! Continue Your Learning
 
 Want to learn more about different Prompt Engineering concepts? Go to the [continued learning page](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to find other great resources on this topic.

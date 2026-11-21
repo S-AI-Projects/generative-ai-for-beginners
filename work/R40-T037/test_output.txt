@@ -1,0 +1,31 @@
+test_deliberate_wrong_missing_key_assertion_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_missing_key_assertion_fails)
+Assert that an incorrect exception expectation raises AssertionError. ... ok
+test_deliberate_wrong_output_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_output_fails)
+Assert that an incorrect output string expectation raises AssertionError. ... ok
+test_exact_worked_example_regression (test_example.TestFocusWorkedExampleAndRegression.test_exact_worked_example_regression)
+Execute the exact worked example as a regression test: ... ok
+test_worked_example_walkthrough_pipeline (test_example.TestFocusWorkedExampleAndRegression.test_worked_example_walkthrough_pipeline)
+Verify that run_worked_example executes all steps and publishes explanations. ... ok
+test_braces_inside_user_data_remain_literal (test_example.TestPromptTemplateContract.test_braces_inside_user_data_remain_literal)
+Braces inside user data must remain literal and not trigger formatting errors. ... ok
+test_instruction_and_data_boundaries_remain_distinct (test_example.TestPromptTemplateContract.test_instruction_and_data_boundaries_remain_distinct)
+Fixed instruction fields are strictly isolated from user data blocks. ... ok
+test_invalid_variable_type_fails (test_example.TestPromptTemplateContract.test_invalid_variable_type_fails)
+Non-string variables (e.g. integer or boolean) fail with InvalidVariableTypeError. ... ok
+test_missing_name_fails (test_example.TestPromptTemplateContract.test_missing_name_fails)
+Missing 'name' must fail validation with MissingVariableError. ... ok
+test_missing_topic_fails (test_example.TestPromptTemplateContract.test_missing_topic_fails)
+Missing 'topic' must fail validation with MissingVariableError. ... ok
+test_none_value_fails_as_missing (test_example.TestPromptTemplateContract.test_none_value_fails_as_missing)
+None value for declared variable fails as missing. ... ok
+test_render_supplied_values (test_example.TestPromptTemplateContract.test_render_supplied_values)
+Template with name and topic renders supplied values correctly. ... ok
+test_templating_alone_does_not_prevent_prompt_injection (test_example.TestPromptTemplateContract.test_templating_alone_does_not_prevent_prompt_injection)
+Verify that semantic prompt injection payloads are rendered literally within ... ok
+test_unknown_variable_fails (test_example.TestPromptTemplateContract.test_unknown_variable_fails)
+Supplying undeclared keys fails with UnknownVariableError. ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.001s
+
+OK
