@@ -245,6 +245,74 @@ There are many different use cases where RAG can improve your app, such as:
 
 We have covered the fundamental areas of RAG from adding our data to the application, the user query and output. To simplify creation of RAG, you can use frameworks such as Semantic Kernel, LangChain or AutoGen.
 
+## Applied Lab: R40-T050 — Tiny Lexical Retriever (RAG Test Double)
+
+> [!NOTE]
+> **[TEST DOUBLE / SIMULATION]** This lab implements a deterministic lexical test double based on lowercase word-set overlap. It is **not** a production vector search (it does not compute dense embeddings, cosine similarity, or approximate nearest neighbors). No model downloads, GPU, or paid vector databases (such as Azure AI Search or Cosmos DB) are required.
+
+This applied lab extends Lesson 15 by demonstrating a minimal RAG retrieval component (`TinyLexicalRetriever`) over a 3-document corpus:
+- Document A: `"red apple"`
+- Document B: `"green apple"`
+- Document C: `"blue sky"`
+
+### Query Normalization, Scoring, and Tie-Breaking
+
+1. **Normalization**: Queries and documents are converted to lowercase word sets using regular expressions (`\b[a-z0-9]+\b`), stripping punctuation and whitespace variations.
+2. **Overlap Scoring**: Relevance is computed as set intersection size: $\text{score} = |\text{query\_words} \cap \text{doc\_words}|$.
+3. **Tie-Breaking**: If two documents achieve the same overlap score, ties are broken alphabetically by document ID (`doc_id`).
+4. **Empty Results**: Queries with zero matching words (such as `"ocean"`) return an empty list (`[]`).
+
+### Three Applied Questions
+
+- **Q1 (Predict Output)**: Query `"apple"` matches both A and B with overlap score 1 (C has 0). Document ID tie-breaking ranks `["A", "B"]`.
+- **Q2 (Diagnose Failure)**: A naive `text.split()` without punctuation stripping fails to match `"apple!"` against Document A (`"red apple"`) because exact string equality `apple! == apple` is false. Normalized regex tokenization resolves this failure.
+- **Q3 (Choose Boundary Policy)**: When retrieval returns 0 matches (e.g. `"ocean"`), the RAG pipeline must short-circuit and refuse generation (or return a clear fallback) rather than passing empty context to the LLM and causing ungrounded hallucinations.
+
+### Fixtures and Contract Results
+
+| Query | Overlap Breakdown | Ranked Result | Document IDs Returned | Status |
+|---|---|---|---|---|
+| `"red apple"` | A: 2 (`red`, `apple`), B: 1 (`apple`), C: 0 | `[A (score=2), B (score=1)]` | `["A", "B"]` | Matches contract |
+| `"ocean"` | A: 0, B: 0, C: 0 | `[]` (Empty) | `[]` | No match |
+| `"apple"` | A: 1 (`apple`), B: 1 (`apple`), C: 0 | `[A (score=1), B (score=1)]` | `["A", "B"]` | Tie broken by ID |
+
+### Invocation and Test Suite
+
+Execute the test suite using Python's standard library:
+
+```bash
+# Run from repository root
+python3 -m unittest discover -s 15-rag-and-vector-databases/applied-labs/r40-t050 -p "test_*.py" -v
+```
+
+Expected output (**12 tests**, exit code 0):
+
+```
+test_query_red_apple_ranks_A_before_B (test_example.TestTinyLexicalRetrieverContract.test_query_red_apple_ranks_A_before_B) ... ok
+test_query_ocean_returns_no_match (test_example.TestTinyLexicalRetrieverContract.test_query_ocean_returns_no_match) ... ok
+test_results_include_document_ids (test_example.TestTinyLexicalRetrieverContract.test_results_include_document_ids) ... ok
+test_q1_predict_output_executable_check (test_example.TestAppliedQuestionsExecutableChecks.test_q1_predict_output_executable_check) ... ok
+test_q2_diagnose_failure_executable_check (test_example.TestAppliedQuestionsExecutableChecks.test_q2_diagnose_failure_executable_check) ... ok
+test_q3_choose_boundary_policy_executable_check (test_example.TestAppliedQuestionsExecutableChecks.test_q3_choose_boundary_policy_executable_check) ... ok
+...
+----------------------------------------------------------------------
+Ran 12 tests in 0.001s
+
+OK
+```
+
+> [!IMPORTANT]
+> The checker exits non-zero if assertions fail. Deliberate failure tests (`test_deliberate_wrong_ranking_fails` and `test_deliberate_wrong_ocean_match_fails`) verify that any incorrect ranking or false-positive match immediately raises an `AssertionError`.
+
+### Simplification Boundary
+
+This local lexical test double isolates ranking logic:
+- It does **not** evaluate semantic embeddings or cross-language synonym retrieval (e.g., "crimson" will not match "red").
+- It does **not** connect to Azure AI Search, Azure Cosmos DB, or external vector indexes.
+- It makes no claims regarding embedding latency or cloud LLM grounding quality.
+
+---
+
 ## Assignment
 
 To continue your learning of Retrieval Augmented Generation (RAG) you can build:
