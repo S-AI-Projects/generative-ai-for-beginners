@@ -79,6 +79,65 @@ Construct, from Proof-of-Concept(POC) until large scale applications with Prompt
 
 ![LLMOps with PromptFlow](./images/06-llm-promptflow.png?WT.mc_id=academic-105485-koreyst)
 
+## Applied Lab: R40-T043 — Server Launch Configuration Validation & Secret Redaction
+
+> [!NOTE]
+> **[SIMULATION / MOCK]** This lab operates locally on an in-memory configuration validator. No subprocesses are spawned, and no network ports are bound (`process_launched=False`). No cloud providers, models, or GPUs are required.
+
+This applied lab extends Lesson 14 by illustrating preflight deployment validation in the LLMOps operationalization lifecycle. When configuring local model servers (e.g., Uvicorn, vLLM, or Ollama), startup commands and environment configurations must be strictly validated and sanitized before deployment.
+
+### Core Contract & Boundary Rules
+
+1. **Required Command**: Missing, `None`, or empty command strings fail with `ValueError`.
+2. **Explicit Argument Array**: Passing a single string (e.g. `"--port 8000"`) where an array/list of arguments is expected fails with `TypeError` to enforce safe process boundaries and prevent shell injection.
+3. **Secret Redaction**: Environment variable keys are recorded in the summary, but all values are replaced with `[REDACTED]`.
+4. **No Process Launch**: Validating a configuration produces a `LaunchSummary` record without spawning any OS process.
+
+### Focus: Comparison with Independent Reference Oracle Table
+
+The direct implementation (`validate_launch_config`) is formally compared against an independent reference oracle calculation (`reference_oracle_table`) using identical test fixtures:
+
+| Fixture | Input Command | Arguments | Configured Env Keys | Redaction Verified | Oracle Equivalence |
+|---|---|---|---|---|---|
+| **Inference Server** | `"uvicorn"` | `["main:app", "--port", "8000"]` | `{"KEY": "secret"}` | Values -> `[REDACTED]` | Verified ✓ |
+| **Model Service** | `"vllm"` | `["serve", "--model", "phi-4"]` | `{"SECRET_A": "1", "SECRET_B": "2"}` | Values -> `[REDACTED]` | Verified ✓ |
+| **Empty Bounds** | `"ollama"` | `[]` | `{}` | No keys exposed | Verified ✓ |
+
+### Invocation and Test Suite
+
+Execute the test suite using standard library `unittest`:
+
+```bash
+# Run from repository root
+python3 -m unittest discover -s 14-the-generative-ai-application-lifecycle/applied-labs/r40-t043 -p "test_*.py" -v
+```
+
+Expected output (**9 tests**, exit code 0):
+
+```
+test_valid_record_produces_redacted_summary (test_example.TestLaunchConfigContract.test_valid_record_produces_redacted_summary) ... ok
+test_missing_command_fails (test_example.TestLaunchConfigContract.test_missing_command_fails) ... ok
+test_single_string_where_array_required_fails (test_example.TestLaunchConfigContract.test_single_string_where_array_required_fails) ... ok
+test_comparison_with_independent_oracle (test_example.TestIndependentOracleComparison.test_comparison_with_independent_oracle) ... ok
+...
+----------------------------------------------------------------------
+Ran 9 tests in 0.001s
+
+OK
+```
+
+> [!IMPORTANT]
+> The checker exits non-zero if assertions fail. Deliberate failure tests (`test_deliberate_wrong_command_fails` and `test_deliberate_wrong_redaction_fails`) verify that any modified expected results or leaked secrets immediately raise an `AssertionError`.
+
+### Simplification Boundary
+
+This local validator isolates startup configuration preflight checks:
+- It does **not** launch or monitor real operating system daemons.
+- It does **not** communicate with remote Kubernetes, Docker, or Azure ML clusters.
+- It makes no claims regarding actual server latency or inference performance.
+
+---
+
 ## Great! Continue your Learning!
 
 Amazing, now learn more about how we structure an application to use the concepts with the [Contoso Chat App](https://nitya.github.io/contoso-chat/?WT.mc_id=academic-105485-koreyst), to check how Cloud Advocacy adds those concepts in demonstrations. For more content, check our [Ignite breakout session!

@@ -1,0 +1,16 @@
+test_empty_args_list_allowed (test_example.TestBoundaryScenarios.test_empty_args_list_allowed) ... ok
+test_missing_env_defaults_to_empty (test_example.TestBoundaryScenarios.test_missing_env_defaults_to_empty) ... ok
+test_non_string_arg_in_array_fails (test_example.TestBoundaryScenarios.test_non_string_arg_in_array_fails) ... ok
+test_comparison_with_independent_oracle (test_example.TestIndependentOracleComparison.test_comparison_with_independent_oracle) ... ok
+test_deliberate_wrong_command_fails (test_example.TestLaunchConfigContract.test_deliberate_wrong_command_fails)
+Checker must fail if command assertion is modified. ... ok
+test_deliberate_wrong_redaction_fails (test_example.TestLaunchConfigContract.test_deliberate_wrong_redaction_fails)
+Checker must fail if unredacted secret is falsely claimed to match marker. ... ok
+test_missing_command_fails (test_example.TestLaunchConfigContract.test_missing_command_fails) ... ok
+test_single_string_where_array_required_fails (test_example.TestLaunchConfigContract.test_single_string_where_array_required_fails) ... ok
+test_valid_record_produces_redacted_summary (test_example.TestLaunchConfigContract.test_valid_record_produces_redacted_summary) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.000s
+
+OK
