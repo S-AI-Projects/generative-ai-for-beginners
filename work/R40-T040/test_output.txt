@@ -1,0 +1,23 @@
+test_applied_question_1_predict_output (test_example.TestOpenSourceModelDecisions.test_applied_question_1_predict_output)
+Applied question 1: predict output for open weights scenario. ... ok
+test_applied_question_2_diagnose_failure (test_example.TestOpenSourceModelDecisions.test_applied_question_2_diagnose_failure)
+Applied question 2: diagnose missing weights evaluation failure. ... ok
+test_applied_question_3_choose_boundary_policy (test_example.TestOpenSourceModelDecisions.test_applied_question_3_choose_boundary_policy)
+Applied question 3: choose boundary policy for full OSI compliance. ... ok
+test_applied_question_wrong_answer_fails (test_example.TestOpenSourceModelDecisions.test_applied_question_wrong_answer_fails)
+Executable check must fail when candidate answer is incorrect. ... ok
+test_boundary_scenario (test_example.TestOpenSourceModelDecisions.test_boundary_scenario)
+Test boundary scenario: open weights with private training dataset. ... ok
+test_decision_table_passes (test_example.TestOpenSourceModelDecisions.test_decision_table_passes)
+Published decision table check passes without error. ... ok
+test_deliberate_tampered_decision_fails (test_example.TestOpenSourceModelDecisions.test_deliberate_tampered_decision_fails)
+Altering a decision in the published table fails the checker. ... ok
+test_missing_info_scenario (test_example.TestOpenSourceModelDecisions.test_missing_info_scenario)
+Test missing-information scenario: None weight availability. ... ok
+test_normal_scenario (test_example.TestOpenSourceModelDecisions.test_normal_scenario)
+Test normal scenario: strict open source requirements with full open assets. ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.000s
+
+OK
