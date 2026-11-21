@@ -1,0 +1,21 @@
+test_approximate_token_count (test_example.TestTextGenerationDecisions.test_approximate_token_count)
+Token count helper test. ... ok
+test_boundary_scenario (test_example.TestTextGenerationDecisions.test_boundary_scenario)
+Test boundary scenario: creative prompt with tight budget near lower floor. ... ok
+test_check_decision_table_passes (test_example.TestTextGenerationDecisions.test_check_decision_table_passes)
+Published decision table must validate successfully. ... ok
+test_deliberate_wrong_decision_fails_checker (test_example.TestTextGenerationDecisions.test_deliberate_wrong_decision_fails_checker)
+Checker must fail when an expected decision in the table is deliberately altered. ... ok
+test_invalid_budget_negative (test_example.TestTextGenerationDecisions.test_invalid_budget_negative)
+Negative budget must be rejected with invalid budget status. ... ok
+test_missing_info_scenario (test_example.TestTextGenerationDecisions.test_missing_info_scenario)
+Test missing-information scenario: empty/whitespace prompt. ... ok
+test_normal_scenario (test_example.TestTextGenerationDecisions.test_normal_scenario)
+Test normal scenario: valid prompt, factual summarization, ample budget. ... ok
+test_prompt_exceeding_budget (test_example.TestTextGenerationDecisions.test_prompt_exceeding_budget)
+Prompt longer than total budget must be rejected. ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.007s
+
+OK
