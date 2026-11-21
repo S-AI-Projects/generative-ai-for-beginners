@@ -184,6 +184,62 @@ Try it yourself, then compare with the reference solutions:
 
 Also work through the notebooks in [python/](./python) (`aoai-assignment.ipynb` for Azure, `oai-assignment.ipynb` for OpenAI).
 
+## Applied Lab: Tensor-Shape Contract & Offline Service Adapter (R40-T035)
+
+This applied lab extends this lesson by implementing an offline preprocessing service adapter that validates and normalizes synthetic image batches before forwarding them to downstream generative vision models.
+
+The implementation is located at:
+- Implementation: [example.py](./applied-labs/r40-t035/example.py)
+- Test Suite: [test_example.py](./applied-labs/r40-t035/test_example.py)
+
+### Core Contract & Boundary Rules
+
+1. **Shape Preservation**: Given an input batch tensor of shape $N \times H \times W$ with numeric pixel intensities in $[0, 255]$, the preprocessor normalizes pixel values to $[0.0, 1.0]$ while strictly preserving the tensor dimensions.
+2. **Contract Fixture**: An input batch `[[[0, 255], [128, 64]]]` of shape `(1, 2, 2)` normalizes `0 -> 0.0`, `255 -> 1.0`, `128 -> 0.501961`, and `64 -> 0.25098`, retaining shape `(1, 2, 2)`.
+3. **Strict Bounds Checking**: Any negative pixel (`< 0`) or pixel exceeding 255 (`> 255`) is rejected with `InvalidPixelValueError`. Ragged or non-3D inputs raise `InvalidTensorShapeError`.
+4. **Callable Interface & Offline Adapter**: The external service dependency is encapsulated behind the `ImageBatchService` callable protocol and satisfied by `DeterministicLocalImageAdapter`. The adapter explicitly lists unestablished real-service behaviors (network transport, cloud authentication, neural diffusion passes, and content moderation).
+
+### Invocation and Test Suite
+
+Run the tests using standard library `unittest`:
+
+```bash
+# Run from repository root
+python3 -m unittest discover -s 09-building-image-applications/applied-labs/r40-t035 -p "test_*.py" -v
+```
+
+Expected output (**13 tests**, exit code 0):
+
+```
+test_deliberate_wrong_pixel_value_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_pixel_value_fails) ... ok
+test_deliberate_wrong_shape_assertion_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_shape_assertion_fails) ... ok
+test_adapter_identifies_unestablished_real_service_behaviors (test_example.TestFocusCallableInterfaceAndAdapter.test_adapter_identifies_unestablished_real_service_behaviors) ... ok
+test_adapter_satisfies_callable_interface (test_example.TestFocusCallableInterfaceAndAdapter.test_adapter_satisfies_callable_interface) ... ok
+test_dependency_injection_with_custom_adapter (test_example.TestFocusCallableInterfaceAndAdapter.test_dependency_injection_with_custom_adapter) ... ok
+test_empty_batch_boundary (test_example.TestTensorShapeContract.test_empty_batch_boundary) ... ok
+test_multi_image_batch_processing (test_example.TestTensorShapeContract.test_multi_image_batch_processing) ... ok
+test_negative_pixel_is_rejected (test_example.TestTensorShapeContract.test_negative_pixel_is_rejected) ... ok
+test_non_numeric_pixel_raises_type_error (test_example.TestTensorShapeContract.test_non_numeric_pixel_raises_type_error) ... ok
+test_pixel_greater_than_255_is_rejected (test_example.TestTensorShapeContract.test_pixel_greater_than_255_is_rejected) ... ok
+test_ragged_tensor_height_rejected (test_example.TestTensorShapeContract.test_ragged_tensor_height_rejected) ... ok
+test_ragged_tensor_width_rejected (test_example.TestTensorShapeContract.test_ragged_tensor_width_rejected) ... ok
+test_required_contract_fixture (test_example.TestTensorShapeContract.test_required_contract_fixture) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.001s
+
+OK
+```
+
+> [!IMPORTANT]
+> The test suite includes deliberate wrong assertions (`test_deliberate_wrong_shape_assertion_fails` and `test_deliberate_wrong_pixel_value_fails`) verifying that any discrepancy immediately produces a nonzero exit code.
+
+### Simplification & Simulation Boundary
+
+This local lab isolates tensor preprocessing and validation:
+- It runs purely in-memory using Python standard library types; no physical GPU hardware or deep learning framework weights (e.g., Stable Diffusion, DALL-E) are required.
+- It makes no unsupported claims regarding real-world image generation fidelity or prompt adherence.
+
 ## Great work! Continue your learning
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to keep leveling up your Generative AI knowledge!
