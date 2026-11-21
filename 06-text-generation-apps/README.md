@@ -609,6 +609,88 @@ What we have so far is code that works, but there are some tweaks we should be d
 
   In short: `temperature`/`top_p` are still valid on many models (Llama, Mistral, Phi, and the GPT-4.x family - though GPT-4.x is deprecating), but the direction of travel is prompt engineering + reasoning controls on reasoning models like GPT-5.
 
+## Applied Lab: R40-T044 — Decision Table for Recipe Suggestions
+
+> [!NOTE]
+> **[SIMULATION / MOCK]** This lab runs entirely locally with no API key, model download, GPU, or network access required. The `MockTextGenerationAdapter` returns deterministic fixture strings. See [example.py](./applied-labs/r40-t044/example.py) for the explicit list of real-service behaviours the mock does **not** establish.
+
+This applied lab extends the recipe-generator exercise from the lesson into a **prompt-engineering decision table** with three worked scenarios. It illustrates the same three-step pipeline taught here:
+
+1. **Construct a prompt** from input facts (ingredients, constraints, format instructions).
+2. **Call a text-generation interface** — `TextGenerationClient` — that wraps the external dependency.
+3. **Post-process the completion** to map the result to an application decision.
+
+### Callable interface and local adapter
+
+The external dependency (the LLM API call) sits behind a `Protocol`:
+
+```python
+class TextGenerationClient(Protocol):
+    def generate(self, prompt: str) -> str: ...
+```
+
+The **deterministic local adapter** (`MockTextGenerationAdapter`) implements this interface without any network or model access. In production you would swap in an `OpenAI`-backed adapter; the application logic is unchanged.
+
+### Three scenarios
+
+| # | Scenario | Input ingredients | Expected decision |
+|---|---|---|---|
+| 1 | **Normal** | `chicken, potatoes, carrots` | `SUGGEST` |
+| 2 | **Boundary** | `tomato` (single ingredient) | `SUGGEST_MINIMAL` |
+| 3 | **Missing-information** | *(empty list)* | `CANNOT_SUGGEST` |
+
+**Rationale tied to the lesson:**
+- *Normal*: Three named ingredients give the model the context Lesson 06 describes — a full prompt → rich completion → present to user.
+- *Boundary*: One ingredient is the minimum viable prompt from the recipe-generator exercise. The model can respond but results may be limited.
+- *Missing-information*: Lesson 06 makes clear that the prompt is the primary interface to the model. Without ingredients the application must not guess.
+
+### Run the lab
+
+```bash
+# From the repo root — no virtual environment or API key needed
+python3 -m unittest discover -s 06-text-generation-apps/applied-labs/r40-t044 -p "test_*.py" -v
+```
+
+Expected output (all three scenarios + integrity checks, **14 tests**):
+
+```
+test_decision_is_suggest_minimal (test_example.TestBoundaryScenario...) ... ok
+test_deliberate_wrong_decision_fails (test_example.TestBoundaryScenario...) ... ok
+test_response_has_at_least_one_recipe (test_example.TestBoundaryScenario...) ... ok
+test_boundary_decision_is_not_cannot_suggest (test_example.TestDecisionTableIntegrity...) ... ok
+test_missing_decision_is_not_suggest (test_example.TestDecisionTableIntegrity...) ... ok
+test_normal_decision_is_not_suggest_minimal (test_example.TestDecisionTableIntegrity...) ... ok
+test_decision_is_cannot_suggest (test_example.TestMissingInformationScenario...) ... ok
+test_deliberate_wrong_decision_fails (test_example.TestMissingInformationScenario...) ... ok
+test_response_has_no_recipes (test_example.TestMissingInformationScenario...) ... ok
+test_mock_does_not_raise_on_any_input (test_example.TestMockIsNotRealService...) ... ok
+test_mock_is_deterministic (test_example.TestMockIsNotRealService...) ... ok
+test_decision_is_suggest (test_example.TestNormalScenario...) ... ok
+test_deliberate_wrong_decision_fails (test_example.TestNormalScenario...) ... ok
+test_response_has_recipes (test_example.TestNormalScenario...) ... ok
+----------------------------------------------------------------------
+Ran 14 tests in 0.001s
+OK
+```
+
+> [!IMPORTANT]
+> The checker **exits non-zero** if any assertion fails. The three `test_deliberate_wrong_decision_fails` tests each verify that asserting the **wrong** expected decision raises `AssertionError` — proving the checker catches mistakes.
+
+### Where the simplification stops
+
+The mock establishes the *application contract* only. It does **not** establish:
+
+- **Non-determinism** — a real model returns different text every call.
+- **Token limits** — the mock never truncates; a real model may cut off mid-sentence.
+- **Network errors / rate-limits** — the mock never raises `openai.APIError` or HTTP 429.
+- **Safety-filter refusals** — the mock never declines a prompt.
+- **Hallucination** — the mock never invents ingredients absent from the prompt.
+- **Latency and cost** — the mock is instantaneous and free.
+
+Tests that pass here prove the **application logic** (prompt construction, response parsing, decision mapping) is correct in isolation — not that a live model integration is correct.
+
+---
+
 ## Assignment
 
 For this assignment, you can choose what to build.
