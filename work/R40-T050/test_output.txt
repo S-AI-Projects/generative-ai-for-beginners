@@ -1,0 +1,22 @@
+test_q1_predict_output_executable_check (test_example.TestAppliedQuestionsExecutableChecks.test_q1_predict_output_executable_check)
+Q1 Executable Check: ... ok
+test_q2_diagnose_failure_executable_check (test_example.TestAppliedQuestionsExecutableChecks.test_q2_diagnose_failure_executable_check)
+Q2 Executable Check: ... ok
+test_q3_choose_boundary_policy_executable_check (test_example.TestAppliedQuestionsExecutableChecks.test_q3_choose_boundary_policy_executable_check)
+Q3 Executable Check: ... ok
+test_case_insensitive_matching (test_example.TestBoundaryAndEdgeCases.test_case_insensitive_matching) ... ok
+test_empty_query_returns_no_match (test_example.TestBoundaryAndEdgeCases.test_empty_query_returns_no_match) ... ok
+test_single_word_partial_matches (test_example.TestBoundaryAndEdgeCases.test_single_word_partial_matches) ... ok
+test_deliberate_wrong_ocean_match_fails (test_example.TestTinyLexicalRetrieverContract.test_deliberate_wrong_ocean_match_fails)
+Deliberately assert that 'ocean' matches Document C. ... ok
+test_deliberate_wrong_ranking_fails (test_example.TestTinyLexicalRetrieverContract.test_deliberate_wrong_ranking_fails)
+Deliberately assert that B is ranked before A for 'red apple'. ... ok
+test_label_identifies_lexical_test_double (test_example.TestTinyLexicalRetrieverContract.test_label_identifies_lexical_test_double) ... ok
+test_query_ocean_returns_no_match (test_example.TestTinyLexicalRetrieverContract.test_query_ocean_returns_no_match) ... ok
+test_query_red_apple_ranks_A_before_B (test_example.TestTinyLexicalRetrieverContract.test_query_red_apple_ranks_A_before_B) ... ok
+test_results_include_document_ids (test_example.TestTinyLexicalRetrieverContract.test_results_include_document_ids) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.000s
+
+OK
