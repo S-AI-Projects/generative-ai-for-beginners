@@ -344,6 +344,76 @@ while not generator.is_done():
 In addition to ONNX Runtime, Ollama, and Foundry Local reference methods, we can also complete the reference of quantitative models based on the model reference methods provided by different manufacturers. Such as Apple MLX framework with Apple Metal, Qualcomm QNN with NPU, Intel OpenVINO with CPU/GPU, etc. You can also get more content from [Phi-3 Cookbook](https://github.com/microsoft/phi-3cookbook?WT.mc_id=academic-105485-koreyst)
 
 
+## Applied Lab: R40-T048 — Prompt Budget Preflight with Intermediate State Invariants
+
+> [!NOTE]
+> **[TEACHING APPROXIMATION / SIMULATION]** This lab operates locally on a deterministic whitespace tokenizer. It is a teaching approximation and **not** the real tokenizer of Phi-3/3.5/4 or production SLMs. No GPU, model weights download, or paid provider is required.
+
+This applied lab extends Lesson 19 by implementing an auditable **prompt token budget preflight pipeline** (`PromptBudgetPipeline`). When deploying SLMs on resource-constrained edge or mobile devices, prompt lengths must be verified before inference.
+
+### Discrete Pipeline Steps & Intermediate State Recording
+
+The pipeline records an execution trace capturing intermediate state snapshots after each step:
+1. **`VALIDATE_INPUT`**: Confirms budget $\ge 0$. Snapshot: `{budget, prompt_length}`.
+2. **`TOKENIZATION`**: Splits prompt into tokens via `WhitespaceTokenizer`. Snapshot: `{tokens, token_count}`.
+3. **`EVALUATE_BUDGET`**: Calculates planned retained count and removed count. Snapshot: `{initial_count, planned_retained_count, planned_removed_count}`.
+4. **`TRUNCATION`**: Slices tokens into retained vs. removed subsets. Snapshot: `{retained_tokens, removed_tokens, actual_retained_count, actual_removed_count}`.
+5. **`REPORTING`**: Assembles final `BudgetReport` with retained tokens, removed count, budget, and complete execution trace.
+
+### Mathematical Invariants Linking Intermediate State to Output
+
+The pipeline formally verifies invariants linking the intermediate snapshots to the final output (`verify_pipeline_invariants`):
+- **Token Conservation**: $\text{len}(\text{initial\_tokens}) = \text{len}(\text{retained\_tokens}) + \text{removed\_count}$.
+- **Sequence Reconstitution**: $\text{initial\_tokens} = \text{retained\_tokens} + \text{removed\_tokens}$.
+- **Bounded Capacity**: $\text{len}(\text{retained\_tokens}) \le \text{budget}$.
+- **Prefix Preservation**: $\text{initial\_tokens}[:\text{len}(\text{retained\_tokens})] = \text{retained\_tokens}$.
+
+### Scenarios & Test Fixtures
+
+| Scenario | Input Prompt | Budget | Retained Tokens | Removed Count | Status |
+|---|---|---|---|---|---|
+| **Normal** | `"one two three four"` | `3` | `["one", "two", "three"]` | `1` | Truncates to budget limit |
+| **Boundary (Empty)** | `""` | `3` | `[]` | `0` | Empty input retains none |
+| **Boundary (Zero Budget)** | `"one two three"` | `0` | `[]` | `3` | Retains none, reports all removed |
+| **Boundary (Excess Budget)**| `"hello world"` | `10` | `["hello", "world"]` | `0` | Retains all |
+| **Failure (Negative Budget)** | `"any prompt"` | `-1` | N/A | N/A | Raises `ValueError` |
+
+### Invocation and Test Suite
+
+Execute the test suite using standard library `unittest`:
+
+```bash
+# Run from repository root
+python3 -m unittest discover -s 19-slm/applied-labs/r40-t048 -p "test_*.py" -v
+```
+
+Expected output (**18 tests**, exit code 0):
+
+```
+test_retained_tokens (test_example.TestNormalScenario.test_retained_tokens) ... ok
+test_removed_count (test_example.TestNormalScenario.test_removed_count) ... ok
+test_token_conservation_invariant (test_example.TestIntermediateStateAndInvariants.test_token_conservation_invariant) ... ok
+test_sequence_reconstitution_invariant (test_example.TestIntermediateStateAndInvariants.test_sequence_reconstitution_invariant) ... ok
+test_prefix_preservation_invariant (test_example.TestIntermediateStateAndInvariants.test_prefix_preservation_invariant) ... ok
+test_invariants_pass (test_example.TestNormalScenario.test_invariants_pass) ... ok
+...
+----------------------------------------------------------------------
+Ran 18 tests in 0.001s
+
+OK
+```
+
+> [!IMPORTANT]
+> The checker exits non-zero if assertions fail. Deliberate failure tests (`test_deliberate_wrong_*_fails` and `test_deliberate_invariant_violation_fails`) confirm that any unexpected outputs or corrupted intermediate states immediately raise an `AssertionError`.
+
+### Simplification Boundary
+
+This local simulation isolates tokenizer budgeting logic:
+- It does **not** simulate Byte-Pair Encoding (BPE), vocabulary lookup tables, or SentencePiece merges.
+- It makes no claims regarding actual hardware latency, NPU memory consumption, or trained SLM inference output.
+
+---
+
 ## More
 
 We have learned the basics of Phi-3/3.5 Family, but to learn more about SLM we need more knowledge. You can find the answers in the Phi-3 Cookbook. If you want to learn more, please visit the [Phi-3 Cookbook](https://github.com/microsoft/phi-3cookbook?WT.mc_id=academic-105485-koreyst).

@@ -1,0 +1,27 @@
+test_empty_input_retains_none (test_example.TestBoundaryScenarios.test_empty_input_retains_none) ... ok
+test_excess_budget_retains_all (test_example.TestBoundaryScenarios.test_excess_budget_retains_all) ... ok
+test_zero_budget_retains_none (test_example.TestBoundaryScenarios.test_zero_budget_retains_none) ... ok
+test_deliberate_wrong_no_exception_fails (test_example.TestFailureScenarios.test_deliberate_wrong_no_exception_fails) ... ok
+test_negative_budget_raises_value_error (test_example.TestFailureScenarios.test_negative_budget_raises_value_error) ... ok
+test_deliberate_invariant_violation_fails (test_example.TestIntermediateStateAndInvariants.test_deliberate_invariant_violation_fails)
+Corrupting the report must cause verify_pipeline_invariants to raise AssertionError. ... ok
+test_intermediate_steps_recorded (test_example.TestIntermediateStateAndInvariants.test_intermediate_steps_recorded) ... ok
+test_prefix_preservation_invariant (test_example.TestIntermediateStateAndInvariants.test_prefix_preservation_invariant)
+Retained tokens must exactly match the prefix of the initial token stream. ... ok
+test_sequence_reconstitution_invariant (test_example.TestIntermediateStateAndInvariants.test_sequence_reconstitution_invariant)
+Initial token tuple must equal retained tokens concatenated with removed tokens. ... ok
+test_token_conservation_invariant (test_example.TestIntermediateStateAndInvariants.test_token_conservation_invariant)
+Initial tokens must equal retained tokens count plus removed tokens count. ... ok
+test_budget_value (test_example.TestNormalScenario.test_budget_value) ... ok
+test_deliberate_wrong_removed_fails (test_example.TestNormalScenario.test_deliberate_wrong_removed_fails) ... ok
+test_deliberate_wrong_retained_fails (test_example.TestNormalScenario.test_deliberate_wrong_retained_fails) ... ok
+test_invariants_pass (test_example.TestNormalScenario.test_invariants_pass) ... ok
+test_removed_count (test_example.TestNormalScenario.test_removed_count) ... ok
+test_retained_tokens (test_example.TestNormalScenario.test_retained_tokens) ... ok
+test_tokenizer_label_teaching_approximation (test_example.TestNormalScenario.test_tokenizer_label_teaching_approximation) ... ok
+test_deterministic_output (test_example.TestSimulationContract.test_deterministic_output) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.000s
+
+OK
