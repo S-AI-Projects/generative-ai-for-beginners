@@ -1,0 +1,18 @@
+test_empty_allowed_toolset_rejects_all (test_example.TestBoundaryScenarios.test_empty_allowed_toolset_rejects_all) ... ok
+test_empty_string_path_rejected (test_example.TestBoundaryScenarios.test_empty_string_path_rejected) ... ok
+test_invalid_argument_type_rejected (test_example.TestBoundaryScenarios.test_invalid_argument_type_rejected) ... ok
+test_deliberate_leakage_assertion_fails (test_example.TestControlledConfigurationsComparison.test_deliberate_leakage_assertion_fails)
+Deliberately assert non-zero leakage to verify checker. ... ok
+test_three_configurations_comparison (test_example.TestControlledConfigurationsComparison.test_three_configurations_comparison) ... ok
+test_allowed_read_with_valid_path_passes (test_example.TestResponsiblePolicyContract.test_allowed_read_with_valid_path_passes) ... ok
+test_deliberate_wrong_execution_status_fails (test_example.TestResponsiblePolicyContract.test_deliberate_wrong_execution_status_fails)
+Deliberately assert that unknown tool was executed. ... ok
+test_deliberate_wrong_refusal_reason_fails (test_example.TestResponsiblePolicyContract.test_deliberate_wrong_refusal_reason_fails)
+Deliberately assert wrong refusal reason. ... ok
+test_missing_required_argument_is_rejected (test_example.TestResponsiblePolicyContract.test_missing_required_argument_is_rejected) ... ok
+test_unknown_delete_tool_is_rejected (test_example.TestResponsiblePolicyContract.test_unknown_delete_tool_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.000s
+
+OK
