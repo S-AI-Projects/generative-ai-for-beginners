@@ -112,6 +112,68 @@ Building an operational practice around your AI applications is the final stage.
 
 While the work of developing Responsible AI solutions may seem like a lot, it is work well worth the effort. As the area of Generative AI grows, more tooling to help developers efficiently integrate responsibility into their workflows will mature. For example, the [Azure AI Content Safety](https://learn.microsoft.com/azure/ai-services/content-safety/overview?WT.mc_id=academic-105485-koreyst) can help detect harmful content and images via an API request.
 
+## Applied Lab: R40-T049 — Pre-Execution Action Policy & Tool Validation
+
+> [!NOTE]
+> **[SIMULATION / MOCK]** This lab operates locally on an in-memory tool policy validator and stub executor. No external model calls, API keys, GPUs, or network access are required.
+
+This applied lab extends Lesson 03 by demonstrating pre-execution action policy guardrails. In an AI agent system, language models may suggest external actions (such as filesystem access or web search). To maintain Reliability/Safety and Accountability, proposed actions must be validated against an explicit allowed-tool set and per-tool argument schema before being forwarded to an execution layer.
+
+### Core Contract & Validation Order
+
+1. **Tool Whitelist Check**: The proposed tool name must exist in the configured `allowed_tools` set. Unknown tools (e.g., `delete`) are rejected immediately with `UNKNOWN_TOOL`.
+2. **Argument Schema Check**: All required parameters must be present, non-empty, and match expected types. Missing arguments trigger `MISSING_REQUIRED_ARGUMENT`.
+3. **Execution Isolation (Zero Leakage)**: If an action is rejected at any validation step, it **never reaches the stub executor**.
+
+### Controlled Configurations & Trade-Off Comparison
+
+We benchmark three controlled policy configurations across an identical 5-action test workload (`read`, `delete`, `search`, `summarize`, and malformed `read`):
+
+| Configuration | Allowed Tools | Executed Actions | Blocked Actions | Interception Rate | Executor Leakage |
+|---|---|---|---|---|---|
+| **Config A (Strict Read)** | `{"read"}` | 1 | 4 | **80%** | **0** |
+| **Config B (Standard Inspection)** | `{"read", "search"}` | 2 | 3 | **60%** | **0** |
+| **Config C (Extended Assistant)** | `{"read", "search", "summarize"}` | 3 | 2 | **40%** | **0** |
+
+**Observed Trade-off:**
+- Strict policy minimizes capability exposure and potential unintended consequences, at the cost of higher rejection of benign requests.
+- Wider policies enable richer agent workflows while consistently rejecting malicious (`delete`) and malformed actions. Across all configurations, the zero-leakage safety invariant holds strictly.
+
+### Invocation and Test Suite
+
+Execute the test suite using standard library `unittest`:
+
+```bash
+# Run from repository root
+python3 -m unittest discover -s 03-using-generative-ai-responsibly/applied-labs/r40-t049 -p "test_*.py" -v
+```
+
+Expected output (**10 tests**, exit code 0):
+
+```
+test_allowed_read_with_valid_path_passes (test_example.TestResponsiblePolicyContract.test_allowed_read_with_valid_path_passes) ... ok
+test_unknown_delete_tool_is_rejected (test_example.TestResponsiblePolicyContract.test_unknown_delete_tool_is_rejected) ... ok
+test_missing_required_argument_is_rejected (test_example.TestResponsiblePolicyContract.test_missing_required_argument_is_rejected) ... ok
+test_three_configurations_comparison (test_example.TestControlledConfigurationsComparison.test_three_configurations_comparison) ... ok
+...
+----------------------------------------------------------------------
+Ran 10 tests in 0.001s
+
+OK
+```
+
+> [!IMPORTANT]
+> The checker exits non-zero if assertions fail. Deliberate failure tests (`test_deliberate_wrong_*_fails` and `test_deliberate_leakage_assertion_fails`) confirm that any unexpected tool execution or state discrepancy immediately raises an `AssertionError`.
+
+### Simplification Boundary
+
+This local simulation isolates deterministic action policy validation:
+- It does **not** evaluate fuzzy semantic intent or natural-language jailbreak prompts.
+- It does **not** simulate cloud content-safety filters (e.g. Azure Content Safety API) or real operating system file operations.
+- No claims are made regarding trained-model reasoning accuracy.
+
+---
+
 ## Knowledge check
 
 What are some things you need to care about to ensure responsible AI usage?
