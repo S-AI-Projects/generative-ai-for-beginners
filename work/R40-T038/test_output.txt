@@ -1,0 +1,31 @@
+test_boundary_case_matrix_audit (test_example.TestBoundaryCasesAndSmallestValid.test_boundary_case_matrix_audit)
+Verify the published boundary evaluation case matrix has all required categories. ... ok
+test_boundary_zero_min_score_includes_zero_score_documents (test_example.TestBoundaryCasesAndSmallestValid.test_boundary_zero_min_score_includes_zero_score_documents)
+When min_score=0 is explicitly configured, even 0-score docs are included. ... ok
+test_empty_and_whitespace_query_boundary (test_example.TestBoundaryCasesAndSmallestValid.test_empty_and_whitespace_query_boundary)
+Empty or whitespace-only queries produce empty results list. ... ok
+test_smallest_valid_case (test_example.TestBoundaryCasesAndSmallestValid.test_smallest_valid_case)
+Smallest valid case: Single character document ('a') and single token query ('a'). ... ok
+test_threshold_boundary_exact_match (test_example.TestBoundaryCasesAndSmallestValid.test_threshold_boundary_exact_match)
+Boundary decision: score >= min_score is inclusive. ... ok
+test_deliberate_wrong_omission_assertion_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_omission_assertion_fails)
+Asserting that doc_3 ('blue sky') is included for query 'red' raises AssertionError. ... ok
+test_deliberate_wrong_tie_order_assertion_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_tie_order_assertion_fails)
+Asserting that doc_2 is ranked before doc_1 for query 'red' raises AssertionError. ... ok
+test_invalid_doc_id_raises_value_error (test_example.TestInvalidCasesAndFailures.test_invalid_doc_id_raises_value_error)
+Empty or blank document ID raises ValueError. ... ok
+test_invalid_doc_text_raises_type_error (test_example.TestInvalidCasesAndFailures.test_invalid_doc_text_raises_type_error)
+Non-string document content raises TypeError. ... ok
+test_invalid_query_type_raises_type_error (test_example.TestInvalidCasesAndFailures.test_invalid_query_type_raises_type_error)
+Non-string query raises TypeError. ... ok
+test_negative_threshold_raises_value_error (test_example.TestInvalidCasesAndFailures.test_negative_threshold_raises_value_error)
+Negative minimum score threshold raises ValueError. ... ok
+test_query_red_matches_apple_and_berry_equally_with_stable_tie_break (test_example.TestRankedSearchContract.test_query_red_matches_apple_and_berry_equally_with_stable_tie_break)
+Contract requirement: ... ok
+test_score_ranking_differentiation (test_example.TestRankedSearchContract.test_score_ranking_differentiation)
+Query 'red apple' scores 2 for doc_1 and 1 for doc_2. ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.001s
+
+OK
