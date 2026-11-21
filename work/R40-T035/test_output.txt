@@ -1,0 +1,31 @@
+test_deliberate_wrong_pixel_value_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_pixel_value_fails)
+Asserting an incorrect normalized pixel value raises AssertionError. ... ok
+test_deliberate_wrong_shape_assertion_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_shape_assertion_fails)
+Asserting an incorrect tensor shape raises AssertionError. ... ok
+test_adapter_identifies_unestablished_real_service_behaviors (test_example.TestFocusCallableInterfaceAndAdapter.test_adapter_identifies_unestablished_real_service_behaviors)
+Verify that the adapter explicitly identifies which real-service behaviors ... ok
+test_adapter_satisfies_callable_interface (test_example.TestFocusCallableInterfaceAndAdapter.test_adapter_satisfies_callable_interface)
+Verify adapter can be invoked via __call__ and process_batch. ... ok
+test_dependency_injection_with_custom_adapter (test_example.TestFocusCallableInterfaceAndAdapter.test_dependency_injection_with_custom_adapter)
+Verify that downstream client code can accept any ImageBatchService callable. ... ok
+test_empty_batch_boundary (test_example.TestTensorShapeContract.test_empty_batch_boundary)
+An empty batch yields a valid result with shape (0, 0, 0). ... ok
+test_multi_image_batch_processing (test_example.TestTensorShapeContract.test_multi_image_batch_processing)
+A batch of multiple images (N=2, H=3, W=2) preserves dimensions correctly. ... ok
+test_negative_pixel_is_rejected (test_example.TestTensorShapeContract.test_negative_pixel_is_rejected)
+Pixels < 0 must be rejected with InvalidPixelValueError. ... ok
+test_non_numeric_pixel_raises_type_error (test_example.TestTensorShapeContract.test_non_numeric_pixel_raises_type_error)
+Non-numeric or boolean values must raise TypeError. ... ok
+test_pixel_greater_than_255_is_rejected (test_example.TestTensorShapeContract.test_pixel_greater_than_255_is_rejected)
+Pixels > 255 must be rejected with InvalidPixelValueError. ... ok
+test_ragged_tensor_height_rejected (test_example.TestTensorShapeContract.test_ragged_tensor_height_rejected)
+Inconsistent image heights across a batch raise InvalidTensorShapeError. ... ok
+test_ragged_tensor_width_rejected (test_example.TestTensorShapeContract.test_ragged_tensor_width_rejected)
+Inconsistent row width within an image raises InvalidTensorShapeError. ... ok
+test_required_contract_fixture (test_example.TestTensorShapeContract.test_required_contract_fixture)
+Contract requirement: ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.001s
+
+OK
