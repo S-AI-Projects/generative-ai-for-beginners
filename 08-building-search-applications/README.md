@@ -156,6 +156,74 @@ When you run the notebook, you'll be prompted to enter a query. The input box wi
 
 ![Input box for the user to input a query](./images/notebook-search.png?WT.mc_id=academic-105485-koreyst)
 
+## Applied Lab: Ranked Search with Stable Ties & Boundary Evaluation (R40-T038)
+
+This applied lab extends this lesson by implementing a local ranked search engine with token overlap scoring, minimum-score threshold filtering, and deterministic document ID tie-breaking.
+
+The implementation is located at:
+- Implementation: [example.py](./applied-labs/r40-t038/example.py)
+- Test Suite: [test_example.py](./applied-labs/r40-t038/test_example.py)
+
+### Core Contract & Boundary Rules
+
+1. **Ranking & Thresholding**: Queries are tokenized and scored against local document token sets. Documents with scores meeting or exceeding the minimum score threshold (`score >= min_score`, default `min_score=1`) are retained; ungrounded documents scoring zero are omitted.
+2. **Contract Fixture**: In corpus `doc_1: "red apple"`, `doc_2: "red berry"`, and `doc_3: "blue sky"`:
+   - Query `"red"` matches `doc_1` and `doc_2` with equal overlap score (`score=1`).
+   - Stable alphabetical `doc_id` order breaks the tie, ranking `doc_1` before `doc_2`.
+   - `doc_3` scores 0 and is omitted.
+3. **Provenance**: Search results return structured `SearchResult` records containing `doc_id`, `score`, and `text`.
+
+### Focus: Boundary Evaluation Matrix & Decision Rationales
+
+The lab defines explicit boundary cases:
+- **Smallest Valid Case**: Document `{"min_1": "a"}` and query `"a"` returning `score=1`.
+- **Threshold Boundary (Exact)**: `score == min_score` is inclusive; boundary documents are retained.
+- **Threshold Boundary (Omission)**: `score < min_score` drops ungrounded documents.
+- **Tie-Breaking Boundary**: Ties in score are resolved by ascending `doc_id` string comparison.
+- **Empty Query Boundary**: Whitespace or punctuation queries return empty results (`[]`).
+- **Invalid Threshold**: Negative thresholds raise `ValueError`.
+
+### Invocation and Test Suite
+
+Run the tests using standard library `unittest`:
+
+```bash
+# Run from repository root
+python3 -m unittest discover -s 08-building-search-applications/applied-labs/r40-t038 -p "test_*.py" -v
+```
+
+Expected output (**13 tests**, exit code 0):
+
+```
+test_boundary_case_matrix_audit (test_example.TestBoundaryCasesAndSmallestValid.test_boundary_case_matrix_audit) ... ok
+test_boundary_zero_min_score_includes_zero_score_documents (test_example.TestBoundaryCasesAndSmallestValid.test_boundary_zero_min_score_includes_zero_score_documents) ... ok
+test_empty_and_whitespace_query_boundary (test_example.TestBoundaryCasesAndSmallestValid.test_empty_and_whitespace_query_boundary) ... ok
+test_smallest_valid_case (test_example.TestBoundaryCasesAndSmallestValid.test_smallest_valid_case) ... ok
+test_threshold_boundary_exact_match (test_example.TestBoundaryCasesAndSmallestValid.test_threshold_boundary_exact_match) ... ok
+test_deliberate_wrong_omission_assertion_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_omission_assertion_fails) ... ok
+test_deliberate_wrong_tie_order_assertion_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_tie_order_assertion_fails) ... ok
+test_invalid_doc_id_raises_value_error (test_example.TestInvalidCasesAndFailures.test_invalid_doc_id_raises_value_error) ... ok
+test_invalid_doc_text_raises_type_error (test_example.TestInvalidCasesAndFailures.test_invalid_doc_text_raises_type_error) ... ok
+test_invalid_query_type_raises_type_error (test_example.TestInvalidCasesAndFailures.test_invalid_query_type_raises_type_error) ... ok
+test_negative_threshold_raises_value_error (test_example.TestInvalidCasesAndFailures.test_negative_threshold_raises_value_error) ... ok
+test_query_red_matches_apple_and_berry_equally_with_stable_tie_break (test_example.TestRankedSearchContract.test_query_red_matches_apple_and_berry_equally_with_stable_tie_break) ... ok
+test_score_ranking_differentiation (test_example.TestRankedSearchContract.test_score_ranking_differentiation) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.001s
+
+OK
+```
+
+> [!IMPORTANT]
+> The test suite includes deliberate wrong assertions (`test_deliberate_wrong_tie_order_assertion_fails` and `test_deliberate_wrong_omission_assertion_fails`) verifying that any discrepancy immediately produces a nonzero exit code.
+
+### Simplification & Simulation Boundary
+
+This local lab isolates lexical ranking and tie-breaking:
+- It runs purely in-memory using standard library Python types; no physical GPU, dense embeddings (`text-embedding-ada-002`), or cloud vector databases (e.g., Azure AI Search) are required.
+- It makes no claims regarding semantic synonym recall or real-world model accuracy.
+
 ## Great Work! Continue Your Learning
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!
