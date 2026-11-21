@@ -1,0 +1,35 @@
+test_deliberate_wrong_trainable_count_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_trainable_count_fails)
+Asserting an incorrect trainable parameter count raises AssertionError. ... ok
+test_deliberate_wrong_unmatched_prefix_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_unmatched_prefix_fails)
+Asserting an incorrect unmatched prefix raises AssertionError. ... ok
+test_matcher_unit_functionality (test_example.TestExtractedResponsibility.test_matcher_unit_functionality)
+Matcher correctly compiles prefixes, tests layers, and tracks unmatched rules. ... ok
+test_contract_fixture_before_after_equivalence (test_example.TestFocusBeforeAfterEquivalence.test_contract_fixture_before_after_equivalence)
+Verify exact equivalence between baseline_freeze_budget and ... ok
+test_diverse_fixtures_before_after_equivalence (test_example.TestFocusBeforeAfterEquivalence.test_diverse_fixtures_before_after_equivalence)
+Verify equivalence across multiple complex fixtures: ... ok
+test_all_layers_frozen (test_example.TestParameterBudgetContract.test_all_layers_frozen)
+When all layers match freeze rules, trainable parameters are 0. ... ok
+test_empty_freeze_prefixes_leaves_all_trainable (test_example.TestParameterBudgetContract.test_empty_freeze_prefixes_leaves_all_trainable)
+When no freeze prefixes are provided, 100% of parameters remain trainable. ... ok
+test_empty_manifest_returns_zero_budget (test_example.TestParameterBudgetContract.test_empty_manifest_returns_zero_budget)
+Empty manifest safely evaluates to 0 total and 0 trainable parameters. ... ok
+test_multiple_freeze_prefixes_and_nested_modules (test_example.TestParameterBudgetContract.test_multiple_freeze_prefixes_and_nested_modules)
+Prefix matching works on hierarchical/nested PyTorch-style layer paths. ... ok
+test_required_contract_encoder_head (test_example.TestParameterBudgetContract.test_required_contract_encoder_head)
+Contract requirement: ... ok
+test_unmatched_freeze_prefix_is_reported (test_example.TestParameterBudgetContract.test_unmatched_freeze_prefix_is_reported)
+Contract requirement: ... ok
+test_empty_layer_name_raises_value_error (test_example.TestValidationFailures.test_empty_layer_name_raises_value_error)
+Empty or whitespace-only layer names fail validation. ... ok
+test_invalid_freeze_prefixes_type_raises_type_error (test_example.TestValidationFailures.test_invalid_freeze_prefixes_type_raises_type_error)
+Non-sequence freeze prefixes input raises TypeError. ... ok
+test_invalid_manifest_type_raises_type_error (test_example.TestValidationFailures.test_invalid_manifest_type_raises_type_error)
+Non-mapping manifest input raises TypeError. ... ok
+test_negative_parameter_count_raises_value_error (test_example.TestValidationFailures.test_negative_parameter_count_raises_value_error)
+Negative parameter count must fail validation. ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.001s
+
+OK

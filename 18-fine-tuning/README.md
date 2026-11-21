@@ -130,6 +130,66 @@ The following resources provide step-by-step tutorials that walk you through a r
 
 Select one of the tutorials above and walk through them. _We may replicate a version of these tutorials in Jupyter Notebooks in this repo for reference only. Please use the original sources directly to get the latest versions_.
 
+## Applied Lab: Prefix-Based Layer Freezing and Trainable Parameter Budget (R40-T036)
+
+This applied lab extends the concepts of selective fine-tuning and parameter-efficient training introduced in this lesson. When preparing an LLM for fine-tuning, training all parameters requires massive GPU VRAM. In practice, engineers selectively freeze backbone layers using prefix rules and train only task-specific adapters or heads. Catching configuration mistakes (like misspelled freeze prefixes) before starting training avoids silent, expensive full-parameter runs.
+
+The implementation is located at:
+- Implementation: [example.py](./applied-labs/r40-t036/example.py)
+- Test Suite: [test_example.py](./applied-labs/r40-t036/test_example.py)
+
+### Core Contract & Boundary Rules
+
+1. **Parameter Counting & Freezing**: Given a local named-parameter manifest (e.g. `{"encoder": 100, "head": 20}`) and freeze rules (e.g. `["encoder"]`), layers matching any freeze prefix are marked frozen. For this fixture: `total=120`, `trainable=20`, and `frozen=100`.
+2. **Unmatched Prefix Detection**: Any freeze prefix that does not match any layer in the manifest is reported in `unmatched_prefixes` to catch configuration mistakes (such as typos like `"encodr"`) that would otherwise silently cause unintended full-parameter training.
+3. **Focus: Baseline & Extracted Responsibility Equivalence**:
+   - Monolithic baseline (`baseline_freeze_budget`) performs validation, prefix scanning, parameter summation, and reporting in a single pass.
+   - Refactored design extracts prefix compilation and layer classification into a dedicated `PrefixFreezeMatcher` class, delegated to by `count_fine_tuning_parameters`.
+   - Behavioral equivalence is proven across all fixtures (`baseline_result == refactored_result`).
+
+### Invocation and Test Suite
+
+Run the tests using standard library `unittest`:
+
+```bash
+# Run from repository root
+python3 -m unittest discover -s 18-fine-tuning/applied-labs/r40-t036 -p "test_*.py" -v
+```
+
+Expected output (**15 tests**, exit code 0):
+
+```
+test_deliberate_wrong_trainable_count_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_trainable_count_fails) ... ok
+test_deliberate_wrong_unmatched_prefix_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_unmatched_prefix_fails) ... ok
+test_matcher_unit_functionality (test_example.TestExtractedResponsibility.test_matcher_unit_functionality) ... ok
+test_contract_fixture_before_after_equivalence (test_example.TestFocusBeforeAfterEquivalence.test_contract_fixture_before_after_equivalence) ... ok
+test_diverse_fixtures_before_after_equivalence (test_example.TestFocusBeforeAfterEquivalence.test_diverse_fixtures_before_after_equivalence) ... ok
+test_all_layers_frozen (test_example.TestParameterBudgetContract.test_all_layers_frozen) ... ok
+test_empty_freeze_prefixes_leaves_all_trainable (test_example.TestParameterBudgetContract.test_empty_freeze_prefixes_leaves_all_trainable) ... ok
+test_empty_manifest_returns_zero_budget (test_example.TestParameterBudgetContract.test_empty_manifest_returns_zero_budget) ... ok
+test_multiple_freeze_prefixes_and_nested_modules (test_example.TestParameterBudgetContract.test_multiple_freeze_prefixes_and_nested_modules) ... ok
+test_required_contract_encoder_head (test_example.TestParameterBudgetContract.test_required_contract_encoder_head) ... ok
+test_unmatched_freeze_prefix_is_reported (test_example.TestParameterBudgetContract.test_unmatched_freeze_prefix_is_reported) ... ok
+test_empty_layer_name_raises_value_error (test_example.TestValidationFailures.test_empty_layer_name_raises_value_error) ... ok
+test_invalid_freeze_prefixes_type_raises_type_error (test_example.TestValidationFailures.test_invalid_freeze_prefixes_type_raises_type_error) ... ok
+test_invalid_manifest_type_raises_type_error (test_example.TestValidationFailures.test_invalid_manifest_type_raises_type_error) ... ok
+test_negative_parameter_count_raises_value_error (test_example.TestValidationFailures.test_negative_parameter_count_raises_value_error) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.001s
+
+OK
+```
+
+> [!IMPORTANT]
+> The test suite includes deliberate wrong assertions (`test_deliberate_wrong_trainable_count_fails` and `test_deliberate_wrong_unmatched_prefix_fails`) verifying that any discrepancy immediately produces a nonzero exit code.
+
+### Simplification & Simulation Boundary
+
+This local lab isolates layer freezing and parameter budget calculations:
+- It runs purely in-memory on named-parameter maps; no real GPU/TPU hardware, PyTorch autograd graph, or downloaded weights (e.g., Llama, Mistral) are required.
+- It makes no unsupported claims regarding real-world fine-tuning convergence, loss values, or trained model accuracy.
+
 ## Great Work! Continue Your Learning.
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!
