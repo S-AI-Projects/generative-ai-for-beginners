@@ -1,0 +1,29 @@
+test_deliberate_wrong_empty_result_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_empty_result_fails)
+Asserting that 'ocean' returns a match raises AssertionError. ... ok
+test_deliberate_wrong_rank_order_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_rank_order_fails)
+Asserting that B ranks before A raises AssertionError. ... ok
+test_oracle_comparison_on_diverse_queries (test_example.TestFocusIndependentOracleComparison.test_oracle_comparison_on_diverse_queries)
+Compare direct retriever and oracle across multiple queries. ... ok
+test_oracle_comparison_query_ocean (test_example.TestFocusIndependentOracleComparison.test_oracle_comparison_query_ocean)
+Direct retriever and independent oracle both return empty list for 'ocean'. ... ok
+test_oracle_comparison_query_red_apple (test_example.TestFocusIndependentOracleComparison.test_oracle_comparison_query_red_apple)
+Direct retriever and independent oracle produce identical ranked results for 'red apple'. ... ok
+test_case_insensitivity_and_punctuation_handling (test_example.TestLexicalRetrieverContract.test_case_insensitivity_and_punctuation_handling)
+Query matching is case-insensitive and ignores punctuation. ... ok
+test_empty_query_returns_empty_results (test_example.TestLexicalRetrieverContract.test_empty_query_returns_empty_results)
+Empty or whitespace-only query returns empty list. ... ok
+test_invalid_document_inputs_raise_errors (test_example.TestLexicalRetrieverContract.test_invalid_document_inputs_raise_errors)
+Invalid document IDs or texts raise appropriate errors. ... ok
+test_invalid_query_type_raises_type_error (test_example.TestLexicalRetrieverContract.test_invalid_query_type_raises_type_error)
+Non-string query raises TypeError. ... ok
+test_query_ocean_returns_no_match (test_example.TestLexicalRetrieverContract.test_query_ocean_returns_no_match)
+Contract requirement: ... ok
+test_query_red_apple_ranks_a_before_b (test_example.TestLexicalRetrieverContract.test_query_red_apple_ranks_a_before_b)
+Contract requirement: ... ok
+test_tie_breaking_by_doc_id (test_example.TestLexicalRetrieverContract.test_tie_breaking_by_doc_id)
+Contract requirement: ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.001s
+
+OK

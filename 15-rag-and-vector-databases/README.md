@@ -255,6 +255,78 @@ To continue your learning of Retrieval Augmented Generation (RAG) you can build:
 
 Congratulations for completing the lesson 👏.
 
+## Applied Lab: Tiny Lexical Retriever with Source Attribution (R40-T033)
+
+This applied lab extends this lesson by implementing a local lexical retrieval test double with source document attribution, deterministic tie-breaking, and an independent oracle calculation for query matching.
+
+The implementation is located at:
+- Implementation: [example.py](./applied-labs/r40-t033/example.py)
+- Test Suite: [test_example.py](./applied-labs/r40-t033/test_example.py)
+
+### Core Contract & Boundary Rules
+
+1. **Document Corpus**: Three local documents are indexed:
+   - Document `A`: `"red apple"`
+   - Document `B`: `"green apple"`
+   - Document `C`: `"blue sky"`
+2. **Ranking & Source Attribution**: Queries are normalized to lowercase word sets. Overlap with documents is scored:
+   - Query `"red apple"` matches Document `A` with score 2 and Document `B` with score 1 (Document `C` has score 0 and is excluded). This ranks `A` before `B`.
+   - Results explicitly return the source document identifier (`doc_id`).
+3. **Empty Match Handling**: Query `"ocean"` matches 0 documents and returns an empty list (`[]`), avoiding hallucinations when context is absent.
+4. **Deterministic Tie-Breaking**: Equal overlap scores are broken alphabetically by `doc_id` ascending.
+5. **Lexical Test Double Notice**: This implementation is strictly a **lexical test double**, not a production vector search. It does not calculate dense vector embeddings, evaluate cosine distance, or use vector databases.
+
+### Focus: Comparison with Independent Reference Oracle Table
+
+The direct object-oriented retriever (`TinyLexicalRetriever`) is compared against an independent functional oracle calculation (`reference_lexical_oracle`):
+
+| Query Input | Direct Implementation Result | Independent Oracle Result | Parity Verified? |
+|---|---|---|---|
+| `"red apple"` | `[A (score: 2), B (score: 1)]` | `[A (score: 2), B (score: 1)]` | **Identical** (`True`) ✓ |
+| `"ocean"` | `[]` (0 matches) | `[]` (0 matches) | **Identical** (`True`) ✓ |
+| `"apple"` | `[A (score: 1), B (score: 1)]` | `[A (score: 1), B (score: 1)]` | **Identical** (`True`) ✓ |
+| `"blue"` | `[C (score: 1)]` | `[C (score: 1)]` | **Identical** (`True`) ✓ |
+
+### Invocation and Test Suite
+
+Run the tests using standard library `unittest`:
+
+```bash
+# Run from repository root
+python3 -m unittest discover -s 15-rag-and-vector-databases/applied-labs/r40-t033 -p "test_*.py" -v
+```
+
+Expected output (**12 tests**, exit code 0):
+
+```
+test_deliberate_wrong_empty_result_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_empty_result_fails) ... ok
+test_deliberate_wrong_rank_order_fails (test_example.TestDeliberateWrongAssertions.test_deliberate_wrong_rank_order_fails) ... ok
+test_oracle_comparison_on_diverse_queries (test_example.TestFocusIndependentOracleComparison.test_oracle_comparison_on_diverse_queries) ... ok
+test_oracle_comparison_query_ocean (test_example.TestFocusIndependentOracleComparison.test_oracle_comparison_query_ocean) ... ok
+test_oracle_comparison_query_red_apple (test_example.TestFocusIndependentOracleComparison.test_oracle_comparison_query_red_apple) ... ok
+test_case_insensitivity_and_punctuation_handling (test_example.TestLexicalRetrieverContract.test_case_insensitivity_and_punctuation_handling) ... ok
+test_empty_query_returns_empty_results (test_example.TestLexicalRetrieverContract.test_empty_query_returns_empty_results) ... ok
+test_invalid_document_inputs_raise_errors (test_example.TestLexicalRetrieverContract.test_invalid_document_inputs_raise_errors) ... ok
+test_invalid_query_type_raises_type_error (test_example.TestLexicalRetrieverContract.test_invalid_query_type_raises_type_error) ... ok
+test_query_ocean_returns_no_match (test_example.TestLexicalRetrieverContract.test_query_ocean_returns_no_match) ... ok
+test_query_red_apple_ranks_a_before_b (test_example.TestLexicalRetrieverContract.test_query_red_apple_ranks_a_before_b) ... ok
+test_tie_breaking_by_doc_id (test_example.TestLexicalRetrieverContract.test_tie_breaking_by_doc_id) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.001s
+
+OK
+```
+
+> [!IMPORTANT]
+> The test suite includes deliberate wrong assertions (`test_deliberate_wrong_rank_order_fails` and `test_deliberate_wrong_empty_result_fails`) verifying that any discrepancy immediately produces a nonzero exit code.
+
+### Simplification & Simulation Boundary
+
+This local lab isolates lexical matching and ranking:
+- It runs purely in-memory using Python standard library types; no physical GPU, neural embedding models, or vector databases (e.g., Azure AI Search, Cosmos DB) are required.
+- It makes no claims regarding semantic semantic-search recall or trained model accuracy.
+
 ## Learning does not stop here, continue the Journey
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!
