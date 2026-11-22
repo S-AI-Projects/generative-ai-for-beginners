@@ -255,6 +255,34 @@ To continue your learning of Retrieval Augmented Generation (RAG) you can build:
 
 Congratulations for completing the lesson 👏.
 
+### Applied Lab: Lexical Retriever with Source Attribution, State Trace & Invariants (R40-T004)
+
+To understand source attribution, multi-stage state observability, and invariant validation in retrieval systems, see the applied lab:
+[Applied Lab — Lexical Retriever with State Trace & Invariants (R40-T004)](./applied-labs/r40-t004/README.md?WT.mc_id=academic-105485-koreyst).
+
+**Classification & Scope Note (Simulation / Test Double):** This component is strictly a **local lexical test double with state tracing**, not a production vector database or dense embedding pipeline. It executes entirely locally using Python's standard library. It requires zero cloud credentials, no vector DB services, and no GPU hardware.
+
+#### Fixture, Ranking Contract & Invariants
+
+- **Corpus**: `A="red apple"`, `B="green apple"`, `C="blue sky"`.
+- **Query Ranking**: Query `"red apple"` ranks Document A (score 2) before Document B (score 1).
+- **Zero-Match Boundary**: Query `"ocean"` yields zero overlap and produces an empty list (`[]`).
+- **Intermediate State Trace**: Logs 5 stages (tokenization, candidate scoring, threshold filtering, rank ordering, attribution projection).
+- **Tested Invariants**: Scoring fidelity ($I_1$), monotonic order with alphabetical tie-breaking ($I_2$), and zero pruning ($I_3$) are mathematically validated between intermediate trace states and final output.
+
+#### Invocation and Verification
+
+```bash
+# Run unit test suite
+python3 -m unittest discover -s 15-rag-and-vector-databases/applied-labs/r40-t004 -p "test_*.py" -v
+
+# Inspect intermediate state trace
+python3 15-rag-and-vector-databases/applied-labs/r40-t004/example.py --trace "red apple"
+
+# Canonical retrieval check
+python3 15-rag-and-vector-databases/applied-labs/r40-t004/example.py --check
+```
+
 ## Learning does not stop here, continue the Journey
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!

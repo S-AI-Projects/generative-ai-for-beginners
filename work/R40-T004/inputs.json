@@ -1,0 +1,45 @@
+{
+  "task": "R40-T004",
+  "program": "15-rag-and-vector-databases/applied-labs/r40-t004/example.py",
+  "test_module": "15-rag-and-vector-databases/applied-labs/r40-t004/test_example.py",
+  "focus": "Record the intermediate state after each step and test the invariant linking that state to the final output.",
+  "classification": "lexical_retriever_tracing_test_double",
+  "fixture": {
+    "corpus": {
+      "A": "red apple",
+      "B": "green apple",
+      "C": "blue sky"
+    },
+    "queries": {
+      "normal": "red apple",
+      "zero_match": "ocean",
+      "tie": "apple"
+    }
+  },
+  "scenarios": [
+    {
+      "id": "SCENARIO_NORMAL",
+      "type": "normal",
+      "query": "red apple",
+      "expected_decision": "RANK_A_BEFORE_B",
+      "expected_doc_ids": ["A", "B"],
+      "expected_scores": [2, 1]
+    },
+    {
+      "id": "SCENARIO_BOUNDARY_ZERO_MATCH",
+      "type": "boundary_zero_match",
+      "query": "ocean",
+      "expected_decision": "NO_MATCH_EMPTY_RESULT",
+      "expected_doc_ids": [],
+      "expected_scores": []
+    },
+    {
+      "id": "SCENARIO_BOUNDARY_TIE",
+      "type": "boundary_tie",
+      "query": "apple",
+      "expected_decision": "TIE_BROKEN_A_BEFORE_B",
+      "expected_doc_ids": ["A", "B"],
+      "expected_scores": [1, 1]
+    }
+  ]
+}

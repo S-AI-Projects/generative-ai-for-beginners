@@ -1,0 +1,10 @@
+Task: R40-T004
+Operating System: Darwin macOS ARM64
+Python: Python 3.14.7
+Git: git version 2.50.1
+
+Dependencies:
+- Python standard library only (argparse, dataclasses, json, os, re, subprocess, sys, typing, unittest)
+- Zero external package dependencies (no pip install or requirements.txt required)
+- Explicitly classified as local lexical retriever with state trace test double
+- No vector database, cloud credentials, or GPU hardware required
