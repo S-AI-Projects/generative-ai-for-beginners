@@ -90,23 +90,56 @@ It is now time to find ways where we can prevent or limit the potential harm cau
 
 ![Mitigation Layers](./images/mitigation-layers.png?WT.mc_id=academic-105485-koreyst)
 
-- **Model**. Choosing the right model for the right use case. Larger and more complex models like GPT-4 can cause more of a risk of harmful content when applied to smaller and more specific use cases. Using your training data to fine-tune also reduces the risk of harmful content.
+- Model. Choosing the right model for the right use case. Larger and more complex models like GPT-4 can cause more of a risk of harmful content when applied to smaller and more specific use cases. Using your training data to fine-tune also reduces the risk of harmful content.
 
-- **Safety System**. A safety system is a set of tools and configurations on the platform serving the model that help mitigate harm. An example of this is the content filtering system on the Azure OpenAI service. Systems should also detect jailbreak attacks and unwanted activity like requests from bots.
+- Safety System. A safety system is a set of tools and configurations on the platform serving the model that help mitigate harm. An example of this is the content filtering system on the Azure OpenAI service. Systems should also detect jailbreak attacks and unwanted activity like requests from bots.
 
-- **Metaprompt**. Metaprompts and grounding are ways we can direct or limit the model based on certain behaviors and information. This could be using system inputs to define certain limits of the model. In addition, providing outputs that are more relevant to the scope or domain of the system.
+- Metaprompt. Metaprompts and grounding are ways we can direct or limit the model based on certain behaviors and information. This could be using system inputs to define certain limits of the model. In addition, providing outputs that are more relevant to the scope or domain of the system.
 
 It can also be using techniques like Retrieval Augmented Generation (RAG) to have the model only pull information from a selection of trusted sources. There is a lesson later in this course for [building search applications](../08-building-search-applications/README.md?WT.mc_id=academic-105485-koreyst)
 
-- **User Experience**. The final layer is where the user interacts directly with the model through our application’s interface in some way. In this way we can design the UI/UX to limit the user on the types of inputs they can send to the model as well as text or images displayed to the user. When deploying the AI application, we also must be transparent about what our Generative AI application can and can’t do.
+- User Experience. The final layer is where the user interacts directly with the model through our application’s interface in some way. In this way we can design the UI/UX to limit the user on the types of inputs they can send to the model as well as text or images displayed to the user. When deploying the AI application, we also must be transparent about what our Generative AI application can and can’t do.
 
 We have an entire lesson dedicated to [Designing UX for AI Applications](../12-designing-ux-for-ai-applications/README.md?WT.mc_id=academic-105485-koreyst)
 
-- **Evaluate model**. Working with LLMs can be challenging because we don’t always have control over the data the model was trained on. Regardless, we should always evaluate the model’s performance and outputs. It’s still important to measure the model’s accuracy, similarity, groundedness, and relevance of the output. This helps provide transparency and trust to stakeholders and users.
+- Evaluate model. Working with LLMs can be challenging because we don’t always have control over the data the model was trained on. Regardless, we should always evaluate the model’s performance and outputs. It’s still important to measure the model’s accuracy, similarity, groundedness, and relevance of the output. This helps provide transparency and trust to stakeholders and users.
 
 ### Operate a Responsible Generative AI solution
 
 Building an operational practice around your AI applications is the final stage. This includes partnering with other parts of our startup like Legal and Security to ensure we are compliant with all regulatory policies. Before launching, we also want to build plans around delivery, handling incidents, and rollback to prevent any harm to our users from growing.
+
+## Applied Lab: Allowlisted Action Policy (R40-T016)
+
+This lab demonstrates how an application can check a proposed tool action against an explicit allowlist and argument schema before allowing it to reach an executor. It connects to the Safety System layer of responsible AI.
+
+See the [R40-T016 lab instructions](./applied-labs/r40-t016/README.md).
+
+### Prerequisites
+
+- Python 3
+- A local checkout of this repository
+- No third-party Python packages are required
+
+### Run the example
+
+From the repository root, run:
+
+    python3 03-using-generative-ai-responsibly/applied-labs/r40-t016/example.py --scenario normal
+
+The normal fixture requests the allowed `read` tool with the argument `path: "notes.txt"`. Expected output includes:
+
+    "allowed": true
+    "result": "MOCK READ: notes.txt"
+
+The boundary scenario rejects an unknown `delete` tool. The failure scenario rejects a `read` action with its required `path` argument missing.
+
+Run the automated tests with:
+
+    python3 -m unittest discover -s 03-using-generative-ai-responsibly/applied-labs/r40-t016 -p "test_*.py"
+
+### Limitations
+
+This is an offline teaching example. Its executor is a stub and does not read, delete, or modify real files. It demonstrates application-level validation only; it is not a complete security system.
 
 ## Tools
 
