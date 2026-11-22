@@ -1,0 +1,44 @@
+{
+  "task": "R40-T009",
+  "program": "17-ai-agents/applied-labs/r40-t009/example.py",
+  "test_module": "17-ai-agents/applied-labs/r40-t009/test_example.py",
+  "focus": "Compare three small controlled configurations or input sizes using a metric appropriate to this contract. Report correctness and the observed trade-off without claiming real-world model accuracy.",
+  "classification": "typed_tool_dispatch_test_double",
+  "allowlist": ["add", "multiply"],
+  "scenarios": [
+    {
+      "id": "SCENARIO_NORMAL",
+      "type": "normal",
+      "calls": [
+        {"tool": "add", "a": 2, "b": 3},
+        {"tool": "multiply", "a": 2, "b": 3}
+      ],
+      "expected_decision": "TOOLS_DISPATCHED_SUCCESSFULLY",
+      "expected_add_result": 5,
+      "expected_multiply_result": 6
+    },
+    {
+      "id": "SCENARIO_UNKNOWN_TOOL",
+      "type": "unknown_tool",
+      "call": {"tool": "subtract", "a": 5, "b": 2},
+      "expected_decision": "UNKNOWN_TOOL_REJECTED",
+      "expected_error_type": "UnknownToolError"
+    },
+    {
+      "id": "SCENARIO_STRING_TYPE",
+      "type": "type_error",
+      "call": {"tool": "add", "a": "two", "b": 3},
+      "expected_decision": "STRING_ARG_REJECTED",
+      "expected_error_type": "TypeValidationError"
+    },
+    {
+      "id": "SCENARIO_CASCADE_PREVENTION",
+      "type": "cascade_prevention",
+      "calls": [
+        {"tool": "add", "a": "two", "b": 3},
+        {"tool": "multiply", "a": 4, "b": 5}
+      ],
+      "expected_decision": "CASCADE_EXECUTION_BLOCKED"
+    }
+  ]
+}

@@ -238,6 +238,31 @@ To continue your learning of AI Agents you can build with Microsoft Agent Framew
 - Create system messages that guide LLMs in understanding different personas and priorities, and enable the user to pitch a new product idea.
 - The LLM should then generate follow-up questions from each department to refine and improve the pitch and the product idea
 
+### Applied Lab: Typed Tool Dispatch & Evaluation Experiment (R40-T009)
+
+To explore strict tool dispatch allowlisting, numeric argument validation, structured error objects, and execution cascade prevention in AI agent architectures, see the applied lab:
+[Applied Lab — Typed Tool Dispatch & Evaluation Experiment (R40-T009)](./applied-labs/r40-t009/README.md?WT.mc_id=academic-105485-koreyst).
+
+**Classification & Scope Note (Simulation / Test Double):** This component is strictly a **local typed tool dispatch test double**, not a full MCP server or remote agent daemon. It executes entirely locally using Python's standard library. It requires zero cloud credentials, no paid API keys, and no GPU hardware.
+
+#### Dispatch Contract & Cascade Protection
+
+- **Allowlist Enforcement**: Strictly allows `add` and `multiply`; unknown tools return structured `UnknownToolError`.
+- **Deterministic Math**: `add(2, 3)` -> `5`, `multiply(2, 3)` -> `6`.
+- **Type Validation**: Non-numeric arguments return structured `TypeValidationError`.
+- **Cascade Abort Invariant**: A failed tool call immediately blocks subsequent tools in the planned execution chain from executing.
+- **Evaluation Experiment**: Evaluates three controlled dispatch modes (`FAIL_FAST`, `PRE_VALIDATE`, `AUDIT_LOGGED`), verifying 100% boundary safety across all modes.
+
+#### Invocation and Verification
+
+```bash
+# Run unit test suite
+python3 -m unittest discover -s 17-ai-agents/applied-labs/r40-t009 -p "test_*.py" -v
+
+# Run 3-configuration evaluation experiment
+python3 17-ai-agents/applied-labs/r40-t009/example.py --experiment
+```
+
 ## Learning does not stop here, continue the Journey
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!

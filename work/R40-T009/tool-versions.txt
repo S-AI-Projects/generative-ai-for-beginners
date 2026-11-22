@@ -1,0 +1,10 @@
+Task: R40-T009
+Operating System: Darwin macOS ARM64
+Python: Python 3.14.7
+Git: git version 2.50.1
+
+Dependencies:
+- Python standard library only (argparse, dataclasses, enum, json, os, subprocess, sys, time, typing, unittest)
+- Zero external package dependencies (no pip install or requirements.txt required)
+- Explicitly classified as local typed tool dispatch test double
+- No external agent framework or GPU hardware required
