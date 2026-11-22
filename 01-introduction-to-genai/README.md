@@ -134,3 +134,7 @@ A: 3, an LLM is non-deterministic, the response varies, however, you can control
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!
 
 Head over to Lesson 2 where we will look at how to [explore and compare different LLM types](../02-exploring-and-comparing-different-llms/README.md?WT.mc_id=academic-105485-koreyst)!
+
+## Applied Example: Educational Startup
+
+Explore the [R40-T012 prompt-readiness example](./applied-labs/r40-t012/README.md) for normal, boundary, missing-information, and invalid cases.
