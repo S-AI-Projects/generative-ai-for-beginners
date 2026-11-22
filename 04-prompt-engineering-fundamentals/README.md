@@ -285,6 +285,39 @@ In its more complex form like [this example from LangChain](https://python.langc
 
 Finally, the real value of templates lies in the ability to create and publish _prompt libraries_ for vertical application domains - where the prompt template is now _optimized_ to reflect application-specific context or examples that make the responses more relevant and accurate for the targeted user audience. The [Prompts For Edu](https://github.com/microsoft/prompts-for-edu?WT.mc_id=academic-105485-koreyst) repository is a great example of this approach, curating a library of prompts for the education domain with emphasis on key objectives like lesson planning, curriculum design, student tutoring etc.
 
+
+## Applied Lab: Prompt Template Escaping (R40-T015)
+
+Practice rendering reusable prompt templates with declared variables and validating user-provided values.
+
+**Lab:** [Prompt Template Escaping — Offline Service Adapter](./applied-labs/r40-t015/README.md)
+
+**Prerequisites:** Python 3. No external packages, API keys, model downloads, or GPU required.
+
+**Run the example from the repository root:**
+
+```bash
+python3 04-prompt-engineering-fundamentals/applied-labs/r40-t015/example.py
+```
+
+**Input fixture:**
+
+```python
+{"name": "Asha", "topic": "fractions"}
+```
+
+**Expected result:** The template renders the supplied name and topic, and the deterministic local adapter returns a mock response.
+
+**Run the tests:**
+
+```bash
+python3 -m unittest discover -s 04-prompt-engineering-fundamentals/applied-labs/r40-t015 -p "test_*.py"
+```
+
+The lab also tests literal braces in user data, missing and unknown keys, and failure handling.
+
+**Limitations:** The local adapter does not contact a real AI provider. Template rendering alone does not prevent prompt injection.
+
 ## Supporting Content
 
 If we think about prompt construction as having a instruction (task) and a target (primary content), then _secondary content_ is like additional context we provide to **influence the output in some way**. It could be tuning parameters, formatting instructions, topic taxonomies etc. that can help the model _tailor_ its response to be suit the desired user objectives or expectations.
