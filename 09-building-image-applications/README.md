@@ -184,6 +184,30 @@ Try it yourself, then compare with the reference solutions:
 
 Also work through the notebooks in [python/](./python) (`aoai-assignment.ipynb` for Azure, `oai-assignment.ipynb` for OpenAI).
 
+### Applied Lab: Tensor-Shape Contract, Validation & Pipeline Recovery (R40-T008)
+
+To understand input tensor validation, pixel range normalization, shape invariants, and stateful pipeline error recovery in generative image workflows, see the applied lab:
+[Applied Lab — Tensor-Shape Contract & Pipeline Recovery (R40-T008)](./applied-labs/r40-t008/README.md?WT.mc_id=academic-105485-koreyst).
+
+**Classification & Scope Note (Simulation / Test Double):** This component is strictly an **offline tensor preprocessing test double**, not an image diffusion runtime. It executes entirely locally using Python's standard library. It requires zero cloud credentials, no PyTorch/CUDA libraries, and no GPU hardware.
+
+#### Preprocessing Contract & Recovery Invariants
+
+- **Shape Contract**: Accepts regular $N \times H \times W$ batches; canonical fixture `[[[0, 255], [128, 64]]]` strictly preserves shape `(1, 2, 2)`.
+- **Pixel Normalization**: Maps integer pixel values in $[0, 255]$ to floats in $[0.0, 1.0]$ via $x / 255.0$ ($0 \to 0.0$ and $255 \to 1.0$).
+- **Boundary Rejection**: Rejects negative pixels ($< 0$), overflow pixels ($> 255$), and ragged dimensions with `TensorContractError`.
+- **Pipeline Failure & Recovery**: Documented invalid batch fails with descriptive diagnostic error, and pipeline immediately recovers on the subsequent valid input without state pollution.
+
+#### Invocation and Verification
+
+```bash
+# Run unit test suite
+python3 -m unittest discover -s 09-building-image-applications/applied-labs/r40-t008 -p "test_*.py" -v
+
+# Run canonical tensor normalization checks
+python3 09-building-image-applications/applied-labs/r40-t008/example.py --check
+```
+
 ## Great work! Continue your learning
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to keep leveling up your Generative AI knowledge!

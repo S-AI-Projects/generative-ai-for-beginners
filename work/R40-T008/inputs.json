@@ -1,0 +1,37 @@
+{
+  "task": "R40-T008",
+  "program": "09-building-image-applications/applied-labs/r40-t008/example.py",
+  "test_module": "09-building-image-applications/applied-labs/r40-t008/test_example.py",
+  "focus": "Exercise a documented invalid/missing-data case, explain the error, and demonstrate recovery on the next valid input.",
+  "classification": "tensor_shape_contract_test_double",
+  "fixture": {
+    "canonical_batch": [[[0, 255], [128, 64]]],
+    "expected_shape": [1, 2, 2]
+  },
+  "scenarios": [
+    {
+      "id": "SCENARIO_NORMAL",
+      "type": "normal",
+      "input_batch": [[[0, 255], [128, 64]]],
+      "expected_decision": "NORMALIZATION_SUCCESS_SHAPE_PRESERVED",
+      "expected_output_shape": [1, 2, 2]
+    },
+    {
+      "id": "SCENARIO_NEGATIVE_PIXEL",
+      "type": "invalid_range",
+      "input_batch": [[[-10, 255], [128, 64]]],
+      "expected_decision": "NEGATIVE_PIXEL_REJECTED"
+    },
+    {
+      "id": "SCENARIO_OVERFLOW_PIXEL",
+      "type": "invalid_range",
+      "input_batch": [[[0, 300], [128, 64]]],
+      "expected_decision": "OVERFLOW_PIXEL_REJECTED"
+    },
+    {
+      "id": "SCENARIO_RECOVERY",
+      "type": "failure_and_recovery",
+      "expected_decision": "FAILURE_DOCUMENTED_AND_RECOVERED"
+    }
+  ]
+}
