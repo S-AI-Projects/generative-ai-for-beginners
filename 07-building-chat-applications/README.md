@@ -178,6 +178,31 @@ Microsoft's approach to Responsible AI has identified six principles that should
 
 See [assignment](./python?WT.mc_id=academic-105485-koreyst). It will take you through a series of exercises from running your first chat prompts, to classifying and summarizing text and more. Notice that the assignments are available in different programming languages!
 
+### Applied Lab: Chat-View State Lifecycle & Responsibility Extraction (R40-T006)
+
+To understand robust client-side response view modeling, partial text preservation, post-completion chunk rejection, and clean architectural separation between state coordination and content buffer management, see the applied lab:
+[Applied Lab — Chat-View State Lifecycle & Refactoring (R40-T006)](./applied-labs/r40-t006/README.md?WT.mc_id=academic-105485-koreyst).
+
+**Classification & Scope Note (Simulation / Test Double):** This component is strictly a **local client-side chat response state machine test double**, not a remote cloud streaming connection. It executes entirely locally using Python's standard library. It requires zero cloud credentials, no paid LLM provider API keys, and no GPU hardware.
+
+#### State Contract & Refactoring Equivalence
+
+- **State Lifecycle**: Transitions across `PENDING -> STREAMING -> COMPLETE` with stable `message_id`.
+- **Sequential Ingestion**: Ingests `"Hello, "` then `"how can I assist you today?"` in arrival order.
+- **Error Recovery**: Preserves received partial content and appends `[ERROR: <reason>]`.
+- **Terminal Boundary**: Chunks arriving after completion or error raise `ChunkRejectedError`.
+- **Refactoring Proof**: Verifies 100% behavioral equivalence between monolithic baseline and extracted `StreamingContentBuffer` architecture.
+
+#### Invocation and Verification
+
+```bash
+# Run unit test suite
+python3 -m unittest discover -s 07-building-chat-applications/applied-labs/r40-t006 -p "test_*.py" -v
+
+# Verify refactoring equivalence across scenarios
+python3 07-building-chat-applications/applied-labs/r40-t006/example.py --refactor-check
+```
+
 ## Great Work! Continue the Journey
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!

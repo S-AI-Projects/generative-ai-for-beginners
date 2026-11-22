@@ -1,0 +1,10 @@
+Task: R40-T006
+Operating System: Darwin macOS ARM64
+Python: Python 3.14.7
+Git: git version 2.50.1
+
+Dependencies:
+- Python standard library only (argparse, dataclasses, enum, json, os, subprocess, sys, typing, unittest)
+- Zero external package dependencies (no pip install or requirements.txt required)
+- Explicitly classified as local chat-view state machine refactoring simulation
+- No cloud credentials, OpenAI API key, or GPU hardware required

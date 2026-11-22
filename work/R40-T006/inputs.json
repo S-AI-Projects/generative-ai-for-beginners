@@ -1,0 +1,38 @@
+{
+  "task": "R40-T006",
+  "program": "07-building-chat-applications/applied-labs/r40-t006/example.py",
+  "test_module": "07-building-chat-applications/applied-labs/r40-t006/test_example.py",
+  "focus": "Implement a correct baseline, then extract one named responsibility. Keep the same contract and prove before/after equivalence on the fixture.",
+  "classification": "chat_view_state_refactoring_test_double",
+  "fixture": {
+    "message_id": "msg-resp-001",
+    "chunks": [
+      "Hello, ",
+      "how can I assist you today?"
+    ],
+    "error_message": "Stream connection dropped",
+    "late_chunk": " [Late chunk arriving after stream close]"
+  },
+  "scenarios": [
+    {
+      "id": "SCENARIO_NORMAL",
+      "type": "normal",
+      "expected_decision": "STATE_COMPLETE_SUCCESS",
+      "expected_state": "complete",
+      "expected_chunks_received": 2
+    },
+    {
+      "id": "SCENARIO_ERROR",
+      "type": "error",
+      "expected_decision": "STATE_ERROR_RECOVERED",
+      "expected_state": "error",
+      "expected_chunks_received": 1
+    },
+    {
+      "id": "SCENARIO_BOUNDARY",
+      "type": "boundary",
+      "expected_decision": "CHUNK_AFTER_COMPLETION_REJECTED",
+      "expected_rejection_exception": "ChunkRejectedError"
+    }
+  ]
+}
