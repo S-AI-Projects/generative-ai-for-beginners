@@ -1,0 +1,45 @@
+{
+  "task": "R40-T001",
+  "program": "12-designing-ux-for-ai-applications/applied-labs/r40-t001/example.py",
+  "test_module": "12-designing-ux-for-ai-applications/applied-labs/r40-t001/test_example.py",
+  "focus": "Model local pending, streaming, complete and error states for one response with a stable message ID. Two chunks append in order; an error preserves received text with an error marker; chunks after completion are rejected.",
+  "classification": "chat_view_state_simulation",
+  "fixture": {
+    "message_id": "msg-resp-001",
+    "chunks": [
+      "Hello, ",
+      "how can I assist you today?"
+    ],
+    "error_message": "Stream connection dropped unexpectedly",
+    "late_chunk": " [Late chunk after stream completion]"
+  },
+  "scenarios": [
+    {
+      "id": "SCENARIO_NORMAL",
+      "type": "normal",
+      "command": "python3 12-designing-ux-for-ai-applications/applied-labs/r40-t001/example.py --scenario normal",
+      "expected_decision": "STATE_COMPLETE_SUCCESS",
+      "expected_state": "complete",
+      "expected_chunks_received": 2,
+      "expected_content": "Hello, how can I assist you today?"
+    },
+    {
+      "id": "SCENARIO_ERROR",
+      "type": "error_recovery",
+      "command": "python3 12-designing-ux-for-ai-applications/applied-labs/r40-t001/example.py --scenario error",
+      "expected_decision": "STATE_ERROR_RECOVERED",
+      "expected_state": "error",
+      "expected_chunks_received": 1,
+      "expected_content": "Hello, [ERROR: Stream connection dropped unexpectedly]"
+    },
+    {
+      "id": "SCENARIO_BOUNDARY",
+      "type": "boundary_rejection",
+      "command": "python3 12-designing-ux-for-ai-applications/applied-labs/r40-t001/example.py --scenario boundary",
+      "expected_decision": "CHUNK_AFTER_COMPLETION_REJECTED",
+      "expected_state": "complete",
+      "expected_rejection_exception": "ChunkRejectedError",
+      "expected_content": "Hello, how can I assist you today?"
+    }
+  ]
+}

@@ -99,6 +99,31 @@ System errors are common with applications where the user might need assistance 
 
 AI applications are not perfect, therefore, they are bound to make mistakes. When designing your applications, you should ensure you create room for feedback from users and error handling in a way that is simple and easily explainable.
 
+### Applied Lab: Chat-View State Lifecycle & Recovery (R40-T001)
+
+To understand how AI chat applications maintain user trust through responsive state management, stable view identity, partial text preservation during stream drops, and boundary protections against late corrupted packets, explore the local hands-on lab:
+[Applied Lab — Chat-View State Lifecycle & Recovery (R40-T001)](./applied-labs/r40-t001/README.md?WT.mc_id=academic-105485-koreyst).
+
+**Classification & Scope Note (Simulation / Test Double):** This component is strictly a **local client-side chat-view state test double**, not a live cloud streaming service. It executes entirely locally using Python's standard library. It requires zero cloud credentials, no paid API keys, no local weights download, and no GPU hardware.
+
+#### Fixture and State Lifecycle Contract
+
+- **Stable Message ID**: `"msg-resp-001"` persists across `pending -> streaming -> complete` transitions.
+- **Ordered Chunk Ingestion**: Ingests chunks sequentially (`"Hello, "` followed by `"how can I assist you today?"`).
+- **Error Recovery**: Preserves received partial content and appends `[ERROR: <reason>]` without discarding user-visible context.
+- **Terminal State Boundary**: Late packets arriving after `complete` or `error` are rejected by raising `ChunkRejectedError`.
+
+#### Invocation and Verification
+
+```bash
+# Run unit test suite
+python3 -m unittest discover -s 12-designing-ux-for-ai-applications/applied-labs/r40-t001 -p "test_*.py" -v
+
+# Run canonical lifecycle scenario check
+python3 12-designing-ux-for-ai-applications/applied-labs/r40-t001/example.py --check
+```
+
+
 ## Assignment
 
 Take any AI apps you've built so far, consider implementing the below steps in your app:
