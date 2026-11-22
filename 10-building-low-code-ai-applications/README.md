@@ -264,6 +264,38 @@ For example, you can build flows to automatically generate text for a variety of
 
 To learn how to use this AI Model in Power Automate, go through the [Add intelligence with AI Builder and GPT](https://learn.microsoft.com/training/modules/ai-builder-text-generation/?WT.mc_id=academic-109639-somelezediko) module.
 
+## Applied Lab: Low-Code AI Scenario Assessment & Applied Questions (R40-T010)
+
+For an applied hands-on architectural assessment and decision table evaluation, see the [R40-T010 Applied Lab](./applied-labs/r40-t010/README.md).
+
+This lab implements a deterministic, rule-based decision evaluator and governance checker covering:
+- **Three Worked Scenarios**:
+  1. `S1_NORMAL`: Invoice Processing automation via Power Automate and AI Builder prebuilt model (`LOW_CODE_POWER_PLATFORM`).
+  2. `S2_BOUNDARY`: Real-time high-throughput custom neural network image processing (`CUSTOM_CODE_PRO_DEV`).
+  3. `S3_MISSING_INFO`: Underspecified conversational agent proposal (`DEFER_INSUFFICIENT_INFORMATION`).
+- **Published Decision Table Verification**:
+  Automated validation of evaluated decisions against baseline criteria, with negative tamper verification (`--tamper` exits code 1).
+- **Three Applied Questions**:
+  1. *Predict an output*: Support ticket summarizer using AI Builder's "Create Text with GPT".
+  2. *Diagnose a failure*: Diagnosing rejection of proposals lacking volume, latency, or compliance metadata.
+  3. *Choose a boundary policy*: Selecting `POLICY_HYBRID_PRO_CODE_OFFLOAD` when transaction volume exceeds connector quotas.
+
+### Quick Start & Invocation
+
+```bash
+# Run scenario evaluation and applied questions
+python3 10-building-low-code-ai-applications/applied-labs/r40-t010/example.py --scenario all --check --questions
+
+# Verify negative tamper detection (exits code 1)
+python3 10-building-low-code-ai-applications/applied-labs/r40-t010/example.py --check --tamper
+
+# Run automated unit test suite
+python3 -m unittest discover -s 10-building-low-code-ai-applications/applied-labs/r40-t010 -p "test_*.py" -v
+```
+
+> [!NOTE]
+> **Simulation Scope**: This lab operates purely as a local Python test double and rule-based governance engine. It does not require or contact real Power Platform environments, Dataverse databases, AI Builder service credits, or cloud hardware.
+
 ## Great Work! Continue Your Learning
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!

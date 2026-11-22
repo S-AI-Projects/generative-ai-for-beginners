@@ -1,0 +1,9 @@
+Operating System: macOS (Darwin 27.0.0 Darwin Kernel Version 27.0.0 arm64)
+Python Version: Python 3.14.7 (v3.14.7:d08e5473e04, Oct 23 2026, 17:15:37) [Clang 17.0.6 (clang-1706.0.10.9)]
+Git Base Commit: 79a4334e158147d4f36c27d805e0cb163c1e445b
+Task ID: R40-T010
+Student ID: E26B07F1176
+Org/Repo: S-AI-Projects/generative-ai-for-beginners
+Target Issue: #10
+Working Branch: student/e26b07f1176/R40-T010
+Tool Dependencies: Python 3 standard library only (unittest, dataclasses, argparse, json)

@@ -1,0 +1,77 @@
+{
+  "baseline_scenarios": {
+    "S1_NORMAL": {
+      "scenario_id": "S1_NORMAL",
+      "name": "Invoice Processing and Approval Flow",
+      "monthly_volume": 1500,
+      "latency_sla_ms": 60000,
+      "custom_model_required": false,
+      "prebuilt_model_available": true,
+      "developer_persona": "Citizen Developer / Business Analyst",
+      "integration_source": "Exchange Email & SharePoint Online",
+      "compliance_tier": "Standard Enterprise Cloud",
+      "expected_decision": "LOW_CODE_POWER_PLATFORM"
+    },
+    "S2_BOUNDARY": {
+      "scenario_id": "S2_BOUNDARY",
+      "name": "Real-Time Handwritten Exam Fraud Detection",
+      "monthly_volume": 4000000,
+      "latency_sla_ms": 45,
+      "custom_model_required": true,
+      "prebuilt_model_available": false,
+      "developer_persona": "ML Systems Engineer",
+      "integration_source": "Low-latency WebSocket Stream",
+      "compliance_tier": "Strict Isolated Private VPC",
+      "expected_decision": "CUSTOM_CODE_PRO_DEV"
+    },
+    "S3_MISSING_INFO": {
+      "scenario_id": "S3_MISSING_INFO",
+      "name": "Conversational Student Advisory Agent",
+      "monthly_volume": null,
+      "latency_sla_ms": null,
+      "custom_model_required": false,
+      "prebuilt_model_available": true,
+      "developer_persona": "Academic Department Lead",
+      "integration_source": "Undetermined Legacy Database",
+      "compliance_tier": null,
+      "expected_decision": "DEFER_INSUFFICIENT_INFORMATION"
+    }
+  },
+  "applied_questions": {
+    "question_1": {
+      "question_id": "Q1_PREDICT_OUTPUT",
+      "title": "Predict Output for Support Ticket Summarizer",
+      "input_facts": {
+        "scenario_id": "Q1_SUPPORT_TICKETS",
+        "name": "Customer Support Ticket Summarizer",
+        "monthly_volume": 5000,
+        "latency_sla_ms": 10000,
+        "custom_model_required": false,
+        "prebuilt_model_available": true,
+        "compliance_tier": "Standard Enterprise Cloud"
+      },
+      "expected_decision": "LOW_CODE_POWER_PLATFORM"
+    },
+    "question_2": {
+      "question_id": "Q2_DIAGNOSE_FAILURE",
+      "title": "Diagnose Rejection of Incomplete Proposal",
+      "input_facts": {
+        "scenario_id": "Q2_INCOMPLETE_PROPOSAL",
+        "name": "Automated Course Syllabus Parser",
+        "monthly_volume": null,
+        "latency_sla_ms": null,
+        "custom_model_required": false,
+        "prebuilt_model_available": true,
+        "compliance_tier": null
+      },
+      "expected_diagnosis": "MISSING_OPERATIONAL_METRICS",
+      "missing_fields": ["compliance_tier", "latency_sla_ms", "monthly_volume"]
+    },
+    "question_3": {
+      "question_id": "Q3_CHOOSE_BOUNDARY_POLICY",
+      "title": "Choose Architectural Boundary Governance Policy",
+      "trigger_event": "250,000 items/day causing HTTP 429 connector throttling",
+      "expected_policy": "POLICY_HYBRID_PRO_CODE_OFFLOAD"
+    }
+  }
+}
