@@ -112,6 +112,25 @@ Fine-tunable models include OpenAI `gpt-4o-mini`, `gpt-4o`, `gpt-4.1`, `gpt-4.1-
 
 Work through the end-to-end walkthrough in [Customize a model with fine-tuning](https://learn.microsoft.com/azure/ai-foundry/openai/how-to/fine-tuning?WT.mc_id=academic-105485-koreyst), and see the guides for [DPO](https://learn.microsoft.com/azure/ai-foundry/openai/how-to/fine-tuning-direct-preference-optimization?WT.mc_id=academic-105485-koreyst) and [RFT](https://learn.microsoft.com/azure/ai-foundry/openai/how-to/reinforcement-fine-tuning?WT.mc_id=academic-105485-koreyst) when you're ready for the other techniques.
 
+## Applied Example: Trainable-Parameter Accounting
+
+This local lab demonstrates prefix-based parameter freezing using a mock parameter manifest.
+
+Prerequisites: Python 3 and the standard library. No model download or GPU is required.
+
+Lab instructions: [R40-T014 README](./applied-labs/r40-t014/README.md?wt.mc_id=academic-105485-koreyst)
+
+Run from the repository root:
+
+    python3 18-fine-tuning/applied-labs/r40-t014/example.py
+
+Fixture: encoder.weight = 100, head.weight = 20. Freeze prefix: encoder.
+
+Expected result: total = 120, frozen = 100, trainable = 20.
+
+Invariant: total = frozen + trainable.
+
+This is a mock accounting simulation, not actual model training.
 ## Fine-Tuning In Action
 
 The following resources provide step-by-step tutorials that walk you through a real example on a currently supported model with a curated dataset. To work through them, you need an account on the specific provider, along with access to the relevant model and datasets.
