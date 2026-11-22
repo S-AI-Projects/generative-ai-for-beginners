@@ -77,3 +77,9 @@ The best part about open models is that you can get started working with them pr
 ## Learning does not stop here, continue the Journey
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!
+
+## Applied Example: Open Model Decision Checklist
+
+Try the [R40-T011 worked decision example](./applied-labs/r40-t011/README.md?wt.mc_id=academic-105485-koreyst) to explore three local scenarios: a complete information checklist, a boundary case with one unavailable category, and a case with missing information.
+
+The example uses mock local fixtures and Python 3's standard library. It demonstrates how the lesson's five information categories connect to a decision. It does not inspect real models, verify licences, or certify legal open-source status.
