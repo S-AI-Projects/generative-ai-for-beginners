@@ -1,0 +1,53 @@
+{
+  "task": "R40-T002",
+  "program": "20-mistral/applied-labs/r40-t002/example.py",
+  "test_module": "20-mistral/applied-labs/r40-t002/test_example.py",
+  "focus": "Emphasize the smallest valid, boundary and invalid cases in the fixture; explain the exact boundary decision.",
+  "classification": "lexical_retriever_test_double",
+  "fixture": {
+    "corpus": {
+      "A": "red apple",
+      "B": "green apple",
+      "C": "blue sky"
+    },
+    "queries": {
+      "normal": "red apple",
+      "zero_match": "ocean",
+      "tie": "apple",
+      "smallest_valid": "sky",
+      "invalid_empty": "   ",
+      "invalid_type": 12345
+    }
+  },
+  "scenarios": [
+    {
+      "id": "SCENARIO_NORMAL",
+      "type": "normal",
+      "query": "red apple",
+      "expected_decision": "RANK_A_BEFORE_B",
+      "expected_doc_ids": ["A", "B"],
+      "expected_scores": [2, 1]
+    },
+    {
+      "id": "SCENARIO_BOUNDARY_ZERO_MATCH",
+      "type": "boundary_zero_match",
+      "query": "ocean",
+      "expected_decision": "NO_MATCH_EMPTY_RESULT",
+      "expected_doc_ids": [],
+      "expected_scores": []
+    },
+    {
+      "id": "SCENARIO_BOUNDARY_TIE",
+      "type": "boundary_tie",
+      "query": "apple",
+      "expected_decision": "TIE_BROKEN_A_BEFORE_B",
+      "expected_doc_ids": ["A", "B"],
+      "expected_scores": [1, 1]
+    },
+    {
+      "id": "SCENARIO_INVALID_CASES",
+      "type": "invalid_cases",
+      "expected_decision": "INVALID_INPUTS_REJECTED"
+    }
+  ]
+}

@@ -346,6 +346,30 @@ tokens, text = tokenized.tokens, tokenized.text
 print(len(tokens))
 ```
 
+### Applied Lab: Lexical Retriever with Source Attribution & Boundary Cases (R40-T002)
+
+To understand source attribution, score tie-breaking, and zero-match boundary handling in retrieval pipelines, explore the local hands-on lab:
+[Applied Lab — Lexical Retriever with Source Attribution & Boundary Cases (R40-T002)](./applied-labs/r40-t002/README.md?WT.mc_id=academic-105485-koreyst).
+
+**Classification & Scope Note (Simulation / Test Double):** This component is strictly a **local lexical test double**, not a production vector search or dense embedding model. It executes entirely locally using Python's standard library. It requires zero cloud credentials, no paid API keys, no local weights download, and no GPU hardware.
+
+#### Fixture and Retrieval Contract
+
+- **Corpus**: `A="red apple"`, `B="green apple"`, `C="blue sky"`.
+- **Query Ranking**: Query `"red apple"` ranks Document A (score 2) before Document B (score 1).
+- **Zero-Match Boundary**: Query `"ocean"` returns no match (`[]`), preventing spurious citations.
+- **Deterministic Tie-Breaking**: Query `"apple"` matches A and B with score 1; tie is broken alphabetically by document ID (`A` before `B`).
+
+#### Invocation and Verification
+
+```bash
+# Run unit test suite
+python3 -m unittest discover -s 20-mistral/applied-labs/r40-t002 -p "test_*.py" -v
+
+# Run canonical retrieval scenario check
+python3 20-mistral/applied-labs/r40-t002/example.py --check
+```
+
 ## Learning does not stop here, continue the journey
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!
