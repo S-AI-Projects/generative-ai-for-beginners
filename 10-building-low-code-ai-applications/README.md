@@ -264,6 +264,30 @@ For example, you can build flows to automatically generate text for a variety of
 
 To learn how to use this AI Model in Power Automate, go through the [Add intelligence with AI Builder and GPT](https://learn.microsoft.com/training/modules/ai-builder-text-generation/?WT.mc_id=academic-109639-somelezediko) module.
 
+### Applied Lab: Low-Code AI Decision Evaluator — Dual-Approach Comparison (R40-T003)
+
+To explore how architectural requirements determine the selection between Low-Code AI platforms (Power Platform, AI Builder) and Custom Pro-Code Development, see the applied lab:
+[Applied Lab — Low-Code AI Decision Evaluator (R40-T003)](./applied-labs/r40-t003/README.md?WT.mc_id=academic-105485-koreyst).
+
+**Classification & Scope Note (Simulation / Test Double):** This component is strictly an **offline decision framework test double**, not a live Microsoft Power Platform tenant. It executes entirely locally using Python's standard library. It requires zero cloud subscriptions, no Azure OpenAI keys, and no GPU hardware.
+
+#### Scenarios and Dual-Approach Verification
+
+- **Normal Scenario**: Standard invoice processing with prebuilt models selects `LOW_CODE_POWER_PLATFORM`.
+- **Boundary Scenario**: 15,000 RPS, custom weights, and air-gapped hosting selects `CUSTOM_CODE_PRO_DEV`.
+- **Missing Information**: Missing data locality and compliance SLA triggers `DEFER_INSUFFICIENT_INFORMATION`.
+- **Dual-Approach Equivalence**: Procedural rule engine and independent matrix calculation are verified for 100% decision and rationale parity.
+
+#### Invocation and Verification
+
+```bash
+# Run unit test suite
+python3 -m unittest discover -s 10-building-low-code-ai-applications/applied-labs/r40-t003 -p "test_*.py" -v
+
+# Compare dual approaches and verify canonical decision table
+python3 10-building-low-code-ai-applications/applied-labs/r40-t003/example.py --compare
+```
+
 ## Great Work! Continue Your Learning
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!

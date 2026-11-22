@@ -1,0 +1,51 @@
+{
+  "task": "R40-T003",
+  "program": "10-building-low-code-ai-applications/applied-labs/r40-t003/example.py",
+  "test_module": "10-building-low-code-ai-applications/applied-labs/r40-t003/test_example.py",
+  "focus": "Compare the direct implementation with a simpler independent calculation or explicit expected-result table, using identical inputs.",
+  "classification": "decision_worked_example_test_double",
+  "scenarios": [
+    {
+      "id": "SCENARIO_NORMAL",
+      "type": "normal",
+      "facts": {
+        "use_case": "invoice_processing",
+        "prebuilt_model_available": true,
+        "requires_custom_weights": false,
+        "target_throughput_rps": 5,
+        "data_source": "Dataverse",
+        "compliance_tier": "standard_commercial",
+        "delivery_window_weeks": 2
+      },
+      "expected_decision": "LOW_CODE_POWER_PLATFORM"
+    },
+    {
+      "id": "SCENARIO_BOUNDARY",
+      "type": "boundary",
+      "facts": {
+        "use_case": "realtime_video_defect_detection",
+        "prebuilt_model_available": false,
+        "requires_custom_weights": true,
+        "target_throughput_rps": 15000,
+        "data_source": "edge_rtsp_stream",
+        "compliance_tier": "air_gapped_defense",
+        "delivery_window_weeks": 24
+      },
+      "expected_decision": "CUSTOM_CODE_PRO_DEV"
+    },
+    {
+      "id": "SCENARIO_MISSING_INFO",
+      "type": "missing_information",
+      "facts": {
+        "use_case": "feedback_analysis",
+        "prebuilt_model_available": true,
+        "requires_custom_weights": false,
+        "target_throughput_rps": null,
+        "data_source": null,
+        "compliance_tier": null,
+        "delivery_window_weeks": 4
+      },
+      "expected_decision": "DEFER_INSUFFICIENT_INFORMATION"
+    }
+  ]
+}
