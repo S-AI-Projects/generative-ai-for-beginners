@@ -1,0 +1,10 @@
+Task: R40-T007
+Operating System: Darwin macOS ARM64
+Python: Python 3.14.7
+Git: git version 2.50.1
+
+Dependencies:
+- Python standard library only (argparse, dataclasses, json, os, subprocess, sys, typing, unittest)
+- Zero external package dependencies (no pip install or requirements.txt required)
+- Explicitly classified as local prompt template escaping and boundary validation test double
+- No LLM provider API keys or GPU hardware required

@@ -629,6 +629,31 @@ A: 1, because chain-of-thought is about showing the LLM how to solve a problem b
 
 You just used the self-refine technique in the assignment. Take any program you built and consider what improvements you would want to apply to it. Now use the self-refine technique to apply the proposed changes. What did you think the result, better or worse?
 
+### Applied Lab: Prompt-Template Escaping & Worked Regression (R40-T007)
+
+To understand robust template schema validation, literal brace preservation, and structural separation between system instructions and user inputs, explore the applied lab:
+[Applied Lab — Prompt-Template Escaping & Worked Regression (R40-T007)](./applied-labs/r40-t007/README.md?WT.mc_id=academic-105485-koreyst).
+
+**Classification & Scope Note (Simulation / Test Double):** This component is strictly a **local prompt template compiler test double**, not an LLM runtime client. It executes entirely locally using Python's standard library. It requires zero cloud credentials, no paid LLM provider API keys, and no GPU hardware.
+
+#### Schema Contract & Worked Regression
+
+- **Declared Variables**: Declares required `name` and `topic` variables; missing `topic` raises `MissingVariableError`; unknown keys raise `UnknownVariableError`.
+- **Literal Brace Preservation**: Curly braces within user data (e.g. `{Hadamard, CNOT}`) remain strictly literal without formatting errors.
+- **Structural Separation**: Explicitly isolates system instructions (`<instruction>`) from untrusted user inputs (`<user_data>`).
+- **Prompt Injection Boundary**: Confirms structural isolation of untrusted data while acknowledging that semantic injection defense requires downstream model guardrails.
+- **Worked Regression**: Features an automated input-to-output explanation executed as a regression test.
+
+#### Invocation and Verification
+
+```bash
+# Run unit test suite
+python3 -m unittest discover -s 05-advanced-prompts/applied-labs/r40-t007 -p "test_*.py" -v
+
+# Run canonical template checks
+python3 05-advanced-prompts/applied-labs/r40-t007/example.py --check
+```
+
 ## Great Work! Continue Your Learning
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!

@@ -1,0 +1,46 @@
+{
+  "task": "R40-T007",
+  "program": "05-advanced-prompts/applied-labs/r40-t007/example.py",
+  "test_module": "05-advanced-prompts/applied-labs/r40-t007/test_example.py",
+  "focus": "Publish a worked input-to-output explanation and execute the exact example as a regression test.",
+  "classification": "prompt_template_escaping_test_double",
+  "declared_variables": ["name", "topic"],
+  "scenarios": [
+    {
+      "id": "SCENARIO_NORMAL",
+      "type": "normal",
+      "inputs": {
+        "name": "Alice",
+        "topic": "Quantum Computing"
+      },
+      "expected_decision": "TEMPLATE_RENDERED_SUCCESS"
+    },
+    {
+      "id": "SCENARIO_MISSING_TOPIC",
+      "type": "missing_variable",
+      "inputs": {
+        "name": "Bob"
+      },
+      "expected_decision": "MISSING_TOPIC_REJECTED"
+    },
+    {
+      "id": "SCENARIO_BRACES_PRESERVED",
+      "type": "boundary_braces",
+      "inputs": {
+        "name": "Charlie {Eng}",
+        "topic": "Configuration: {debug: true, flags: [1, 2]}"
+      },
+      "expected_decision": "LITERAL_BRACES_PRESERVED"
+    },
+    {
+      "id": "SCENARIO_UNKNOWN_KEY",
+      "type": "unknown_key",
+      "inputs": {
+        "name": "Dana",
+        "topic": "Robotics",
+        "extra_token": "injected"
+      },
+      "expected_decision": "UNKNOWN_KEY_REJECTED"
+    }
+  ]
+}
