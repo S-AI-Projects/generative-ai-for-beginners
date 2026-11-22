@@ -184,6 +184,26 @@ Given the budget and requirements, we suggest the Car, Cheap insurance product w
 
 The point of this example was to show that even though we're using a basic technique like _generated knowledge_, we still need to optimize the prompt in most cases to get the desired outcome.
 
+
+### Applied Example: Prompt-Template Escaping
+
+The [R40-T013 local template-rendering example](./applied-labs/r40-t013/README.md?wt.mc_id=academic-105485-koreyst) compares regular-expression replacement with a left-to-right scanner using the same template and fixtures. It requires Python 3 and the standard library only; it does not call a model or API.
+
+From the repository root, run:
+
+```bash
+python3 05-advanced-prompts/applied-labs/r40-t013/example.py
+```
+
+Normal fixture: `{"name": "Asha", "topic": "Photosynthesis"}`.
+
+Expected output: `Hello Asha. Explain Photosynthesis clearly.`
+
+Boundary fixture: `{"name": "Asha {{admin}}", "topic": "Maths {advanced}"}`.
+
+Expected output: `Hello Asha {{admin}}. Explain Maths {advanced} clearly.`
+
+This example checks required and unknown keys and leaves braces inside inserted values literal. Template rendering alone does not prevent prompt injection.
 ### Least-to-most
 
 The idea with Least-to-most prompting is to break down a bigger problem into subproblems. That way, you help guide the LLM on how to "conquer" the bigger problem. A good example could be for data science where you can ask the LLM to divide up a problem like so:
