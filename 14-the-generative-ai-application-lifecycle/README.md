@@ -79,6 +79,30 @@ Construct, from Proof-of-Concept(POC) until large scale applications with Prompt
 
 ![LLMOps with PromptFlow](./images/06-llm-promptflow.png?WT.mc_id=academic-105485-koreyst)
 
+### Applied Lab: Client-Configuration Validation & Offline Service Adapter (R40-T005)
+
+To understand robust deployment configuration schemas, runtime secret redaction, and offline adapter patterns in the GenAI lifecycle, see the applied lab:
+[Applied Lab — Client-Configuration Validation & Offline Service Adapter (R40-T005)](./applied-labs/r40-t005/README.md?WT.mc_id=academic-105485-koreyst).
+
+**Classification & Scope Note (Simulation / Test Double):** This component is strictly an **offline configuration validator and adapter test double**, not a live container orchestrator. It executes entirely locally using Python's standard library. It requires zero cloud deployment infrastructure, no Kubernetes cluster, and no GPU hardware.
+
+#### Schema Invariants and Offline Execution
+
+- **Required Command**: Must be a non-empty string; missing command raises `ConfigurationValidationError`.
+- **Argument Array Contract**: Arguments must be supplied as an array/list of strings; passing a single string raises `ConfigurationValidationError`.
+- **Environment Redaction**: Sensitive environment values are strictly redacted as `[REDACTED]` in the output summary.
+- **Offline Simulation Boundary**: Produces a launch manifest without spawning host processes; documents unestablished behaviors (port bind conflicts, GPU memory allocation, socket latency).
+
+#### Invocation and Verification
+
+```bash
+# Run unit test suite
+python3 -m unittest discover -s 14-the-generative-ai-application-lifecycle/applied-labs/r40-t005 -p "test_*.py" -v
+
+# Run canonical configuration scenario check
+python3 14-the-generative-ai-application-lifecycle/applied-labs/r40-t005/example.py --check
+```
+
 ## Great! Continue your Learning!
 
 Amazing, now learn more about how we structure an application to use the concepts with the [Contoso Chat App](https://nitya.github.io/contoso-chat/?WT.mc_id=academic-105485-koreyst), to check how Cloud Advocacy adds those concepts in demonstrations. For more content, check our [Ignite breakout session!

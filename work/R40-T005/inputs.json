@@ -1,0 +1,43 @@
+{
+  "task": "R40-T005",
+  "program": "14-the-generative-ai-application-lifecycle/applied-labs/r40-t005/example.py",
+  "test_module": "14-the-generative-ai-application-lifecycle/applied-labs/r40-t005/test_example.py",
+  "focus": "Put the external dependency behind a callable interface and supply the deterministic local adapter. Identify which real-service behavior this mock does not establish.",
+  "classification": "config_validation_adapter_test_double",
+  "scenarios": [
+    {
+      "id": "SCENARIO_NORMAL",
+      "type": "normal",
+      "config": {
+        "command": "uvicorn",
+        "arguments": ["app.main:app", "--host", "0.0.0.0", "--port", "8000"],
+        "environment": {
+          "OPENAI_API_KEY": "sk-secret-token-12345",
+          "MODEL_NAME": "gpt-4o",
+          "DATABASE_URL": "postgresql://user:pass@db:5432/app"
+        }
+      },
+      "expected_decision": "CONFIG_VALID_REDACTED_SUMMARY",
+      "expected_process_launched": false
+    },
+    {
+      "id": "SCENARIO_MISSING_COMMAND",
+      "type": "missing_command",
+      "config": {
+        "arguments": ["--host", "0.0.0.0"],
+        "environment": {"PORT": "8000"}
+      },
+      "expected_decision": "MISSING_COMMAND_REJECTED"
+    },
+    {
+      "id": "SCENARIO_STRING_ARGS",
+      "type": "string_arguments",
+      "config": {
+        "command": "uvicorn",
+        "arguments": "app.main:app --host 0.0.0.0 --port 8000",
+        "environment": {"PORT": "8000"}
+      },
+      "expected_decision": "STRING_ARGS_REJECTED"
+    }
+  ]
+}
