@@ -445,6 +445,24 @@ Ok, so we created `functions` variables and a corresponding Python function, how
    You can click on the links to access the courses.
    ```
 
+## Applied Lab: R40-T020 — Chat-View State Scenario Assessment
+
+Explore how an application handles a chat response while function-calling results are being processed.
+
+The local simulation demonstrates pending, streaming, complete, and error states. It also assesses ordered chunks, preservation of partial text after an error, and rejection of late chunks.
+
+This is a mock application-side simulation. It does not call a real model or external API.
+
+[Open the R40-T020 Chat-View State lab](./applied-labs/r40-t020/README.md).
+
+Run the example from the repository root:
+
+    python3 11-integrating-with-function-calling/applied-labs/r40-t020/example.py
+
+Run its tests:
+
+    python3 -m unittest discover -s 11-integrating-with-function-calling/applied-labs/r40-t020 -p "test_*.py"
+
 ## Assignment
 
 To continue your learning of Azure OpenAI Function Calling you can build:
