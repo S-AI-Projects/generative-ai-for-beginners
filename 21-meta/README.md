@@ -164,7 +164,25 @@ response = client.complete(
 
 print(response.choices[0].message.content)
 ```
+## Applied Lab: Model Manifest Selection (R40-T018)
 
+In this hands-on lab, learn how to select eligible model entries from a
+local synthetic model manifest using explicit RAM and context requirements.
+
+You will practise:
+
+- Checking whether a model meets the available RAM budget.
+- Checking whether a model supports the requested context length.
+- Handling missing or invalid model metadata.
+- Excluding unsuitable entries with clear explanations.
+- Recovering from invalid data and continuing with valid entries.
+
+The lab uses invented teaching fixtures. The values are not specifications
+for real Meta models.
+
+No model downloads, external services, or GPU are required.
+
+[Open the R40-T018 Model Manifest Selection Lab](./applied-labs/r40-t018/README.md)
 ## Learning does not stop here, continue the journey
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!
