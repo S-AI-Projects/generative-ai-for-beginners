@@ -162,3 +162,15 @@ Read up more on how you can [govern and protect sensitive information](https://l
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!
 
 Head over to Lesson 14 where we will look at [the Generative AI Application Lifecycle](../14-the-generative-ai-application-lifecycle/README.md?WT.mc_id=academic-105485-koreyst)!
+
+## Practical lab: Allowlisted Action Policy
+
+Security testing should verify that proposed actions are checked before execution. This local Python lab demonstrates an explicit tool allowlist, per-tool argument validation, and regression tests that confirm rejected actions never reach the executor.
+
+[Open the R40-T017: Allowlisted Action Policy lab](./applied-labs/r40-t017/README.md).
+
+The example uses a mock executor and fixed local inputs. It does not access real files or external services.
+
+To run the tests from the repository root:
+
+`python3 -m unittest discover -s 13-securing-ai-applications/applied-labs/r40-t017 -p "test_*.py"`
