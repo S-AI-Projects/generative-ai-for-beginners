@@ -107,6 +107,34 @@ It uses local synthetic text chunks to test ordered updates, stable message IDs,
 [Open the R40-T019 Chat-View State lab](./applied-labs/r40-t019/README.md).
 
 **Scope and limitations:** This is a deterministic Python simulation. It does not connect to a real AI model or measure real-world model accuracy or latency.
+### Requirements and invocation
+
+Requires Python 3 and the Python standard library. Uses synthetic local text chunks only; no model, API, or GPU is required.
+
+Run separately from the repository root:
+
+```bash
+python3 12-designing-ux-for-ai-applications/applied-labs/r40-t019/example.py normal
+python3 12-designing-ux-for-ai-applications/applied-labs/r40-t019/example.py boundary
+python3 12-designing-ux-for-ai-applications/applied-labs/r40-t019/example.py failure
+python3 12-designing-ux-for-ai-applications/applied-labs/r40-t019/example.py evaluation
+```
+
+### Expected results
+
+- Normal: `complete`, text `Hello there!`.
+- Boundary: `complete`, text `A`.
+- Failure: `error`, partial text preserved, with an error marker.
+- Evaluation: all three configurations report `contract_correct: True`.
+
+Run tests:
+
+```bash
+python3 -m unittest discover -s 12-designing-ux-for-ai-applications/applied-labs/r40-t019 -p "test_*.py"
+```
+
+Expected: 8 tests pass. The measurements are local simulation results, not real-world model accuracy or latency.
+
 ## Assignment
 
 Take any AI apps you've built so far, consider implementing the below steps in your app:
