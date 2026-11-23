@@ -98,6 +98,42 @@ Another way to handle this is to clearly communicate the capabilities and limita
 System errors are common with applications where the user might need assistance with information outside the scope of the AI or the application may have a limit on how many questions/subjects a user can generate summaries. For example, an AI application trained with data on limited subjects for example, History and Math may not be able to handle questions around Geography. To mitigate this, the AI system can give a response like: "Sorry, our product has been trained with data in the following subjects....., I cannot be able to respond to the question you asked."
 
 AI applications are not perfect, therefore, they are bound to make mistakes. When designing your applications, you should ensure you create room for feedback from users and error handling in a way that is simple and easily explainable.
+## Applied Lab: Chat-View State Evaluation (R40-T019)
+
+This lab demonstrates how a chat interface can manage a response through pending, streaming, complete, and error states.
+
+It uses local synthetic text chunks to test ordered updates, stable message IDs, error handling that preserves received text, and rejection of chunks after completion.
+
+[Open the R40-T019 Chat-View State lab](./applied-labs/r40-t019/README.md).
+
+**Scope and limitations:** This is a deterministic Python simulation. It does not connect to a real AI model or measure real-world model accuracy or latency.
+### Requirements and invocation
+
+Requires Python 3 and the Python standard library. Uses synthetic local text chunks only; no model, API, or GPU is required.
+
+Run separately from the repository root:
+
+```bash
+python3 12-designing-ux-for-ai-applications/applied-labs/r40-t019/example.py normal
+python3 12-designing-ux-for-ai-applications/applied-labs/r40-t019/example.py boundary
+python3 12-designing-ux-for-ai-applications/applied-labs/r40-t019/example.py failure
+python3 12-designing-ux-for-ai-applications/applied-labs/r40-t019/example.py evaluation
+```
+
+### Expected results
+
+- Normal: `complete`, text `Hello there!`.
+- Boundary: `complete`, text `A`.
+- Failure: `error`, partial text preserved, with an error marker.
+- Evaluation: all three configurations report `contract_correct: True`.
+
+Run tests:
+
+```bash
+python3 -m unittest discover -s 12-designing-ux-for-ai-applications/applied-labs/r40-t019 -p "test_*.py"
+```
+
+Expected: 8 tests pass. The measurements are local simulation results, not real-world model accuracy or latency.
 
 ## Assignment
 
