@@ -1,0 +1,132 @@
+{
+  "task": "R40-T022",
+  "program": "17-ai-agents/applied-labs/r40-t022/example.py",
+  "test_suite": "17-ai-agents/applied-labs/r40-t022/test_example.py",
+  "contract": {
+    "allowed_tools": [
+      "add",
+      "multiply"
+    ],
+    "argument_validation": "Strict numeric typing (int or float). Reject bool, str, nan, inf.",
+    "failure_isolation": "A failed call halts execution and prevents subsequent tool calls."
+  },
+  "tests": [
+    {
+      "id": "1_normal_add",
+      "name": "Normal addition add(2, 3) -> 5",
+      "command": "python3 17-ai-agents/applied-labs/r40-t022/example.py --call '{\"tool\": \"add\", \"arguments\": {\"a\": 2, \"b\": 3}}'",
+      "expected": {
+        "status": "success",
+        "tool": "add",
+        "arguments": {
+          "a": 2,
+          "b": 3
+        },
+        "result": 5
+      },
+      "expected_exit_code": 0
+    },
+    {
+      "id": "2_normal_multiply",
+      "name": "Normal multiplication multiply(2, 3) -> 6",
+      "command": "python3 17-ai-agents/applied-labs/r40-t022/example.py --call '{\"tool\": \"multiply\", \"arguments\": {\"a\": 2, \"b\": 3}}'",
+      "expected": {
+        "status": "success",
+        "tool": "multiply",
+        "arguments": {
+          "a": 2,
+          "b": 3
+        },
+        "result": 6
+      },
+      "expected_exit_code": 0
+    },
+    {
+      "id": "3_unknown_tool",
+      "name": "Unknown tool structured error (divide)",
+      "command": "python3 17-ai-agents/applied-labs/r40-t022/example.py --call '{\"tool\": \"divide\", \"arguments\": {\"a\": 6, \"b\": 2}}'",
+      "expected": {
+        "status": "error",
+        "tool": "divide",
+        "error": {
+          "type": "UnknownToolError",
+          "code": "TOOL_NOT_ALLOWED"
+        }
+      },
+      "expected_exit_code": 1
+    },
+    {
+      "id": "4_string_argument",
+      "name": "String argument structured error (a = '2')",
+      "command": "python3 17-ai-agents/applied-labs/r40-t022/example.py --call '{\"tool\": \"add\", \"arguments\": {\"a\": \"2\", \"b\": 3}}'",
+      "expected": {
+        "status": "error",
+        "tool": "add",
+        "error": {
+          "type": "ValidationError",
+          "code": "INVALID_ARGUMENT_TYPE"
+        }
+      },
+      "expected_exit_code": 1
+    },
+    {
+      "id": "5_pipeline_failure_halting",
+      "name": "Pipeline failure halting and subsequent tool isolation",
+      "command": "python3 17-ai-agents/applied-labs/r40-t022/example.py --pipeline '[{\"tool\": \"add\", \"arguments\": {\"a\": \"invalid\", \"b\": 3}}, {\"tool\": \"multiply\", \"arguments\": {\"a\": 2, \"b\": 3}}]'",
+      "expected": {
+        "status": "error",
+        "pipeline_halted": true,
+        "completed_steps": 0,
+        "failed_step_index": 0,
+        "aborted_calls_count": 1
+      },
+      "expected_exit_code": 1
+    },
+    {
+      "id": "6_boundary_smallest_integers",
+      "name": "Boundary case: Smallest integers (0, 0)",
+      "command": "python3 17-ai-agents/applied-labs/r40-t022/example.py --call '{\"tool\": \"add\", \"arguments\": {\"a\": 0, \"b\": 0}}'",
+      "expected": {
+        "status": "success",
+        "tool": "add",
+        "result": 0
+      },
+      "expected_exit_code": 0
+    },
+    {
+      "id": "7_boundary_negative_arithmetic",
+      "name": "Boundary case: Negative arithmetic (-2 * 3 = -6)",
+      "command": "python3 17-ai-agents/applied-labs/r40-t022/example.py --call '{\"tool\": \"multiply\", \"arguments\": {\"a\": -2, \"b\": 3}}'",
+      "expected": {
+        "status": "success",
+        "tool": "multiply",
+        "result": -6
+      },
+      "expected_exit_code": 0
+    },
+    {
+      "id": "8_boundary_float_precision",
+      "name": "Boundary case: Floating point multiplication (2.5 * 4.0 = 10.0)",
+      "command": "python3 17-ai-agents/applied-labs/r40-t022/example.py --call '{\"tool\": \"multiply\", \"arguments\": {\"a\": 2.5, \"b\": 4.0}}'",
+      "expected": {
+        "status": "success",
+        "tool": "multiply",
+        "result": 10.0
+      },
+      "expected_exit_code": 0
+    },
+    {
+      "id": "9_boundary_boolean_rejection",
+      "name": "Boundary decision: Boolean value rejected (a = true)",
+      "command": "python3 17-ai-agents/applied-labs/r40-t022/example.py --call '{\"tool\": \"add\", \"arguments\": {\"a\": true, \"b\": 3}}'",
+      "expected": {
+        "status": "error",
+        "error": {
+          "type": "ValidationError",
+          "code": "INVALID_ARGUMENT_TYPE"
+        }
+      },
+      "expected_exit_code": 1
+    }
+  ]
+}
