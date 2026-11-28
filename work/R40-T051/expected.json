@@ -1,0 +1,11 @@
+{
+  "scenario": [
+    "fixture-a"
+  ],
+  "scenario_excluded": [
+    {
+      "name": "fixture-b",
+      "reason": "exceeds budget RAM"
+    }
+  ]
+}
