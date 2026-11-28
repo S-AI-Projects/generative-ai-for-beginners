@@ -455,6 +455,122 @@ To continue your learning of Azure OpenAI Function Calling you can build:
 
 Hint: Follow the [Learn API reference documentation](https://learn.microsoft.com/training/support/catalog-api-developer-reference?WT.mc_id=academic-105485-koreyst) page to see how and where this data is available.
 
+## Applied lab r40-t054 — recorded state history and the reconstruction invariant
+
+This lab adds a small local simulation on top of the lesson concepts: given
+one response message with a stable ID, model its local pending, streaming,
+complete and error states as chunks arrive, **recording an immutable
+snapshot after every step**, and test the invariant that the final output
+can always be rebuilt from that recorded history alone.
+
+> **Simulation / mock behaviour:** the example performs **no** model
+> download, **no** remote API call, **no** GPU and **no** network access.
+> It is a local state machine over plain strings, not a claim about Azure
+> OpenAI's actual streaming wire format, timing or error codes.
+
+### Exact invocation
+
+```bash
+# Inside the repository root
+python3 11-integrating-with-function-calling/applied-labs/r40-t054/example.py
+
+# Test suite, in a fresh process
+python3 -m unittest discover -s 11-integrating-with-function-calling/applied-labs/r40-t054 -p "test_*.py"
+```
+
+### Fixture (synthetic teaching scenario) and recorded history
+
+| step | action | message_id | state after | text after |
+|---|---|---|---|---|
+| 0 | `create_message("msg-1")` | `msg-1` | `pending` | `""` |
+| 1 | `append_chunk("Here are some ")` | `msg-1` | `streaming` | `"Here are some "` |
+| 2 | `append_chunk("Azure courses.")` | `msg-1` | `streaming` | `"Here are some Azure courses."` |
+| 3 | `complete_message()` | `msg-1` | `complete` | `"Here are some Azure courses."` |
+
+Every row above is one `StateSnapshot` appended to `Message.history` as it
+happens -- the example records the intermediate state after each step, not
+just the final one.
+
+### Expected output (exact)
+
+```text
+[LESSON: message identity] creating message id=msg-1
+  step=0 action=create state=pending text=''
+[LESSON: streaming state] step=1 chunk appended -> state=streaming text='Here are some '
+[LESSON: streaming state] step=2 chunk appended -> state=streaming text='Here are some Azure courses.'
+[LESSON: completion] step=3 state=complete text='Here are some Azure courses.' message_id=msg-1
+[LESSON: invariant] reconstruct_text_from_history(history)='Here are some Azure courses.' == message.text='Here are some Azure courses.' -> True
+[LESSON: message identity] creating message id=msg-2
+[LESSON: recovery] state=error text='Here are some [ERROR: upstream timeout]' error='upstream timeout' message_id=msg-2
+[LESSON: invariant] reconstruct_text_from_history(history)='Here are some [ERROR: upstream timeout]' == message.text='Here are some [ERROR: upstream timeout]' -> True
+[LESSON: boundary] chunk after finalize rejected: chunk rejected: message 'msg-2' is already finalized in state 'error'
+[LESSON: invariant] history length unchanged by rejected step: 3
+```
+
+Two chunks append **in order** onto the same `message_id` (`msg-1`, stable
+throughout). A second message (`msg-2`) receives one chunk, then an error:
+the already-received text `"Here are some "` is preserved and an
+`[ERROR: upstream timeout]` marker is appended. Any chunk sent after a
+message reaches `complete` or `error` is rejected -- and, because the
+rejection happens before any mutation, it never grows `history` either.
+
+### The focus: recording intermediate state and testing the invariant
+
+`reconstruct_text_from_history(history)` rebuilds the final text **purely
+from the recorded `StateSnapshot`s** -- it never reads the live `Message`
+object. The invariant this lab tests is:
+
+```text
+reconstruct_text_from_history(message.history) == message.text
+```
+
+for every message, in every scenario (normal completion, error, and the
+zero-chunk boundary case). If the recorded history ever diverged from the
+live state -- for example, if a step mutated `text` without recording a
+snapshot, or recorded the wrong chunk -- this invariant would catch it,
+because the final output would then disagree with the history replay.
+`test_each_intermediate_snapshot_matches_live_state_at_that_point` in the
+test module goes one step further and checks the snapshot recorded at
+*each* step, not only the last one.
+
+### Boundary and failure scenarios
+
+| scenario | input | expected |
+|---|---|---|
+| smallest valid case | zero chunks, then complete | `complete`, `text=""`, invariant holds |
+| single chunk | one chunk, then complete | `complete`, `text` = the one chunk |
+| normal | two chunks, then complete | `complete`, `text` = chunks joined in order, invariant holds |
+| error with prior text | one chunk, then fail("upstream timeout") | `error`, invariant holds |
+| chunk after completion | append after `complete_message()` | `ValueError`, history unchanged |
+| chunk after error | append after `fail_message()` | `ValueError`, history unchanged |
+| double complete | `complete_message()` twice | `ValueError` |
+| empty message id | `create_message("")` | `ValueError` |
+
+These are fully covered by
+[`test_r40_t054.py`](11-integrating-with-function-calling/applied-labs/r40-t054/test_r40_t054.py);
+the regression check lives in
+[`check_r40_t054.py`](11-integrating-with-function-calling/applied-labs/r40-t054/check_r40_t054.py).
+
+### Lesson-concept mapping: public inputs / outputs
+
+| public input / output | lesson concept it illustrates |
+|---|---|
+| `Message.message_id` | per-item identity, as with the Responses API's `call_id` on a function call |
+| `Message.state` / `append_chunk` | building up a response incrementally before it is used downstream |
+| `Message.history` / `StateSnapshot` | recording intermediate state at each step of that incremental build-up |
+| `reconstruct_text_from_history` | the invariant linking recorded intermediate state to the final output |
+| `fail_message` / `Message.error` | the assignment's call to "create error handling when ... does not return any suitable courses" |
+
+### Where the simplification stops
+
+This fixture models message *bookkeeping* only: one in-memory `Message`
+object, a list of immutable snapshots, and string concatenation for
+chunks. It does not call `client.responses.create`, does not stream real
+server-sent events, does not model partial JSON/tool-call argument
+streaming, and does not model retries, backoff or concurrent messages. It
+demonstrates the *shape* of recording and verifying state history against
+a final output, not the Azure OpenAI SDK's actual streaming behavior.
+
 ## Great Work! Continue the Journey
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!

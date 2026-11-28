@@ -1,0 +1,7 @@
+{
+  "scenario_text": "Here are some Azure courses.",
+  "scenario_state": "complete",
+  "scenario_history_length": 4,
+  "error_text": "Here are some [ERROR: upstream timeout]",
+  "error_state": "error"
+}

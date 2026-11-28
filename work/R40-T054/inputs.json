@@ -1,0 +1,33 @@
+{
+  "scenario": {
+    "description": "two chunks append in order, then complete; history is recorded after every step",
+    "chunks": [
+      "Here are some ",
+      "Azure courses."
+    ],
+    "expected_text": "Here are some Azure courses.",
+    "expected_state": "complete",
+    "expected_history_length": 4
+  },
+  "invariant_scenario": {
+    "description": "reconstruct_text_from_history(history) must equal message.text",
+    "checked_on": [
+      "normal completion",
+      "error",
+      "zero chunks"
+    ]
+  },
+  "error_scenario": {
+    "description": "one chunk then an error preserves received text with a marker",
+    "chunks": [
+      "Here are some "
+    ],
+    "error_reason": "upstream timeout",
+    "expected_text": "Here are some [ERROR: upstream timeout]",
+    "expected_state": "error"
+  },
+  "invalid_scenario": {
+    "description": "a chunk sent after completion must be rejected and must not grow history",
+    "expect_error": "ValueError"
+  }
+}
