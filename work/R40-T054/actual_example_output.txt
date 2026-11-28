@@ -1,0 +1,11 @@
+[LESSON: message identity] creating message id=msg-1
+  step=0 action=create state=pending text=''
+[LESSON: streaming state] step=1 chunk appended -> state=streaming text='Here are some '
+[LESSON: streaming state] step=2 chunk appended -> state=streaming text='Here are some Azure courses.'
+[LESSON: completion] step=3 state=complete text='Here are some Azure courses.' message_id=msg-1
+[LESSON: invariant] reconstruct_text_from_history(history)='Here are some Azure courses.' == message.text='Here are some Azure courses.' -> True
+[LESSON: message identity] creating message id=msg-2
+[LESSON: recovery] state=error text='Here are some [ERROR: upstream timeout]' error='upstream timeout' message_id=msg-2
+[LESSON: invariant] reconstruct_text_from_history(history)='Here are some [ERROR: upstream timeout]' == message.text='Here are some [ERROR: upstream timeout]' -> True
+[LESSON: boundary] chunk after finalize rejected: chunk rejected: message 'msg-2' is already finalized in state 'error'
+[LESSON: invariant] history length unchanged by rejected step: 3

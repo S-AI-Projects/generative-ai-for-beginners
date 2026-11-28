@@ -1,0 +1,25 @@
+test_chunk_exactly_at_complete_boundary_is_rejected (test_r40_t054.BoundaryScenario.test_chunk_exactly_at_complete_boundary_is_rejected) ... ok
+test_pending_accepts_first_chunk (test_r40_t054.BoundaryScenario.test_pending_accepts_first_chunk) ... ok
+test_single_chunk_then_complete (test_r40_t054.BoundaryScenario.test_single_chunk_then_complete) ... ok
+test_smallest_valid_case_zero_chunks_then_complete (test_r40_t054.BoundaryScenario.test_smallest_valid_case_zero_chunks_then_complete) ... ok
+test_error_preserves_received_text_with_marker (test_r40_t054.ErrorScenario.test_error_preserves_received_text_with_marker) ... ok
+test_error_reason_recorded (test_r40_t054.ErrorScenario.test_error_reason_recorded) ... ok
+test_chunk_after_completion_rejected (test_r40_t054.InvalidScenario.test_chunk_after_completion_rejected) ... ok
+test_chunk_after_error_rejected (test_r40_t054.InvalidScenario.test_chunk_after_error_rejected) ... ok
+test_double_complete_rejected (test_r40_t054.InvalidScenario.test_double_complete_rejected) ... ok
+test_empty_message_id_rejected (test_r40_t054.InvalidScenario.test_empty_message_id_rejected) ... ok
+test_message_id_stable_across_transitions (test_r40_t054.NormalScenario.test_message_id_stable_across_transitions) ... ok
+test_two_chunks_append_in_order (test_r40_t054.NormalScenario.test_two_chunks_append_in_order) ... ok
+test_wrong_chunk_order_is_not_silently_accepted (test_r40_t054.NormalScenario.test_wrong_chunk_order_is_not_silently_accepted) ... ok
+test_each_intermediate_snapshot_matches_live_state_at_that_point (test_r40_t054.RecordedStateInvariantScenario.test_each_intermediate_snapshot_matches_live_state_at_that_point) ... ok
+test_history_has_one_snapshot_per_successful_step (test_r40_t054.RecordedStateInvariantScenario.test_history_has_one_snapshot_per_successful_step) ... ok
+test_reconstruction_invariant_holds_on_error (test_r40_t054.RecordedStateInvariantScenario.test_reconstruction_invariant_holds_on_error) ... ok
+test_reconstruction_invariant_holds_on_normal_completion (test_r40_t054.RecordedStateInvariantScenario.test_reconstruction_invariant_holds_on_normal_completion) ... ok
+test_reconstruction_invariant_holds_with_zero_chunks (test_r40_t054.RecordedStateInvariantScenario.test_reconstruction_invariant_holds_with_zero_chunks) ... ok
+test_rejected_step_does_not_grow_history (test_r40_t054.RecordedStateInvariantScenario.test_rejected_step_does_not_grow_history) ... ok
+test_wrong_reconstruction_is_not_silently_accepted (test_r40_t054.RecordedStateInvariantScenario.test_wrong_reconstruction_is_not_silently_accepted) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.000s
+
+OK
