@@ -1,0 +1,11 @@
+[LESSON: query normalization] corpus=[('A', 'red apple'), ('B', 'green apple'), ('C', 'blue sky')]
+  retriever=LocalLexicalRetriever (lexical test double, NOT a production vector search)
+[LESSON: retrieval ranking] query='red apple' -> [('A', 2), ('B', 1)]
+[LESSON: empty results] query='ocean' -> [] (no match)
+[LESSON: citations] every result names its source doc_id, e.g. 'A'
+[LESSON: unestablished real-service behavior] this mock does not establish:
+  - semantic/embedding similarity beyond exact lowercase word overlap
+  - stemming, lemmatization, or synonym matching (e.g. 'ocean' vs 'sea')
+  - ranking quality, relevance feedback, or any learned re-ranking
+  - network latency, rate limits, or failure modes of a real embedding/search API
+  - scaling behavior over large corpora, or approximate nearest-neighbor search

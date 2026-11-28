@@ -1,0 +1,67 @@
+{
+  "scenario": {
+    "description": "query 'red apple' ranks document A before B",
+    "documents": [
+      {
+        "doc_id": "A",
+        "text": "red apple"
+      },
+      {
+        "doc_id": "B",
+        "text": "green apple"
+      },
+      {
+        "doc_id": "C",
+        "text": "blue sky"
+      }
+    ],
+    "query": "red apple",
+    "expected_ranking": [
+      {
+        "doc_id": "A",
+        "score": 2
+      },
+      {
+        "doc_id": "B",
+        "score": 1
+      }
+    ]
+  },
+  "no_match_scenario": {
+    "description": "query 'ocean' returns no match",
+    "query": "ocean",
+    "expected_results": []
+  },
+  "boundary_and_failure": [
+    {
+      "label": "tie_break_by_doc_id",
+      "query": "apple",
+      "expected_ids": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "label": "case_and_order_normalization",
+      "query": "APPLE RED",
+      "expected_ids": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "label": "empty_query",
+      "query": "",
+      "expected_ids": []
+    },
+    {
+      "label": "non_string_query",
+      "query": null,
+      "expect_error": "TypeError"
+    },
+    {
+      "label": "duplicate_doc_ids",
+      "expect_error": "ValueError"
+    }
+  ]
+}
