@@ -1,0 +1,6 @@
+[LESSON: tokenization boundary] tokenizer=whitespace (teaching approximation, not a real model tokenizer)
+  text='one two three four' -> tokens=['one', 'two', 'three', 'four']
+[LESSON: resource budget] budget=3
+[LESSON: preflight reporting] retained=['one', 'two', 'three'] removed_count=1 truncated=True
+[LESSON: compare implementations] tokenize_whitespace count=4 vs count_tokens_naive count=4 -> agree=True
+[LESSON: boundary] empty input -> retained=[] removed_count=0 truncated=False
