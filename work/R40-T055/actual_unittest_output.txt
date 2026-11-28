@@ -1,0 +1,20 @@
+test_empty_string_query_returns_no_match (test_r40_t055.BoundaryScenario.test_empty_string_query_returns_no_match) ... ok
+test_query_is_normalized_for_case_and_word_order (test_r40_t055.BoundaryScenario.test_query_is_normalized_for_case_and_word_order) ... ok
+test_single_matching_document (test_r40_t055.BoundaryScenario.test_single_matching_document) ... ok
+test_tie_is_broken_by_ascending_document_id (test_r40_t055.BoundaryScenario.test_tie_is_broken_by_ascending_document_id) ... ok
+test_local_adapter_is_deterministic_across_repeated_calls (test_r40_t055.CallableInterfaceScenario.test_local_adapter_is_deterministic_across_repeated_calls) ... ok
+test_run_retrieval_only_needs_a_callable (test_r40_t055.CallableInterfaceScenario.test_run_retrieval_only_needs_a_callable) ... ok
+test_unestablished_behaviors_are_documented (test_r40_t055.CallableInterfaceScenario.test_unestablished_behaviors_are_documented) ... ok
+test_duplicate_document_ids_rejected_at_construction (test_r40_t055.FailureScenario.test_duplicate_document_ids_rejected_at_construction) ... ok
+test_non_string_query_raises_type_error (test_r40_t055.FailureScenario.test_non_string_query_raises_type_error) ... ok
+test_ocean_query_returns_no_match (test_r40_t055.FailureScenario.test_ocean_query_returns_no_match) ... ok
+test_document_c_excluded_from_red_apple_query (test_r40_t055.NormalScenario.test_document_c_excluded_from_red_apple_query) ... ok
+test_red_apple_ranks_a_before_b (test_r40_t055.NormalScenario.test_red_apple_ranks_a_before_b) ... ok
+test_results_name_their_source_document (test_r40_t055.NormalScenario.test_results_name_their_source_document) ... ok
+test_scores_reflect_word_overlap (test_r40_t055.NormalScenario.test_scores_reflect_word_overlap) ... ok
+test_wrong_ranking_is_not_silently_accepted (test_r40_t055.NormalScenario.test_wrong_ranking_is_not_silently_accepted) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.000s
+
+OK

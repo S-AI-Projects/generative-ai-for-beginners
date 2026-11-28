@@ -1,0 +1,13 @@
+{
+  "scenario_ranking": [
+    {
+      "doc_id": "A",
+      "score": 2
+    },
+    {
+      "doc_id": "B",
+      "score": 1
+    }
+  ],
+  "no_match_results": []
+}
