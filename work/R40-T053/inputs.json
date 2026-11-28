@@ -1,0 +1,56 @@
+{
+  "scenario": {
+    "description": "budget 3 on 'one two three four' retains [one, two, three], removed=1",
+    "text": "one two three four",
+    "budget": 3,
+    "expected_retained": [
+      "one",
+      "two",
+      "three"
+    ],
+    "expected_removed_count": 1
+  },
+  "boundary_and_failure": [
+    {
+      "label": "empty_input",
+      "text": "",
+      "budget": 5,
+      "expected_retained": [],
+      "expected_removed_count": 0
+    },
+    {
+      "label": "budget_equal_to_tokens",
+      "text": "one two three",
+      "budget": 3,
+      "expected_retained": [
+        "one",
+        "two",
+        "three"
+      ],
+      "expected_removed_count": 0
+    },
+    {
+      "label": "budget_greater_than_tokens",
+      "text": "one two",
+      "budget": 10,
+      "expected_retained": [
+        "one",
+        "two"
+      ],
+      "expected_removed_count": 0
+    },
+    {
+      "label": "budget_zero",
+      "text": "one two",
+      "budget": 0,
+      "expected_retained": [],
+      "expected_removed_count": 2
+    },
+    {
+      "label": "negative_budget",
+      "text": "one two",
+      "budget": -1,
+      "expect_error": "ValueError"
+    }
+  ]
+}

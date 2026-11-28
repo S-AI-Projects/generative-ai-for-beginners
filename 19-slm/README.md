@@ -348,6 +348,109 @@ In addition to ONNX Runtime, Ollama, and Foundry Local reference methods, we can
 
 We have learned the basics of Phi-3/3.5 Family, but to learn more about SLM we need more knowledge. You can find the answers in the Phi-3 Cookbook. If you want to learn more, please visit the [Phi-3 Cookbook](https://github.com/microsoft/phi-3cookbook?WT.mc_id=academic-105485-koreyst).
 
+---
+
+## Applied lab r40-t053 — whitespace-token budget preflight check
+
+This lab adds a small local simulation on top of the lesson concepts: SLMs
+are built for resource-constrained environments, so before sending a prompt
+anywhere it helps to know whether it fits a token budget, and exactly which
+tokens would be dropped if it does not.
+
+> **Tokenizer disclaimer / simulation behaviour:** the "tokenizer" here is a
+> **teaching approximation** — plain whitespace splitting (`text.split()`).
+> It is **not** the real subword/BPE tokenizer used by Phi-3/3.5 or any
+> other SLM/LLM, and its counts do not predict a real model's token usage,
+> context window consumption, or billing. The example performs **no**
+> model download, **no** remote API call, **no** GPU and **no** network
+> access.
+
+### Exact invocation
+
+```bash
+# Inside the repository root
+python3 19-slm/applied-labs/r40-t053/example.py
+
+# Test suite, in a fresh process
+python3 -m unittest discover -s 19-slm/applied-labs/r40-t053 -p "test_*.py"
+```
+
+### Fixture (synthetic teaching scenario) and explicit expected-result table
+
+| text | budget | retained | removed_count |
+|---|---|---|---|
+| `"one two three four"` | 3 | `[one, two, three]` | 1 |
+| `""` | 5 | `[]` | 0 |
+| `"one two"` | 0 | `[]` | 2 |
+| `"one two three"` | 3 | `[one, two, three]` | 0 |
+| `"one two"` | 10 | `[one, two]` | 0 |
+
+### Expected output (exact)
+
+```text
+[LESSON: tokenization boundary] tokenizer=whitespace (teaching approximation, not a real model tokenizer)
+  text='one two three four' -> tokens=['one', 'two', 'three', 'four']
+[LESSON: resource budget] budget=3
+[LESSON: preflight reporting] retained=['one', 'two', 'three'] removed_count=1 truncated=True
+[LESSON: compare implementations] tokenize_whitespace count=4 vs count_tokens_naive count=4 -> agree=True
+[LESSON: boundary] empty input -> retained=[] removed_count=0 truncated=False
+```
+
+Budget `3` against `"one two three four"` retains `[one, two, three]` and
+reports **one** removed token. Empty input retains none (`removed_count=0`,
+since there was nothing to remove). A negative budget raises `ValueError`
+rather than silently truncating to zero.
+
+### Comparing implementations on identical inputs
+
+The lab's focus is comparing the direct implementation against an
+independent check, not just asserting one function's own output:
+
+- `tokenize_whitespace(text)` — the direct implementation (`text.split()`).
+- `count_tokens_naive(text)` — a deliberately simpler, independent
+  calculation that never calls `str.split()`; it scans characters directly
+  and counts whitespace-to-non-whitespace transitions.
+- On every sample input, `len(tokenize_whitespace(text)) ==
+  count_tokens_naive(text)`. If one implementation were wrong (for example,
+  silently returning zero tokens), this cross-check — not just a single
+  hard-coded expectation — would catch it.
+- Separately, an explicit expected-result table (above) is checked against
+  `apply_token_budget` for every fixture row, using identical inputs.
+
+### Boundary and failure scenarios
+
+| scenario | input | expected |
+|---|---|---|
+| normal | `"one two three four"`, budget 3 | retained=`[one,two,three]`, removed=1 |
+| empty input | `""`, budget 5 | retained=`[]`, removed=0 |
+| budget == token count | `"one two three"`, budget 3 | retained=all tokens, removed=0 |
+| budget > token count | `"one two"`, budget 10 | retained=all tokens, removed=0 |
+| budget == 0 | `"one two"`, budget 0 | retained=`[]`, removed=2 |
+| negative budget | `"one two"`, budget -1 | `ValueError` |
+
+These are fully covered by
+[`test_r40_t053.py`](19-slm/applied-labs/r40-t053/test_r40_t053.py); the
+regression check lives in
+[`check_r40_t053.py`](19-slm/applied-labs/r40-t053/check_r40_t053.py).
+
+### Lesson-concept mapping: public inputs / outputs
+
+| public input / output | lesson concept it illustrates |
+|---|---|
+| `tokenize_whitespace`, `count_tokens_naive` | the tokenization boundary — what counts as a "token" before any inference happens |
+| `budget` argument to `apply_token_budget` | the resource budget SLMs are designed to respect |
+| `TokenBudgetResult.retained` / `removed_count` / `truncated` | preflight reporting: knowing ahead of inference whether a prompt fits, and what gets dropped if not |
+
+### Where the simplification stops
+
+This fixture models token *counting and truncation bookkeeping* only: a
+whitespace split, a slice, and a subtraction. It does not implement a real
+subword/BPE tokenizer, does not reflect any specific SLM's actual
+vocabulary or token-to-text mapping, and makes no claim about real
+hardware, cloud-service behaviour, or trained-model performance. It
+demonstrates the *shape* of a token-budget preflight check, not a
+production tokenizer.
+
 
 
 

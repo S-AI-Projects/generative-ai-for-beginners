@@ -1,0 +1,70 @@
+{
+  "inputs": {
+    "scenario": {
+      "description": "budget 3 on 'one two three four' retains [one, two, three], removed=1",
+      "text": "one two three four",
+      "budget": 3,
+      "expected_retained": [
+        "one",
+        "two",
+        "three"
+      ],
+      "expected_removed_count": 1
+    },
+    "boundary_and_failure": [
+      {
+        "label": "empty_input",
+        "text": "",
+        "budget": 5,
+        "expected_retained": [],
+        "expected_removed_count": 0
+      },
+      {
+        "label": "budget_equal_to_tokens",
+        "text": "one two three",
+        "budget": 3,
+        "expected_retained": [
+          "one",
+          "two",
+          "three"
+        ],
+        "expected_removed_count": 0
+      },
+      {
+        "label": "budget_greater_than_tokens",
+        "text": "one two",
+        "budget": 10,
+        "expected_retained": [
+          "one",
+          "two"
+        ],
+        "expected_removed_count": 0
+      },
+      {
+        "label": "budget_zero",
+        "text": "one two",
+        "budget": 0,
+        "expected_retained": [],
+        "expected_removed_count": 2
+      },
+      {
+        "label": "negative_budget",
+        "text": "one two",
+        "budget": -1,
+        "expect_error": "ValueError"
+      }
+    ]
+  },
+  "expected": {
+    "scenario_retained": [
+      "one",
+      "two",
+      "three"
+    ],
+    "scenario_removed_count": 1
+  },
+  "example_exit_code": 0,
+  "unittest_exit_code": 0,
+  "unittest_test_count": 11,
+  "unittest_combined": "test_budget_equal_to_token_count_no_truncation (test_r40_t053.BoundaryScenario.test_budget_equal_to_token_count_no_truncation) ... ok\ntest_budget_greater_than_token_count_no_truncation (test_r40_t053.BoundaryScenario.test_budget_greater_than_token_count_no_truncation) ... ok\ntest_budget_zero_retains_nothing (test_r40_t053.BoundaryScenario.test_budget_zero_retains_nothing) ... ok\ntest_empty_input_retains_none (test_r40_t053.BoundaryScenario.test_empty_input_retains_none) ... ok\ntest_table_rows_match_direct_implementation (test_r40_t053.ExpectedResultTableScenario.test_table_rows_match_direct_implementation) ... ok\ntest_negative_budget_on_empty_text_still_raises (test_r40_t053.FailureScenario.test_negative_budget_on_empty_text_still_raises) ... ok\ntest_negative_budget_raises (test_r40_t053.FailureScenario.test_negative_budget_raises) ... ok\ntest_direct_and_naive_counts_agree_on_identical_inputs (test_r40_t053.IndependentCalculationScenario.test_direct_and_naive_counts_agree_on_identical_inputs) ... ok\ntest_naive_count_catches_a_deliberately_wrong_tokenizer (test_r40_t053.IndependentCalculationScenario.test_naive_count_catches_a_deliberately_wrong_tokenizer) ... ok\ntest_headline_fixture_matches_expected_table (test_r40_t053.NormalScenario.test_headline_fixture_matches_expected_table) ... ok\ntest_wrong_retained_order_is_not_silently_accepted (test_r40_t053.NormalScenario.test_wrong_retained_order_is_not_silently_accepted) ... ok\n\n----------------------------------------------------------------------\nRan 11 tests in 0.000s\n\nOK\n"
+}
