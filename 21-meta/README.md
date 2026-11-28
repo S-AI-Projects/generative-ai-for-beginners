@@ -169,3 +169,92 @@ print(response.choices[0].message.content)
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!
 
+---
+
+## Applied lab r40-t051 — selecting a model by RAM and context
+
+This lab adds a small local simulation on top of the lesson concepts: given a
+local synthetic model manifest and an explicit resource envelope (budget RAM
+and requested context), decide which model variants are eligible, and report
+why excluded entries fail.
+
+> **Simulation / mock behaviour:** the example performs **no** model download,
+> **no** remote API call, **no** GPU and **no** network access. RAM and context
+> numbers are invented teaching fixtures, **not** claims about the named real
+> models, real hardware, or any cloud-service behaviour. The example never runs
+> inference and requires no API key.
+
+### Exact invocation
+
+```bash
+# Inside the repository root
+python3 21-meta/applied-labs/r40-t051/example.py
+
+# Test suite, in a fresh process
+python3 -m unittest discover -s 21-meta/applied-labs/r40-t051 -p "test_*.py"
+```
+
+### Fixture (synthetic teaching manifest)
+
+| entry | RAM (GB) | context window (tokens) |
+|---|---|---|
+| fixture-a | 4 | 2048 |
+| fixture-b | 8 | 4096 |
+
+Envelope (budget): `RAM6` and `context 1024`.
+
+### Expected output (exact)
+
+```text
+[LESSON: model metadata] manifest entries = 2
+  model=fixture-a ram_gb=4 context_window=2048 -> eligible
+  model=fixture-b ram_gb=8 context_window=4096 -> excluded
+[LESSON: resource constraints] budget_ram_gb=6 requested_context_tokens=1024
+[LESSON: eligibility] eligible=fixture-a
+[LESSON: eligibility] excluded=fixture-b why=exceeds budget RAM
+```
+
+`budget RAM6` / `context 1024` admits only **fixture-a**. **fixture-b** is
+excluded because it exceeds the RAM budget (`8 > 6`).
+
+### Failure scenarios
+
+| scenario | input | expected |
+|---|---|---|
+| exact fit | `4/1024`, budget 6, context 1024 | eligible (boundary accepts) |
+| over budget by one | `7/1024`, budget 6, context 1024 | excluded: `exceeds budget RAM` |
+| exact context | `4/1024`, budget 6, context 1024 | eligible (boundary accepts) |
+| insufficient context | `4/512`, budget 6, context 1024 | excluded: `insufficient context window` |
+| negative budget | `4`, budget `-1`, context 1024 | `ValueError` |
+
+These are fully covered by
+[`test_r40-t051.py`](21-meta/applied-labs/r40-t051/test_r40-t051.py); the
+regression check lives in `check_r40-t051.py`.
+
+### Lesson-concept mapping: public inputs / outputs
+
+| public input / output | lesson concept it illustrates |
+|---|---|
+| `ModelVariant.name / ram_gb / context_window` | model metadata of the family |
+| `budget_ram_gb` and `requested_context_tokens` | resource constraints (context window vs. compute envelope) |
+| `is_eligible` / `eligibility_reason` / `select_models` | eligibility rule for the lesson's variant decision |
+| exclusion reason strings | eligibility explanations (why an entry fails) |
+
+### Where the simplifications stop
+
+- The RAM/context values are invented numbers for teaching; they are not real
+  Llama 3.1/3.2 specs and not real hardware specs.
+- Real model choice also considers cost, quantization, precision, and vendor
+  availability; this fixture only exercises the RAM + context envelope.
+- The lesson's real samples (Llama 3.3 / Llama 4) require Microsoft Foundry
+  Models credentials and model download; this lab deliberately has none of
+  that.
+
+---
+
+## Prerequisites
+
+- `python3` (stdlib only). No packages to install, no model download, no API
+  key, no GPU, no network.
+
+
