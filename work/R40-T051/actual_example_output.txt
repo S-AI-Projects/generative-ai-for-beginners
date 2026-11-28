@@ -1,0 +1,6 @@
+[LESSON: model metadata] manifest entries = 2
+  model=fixture-a ram_gb=4 context_window=2048 -> eligible
+  model=fixture-b ram_gb=8 context_window=4096 -> excluded
+[LESSON: resource constraints] budget_ram_gb=6 requested_context_tokens=1024
+[LESSON: eligibility] eligible=fixture-a
+[LESSON: eligibility] excluded=fixture-b why=exceeds budget RAM

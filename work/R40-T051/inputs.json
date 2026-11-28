@@ -1,0 +1,103 @@
+{
+  "scenario": {
+    "manifest": [
+      {
+        "name": "fixture-a",
+        "ram_gb": 4,
+        "context_window": 2048
+      },
+      {
+        "name": "fixture-b",
+        "ram_gb": 8,
+        "context_window": 4096
+      }
+    ],
+    "budget_ram_gb": 6,
+    "requested_context_tokens": 1024,
+    "expected_eligible": [
+      "fixture-a"
+    ],
+    "expected_excluded": [
+      {
+        "name": "fixture-b",
+        "reason": "exceeds budget RAM"
+      }
+    ]
+  },
+  "boundary_and_failure": [
+    {
+      "label": "exact_fit",
+      "manifest": [
+        {
+          "name": "exact-fit",
+          "ram_gb": 6,
+          "context_window": 1024
+        }
+      ],
+      "budget_ram_gb": 6,
+      "requested_context_tokens": 1024,
+      "expected_eligible": [
+        "exact-fit"
+      ]
+    },
+    {
+      "label": "exact_context",
+      "manifest": [
+        {
+          "name": "exact-context",
+          "ram_gb": 4,
+          "context_window": 1024
+        }
+      ],
+      "budget_ram_gb": 6,
+      "requested_context_tokens": 1024,
+      "expected_eligible": [
+        "exact-context"
+      ]
+    },
+    {
+      "label": "over_budget_by_one",
+      "manifest": [
+        {
+          "name": "over-ram",
+          "ram_gb": 7,
+          "context_window": 1024
+        }
+      ],
+      "budget_ram_gb": 6,
+      "requested_context_tokens": 1024,
+      "expected_eligible": []
+    },
+    {
+      "label": "under_context",
+      "manifest": [
+        {
+          "name": "under-context",
+          "ram_gb": 4,
+          "context_window": 512
+        }
+      ],
+      "budget_ram_gb": 6,
+      "requested_context_tokens": 1024,
+      "expected_excluded": [
+        {
+          "name": "under-context",
+          "reason": "insufficient context window"
+        }
+      ]
+    },
+    {
+      "label": "negative_budget",
+      "manifest": [
+        {
+          "name": "bad",
+          "ram_gb": 4,
+          "context_window": 1024
+        }
+      ],
+      "budget_ram_gb": -1,
+      "requested_context_tokens": 1024,
+      "expect_error": "ValueError"
+    }
+  ]
+}

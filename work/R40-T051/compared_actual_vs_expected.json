@@ -1,0 +1,131 @@
+{
+  "inputs": {
+    "scenario": {
+      "manifest": [
+        {
+          "name": "fixture-a",
+          "ram_gb": 4,
+          "context_window": 2048
+        },
+        {
+          "name": "fixture-b",
+          "ram_gb": 8,
+          "context_window": 4096
+        }
+      ],
+      "budget_ram_gb": 6,
+      "requested_context_tokens": 1024,
+      "expected_eligible": [
+        "fixture-a"
+      ],
+      "expected_excluded": [
+        {
+          "name": "fixture-b",
+          "reason": "exceeds budget RAM"
+        }
+      ]
+    },
+    "boundary_and_failure": [
+      {
+        "label": "exact_fit",
+        "manifest": [
+          {
+            "name": "exact-fit",
+            "ram_gb": 6,
+            "context_window": 1024
+          }
+        ],
+        "budget_ram_gb": 6,
+        "requested_context_tokens": 1024,
+        "expected_eligible": [
+          "exact-fit"
+        ]
+      },
+      {
+        "label": "exact_context",
+        "manifest": [
+          {
+            "name": "exact-context",
+            "ram_gb": 4,
+            "context_window": 1024
+          }
+        ],
+        "budget_ram_gb": 6,
+        "requested_context_tokens": 1024,
+        "expected_eligible": [
+          "exact-context"
+        ]
+      },
+      {
+        "label": "over_budget_by_one",
+        "manifest": [
+          {
+            "name": "over-ram",
+            "ram_gb": 7,
+            "context_window": 1024
+          }
+        ],
+        "budget_ram_gb": 6,
+        "requested_context_tokens": 1024,
+        "expected_eligible": []
+      },
+      {
+        "label": "under_context",
+        "manifest": [
+          {
+            "name": "under-context",
+            "ram_gb": 4,
+            "context_window": 512
+          }
+        ],
+        "budget_ram_gb": 6,
+        "requested_context_tokens": 1024,
+        "expected_excluded": [
+          {
+            "name": "under-context",
+            "reason": "insufficient context window"
+          }
+        ]
+      },
+      {
+        "label": "negative_budget",
+        "manifest": [
+          {
+            "name": "bad",
+            "ram_gb": 4,
+            "context_window": 1024
+          }
+        ],
+        "budget_ram_gb": -1,
+        "requested_context_tokens": 1024,
+        "expect_error": "ValueError"
+      }
+    ]
+  },
+  "expected": {
+    "scenario": [
+      "fixture-a"
+    ],
+    "scenario_excluded": [
+      {
+        "name": "fixture-b",
+        "reason": "exceeds budget RAM"
+      }
+    ]
+  },
+  "actual_example": {
+    "eligible": [
+      "fixture-a"
+    ],
+    "excluded": [
+      {
+        "name": "fixture-b",
+        "reason": "exceeds budget RAM"
+      }
+    ]
+  },
+  "example_exit_code": 0,
+  "unittest_exit_code": 0,
+  "unittest_test_count": 15,
+  "unittest_combined": "test_exact_context_admits (test_r40_t051.ResourceEnvelopeBoundaryScenario.test_exact_context_admits) ... ok\ntest_exact_fit_admits (test_r40_t051.ResourceEnvelopeBoundaryScenario.test_exact_fit_admits) ... ok\ntest_over_budget_by_one_excluded (test_r40_t051.ResourceEnvelopeBoundaryScenario.test_over_budget_by_one_excluded) ... ok\ntest_over_context_excluded (test_r40_t051.ResourceEnvelopeBoundaryScenario.test_over_context_excluded) ... ok\ntest_empty_manifest (test_r40_t051.ResourceEnvelopeEdgeScenario.test_empty_manifest) ... ok\ntest_is_eligible_deterministic (test_r40_t051.ResourceEnvelopeEdgeScenario.test_is_eligible_deterministic) ... ok\ntest_zero_budget_excludes_all (test_r40_t051.ResourceEnvelopeEdgeScenario.test_zero_budget_excludes_all) ... ok\ntest_negative_budget_raises (test_r40_t051.ResourceEnvelopeFailureScenario.test_negative_budget_raises) ... ok\ntest_negative_manifest_context_raises (test_r40_t051.ResourceEnvelopeFailureScenario.test_negative_manifest_context_raises) ... ok\ntest_negative_manifest_ram_raises (test_r40_t051.ResourceEnvelopeFailureScenario.test_negative_manifest_ram_raises) ... ok\ntest_negative_requested_context_raises (test_r40_t051.ResourceEnvelopeFailureScenario.test_negative_requested_context_raises) ... ok\ntest_a_eligible (test_r40_t051.ResourceEnvelopeNormalScenario.test_a_eligible) ... ok\ntest_b_excluded (test_r40_t051.ResourceEnvelopeNormalScenario.test_b_excluded) ... ok\ntest_excluded_reason (test_r40_t051.ResourceEnvelopeNormalScenario.test_excluded_reason) ... ok\ntest_only_a_admitted (test_r40_t051.ResourceEnvelopeNormalScenario.test_only_a_admitted) ... ok\n\n----------------------------------------------------------------------\nRan 15 tests in 0.000s\n\nOK\n"
+}
