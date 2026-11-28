@@ -1,0 +1,24 @@
+{
+  "scenario": {
+    "description": "two chunks append in order, then complete",
+    "chunks": [
+      "Here are some ",
+      "Azure courses."
+    ],
+    "expected_text": "Here are some Azure courses.",
+    "expected_state": "complete"
+  },
+  "error_scenario": {
+    "description": "one chunk then an error preserves received text with a marker",
+    "chunks": [
+      "Here are some "
+    ],
+    "error_reason": "upstream timeout",
+    "expected_text": "Here are some [ERROR: upstream timeout]",
+    "expected_state": "error"
+  },
+  "invalid_scenario": {
+    "description": "a chunk sent after completion must be rejected",
+    "expect_error": "ValueError"
+  }
+}

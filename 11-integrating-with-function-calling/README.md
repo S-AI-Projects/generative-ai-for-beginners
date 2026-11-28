@@ -455,6 +455,106 @@ To continue your learning of Azure OpenAI Function Calling you can build:
 
 Hint: Follow the [Learn API reference documentation](https://learn.microsoft.com/training/support/catalog-api-developer-reference?WT.mc_id=academic-105485-koreyst) page to see how and where this data is available.
 
+## Applied lab r40-t052 — message state, streaming and recovery
+
+This lab adds a small local simulation on top of the lesson concepts: given
+one response message with a stable ID, model its local pending, streaming,
+complete and error states as chunks arrive, and enforce exactly when a chunk
+may or may not be accepted.
+
+> **Simulation / mock behaviour:** the example performs **no** model
+> download, **no** remote API call, **no** GPU and **no** network access. It
+> is a local state machine over plain strings, not a claim about Azure
+> OpenAI's actual streaming wire format, timing or error codes.
+
+### Exact invocation
+
+```bash
+# Inside the repository root
+python3 11-integrating-with-function-calling/applied-labs/r40-t052/example.py
+
+# Test suite, in a fresh process
+python3 -m unittest discover -s 11-integrating-with-function-calling/applied-labs/r40-t052 -p "test_*.py"
+```
+
+### Fixture (synthetic teaching scenario)
+
+| step | input | message_id | state after | text after |
+|---|---|---|---|---|
+| 1 | `create_message("msg-1")` | `msg-1` | `pending` | `""` |
+| 2 | `append_chunk("Here are some ")` | `msg-1` | `streaming` | `"Here are some "` |
+| 3 | `append_chunk("Azure courses.")` | `msg-1` | `streaming` | `"Here are some Azure courses."` |
+| 4 | `complete_message()` | `msg-1` | `complete` | `"Here are some Azure courses."` |
+
+### Expected output (exact)
+
+```text
+[LESSON: message identity] creating message id=msg-1
+  state=pending text=''
+[LESSON: streaming state] chunk 1 appended -> state=streaming text='Here are some '
+[LESSON: streaming state] chunk 2 appended -> state=streaming text='Here are some Azure courses.'
+[LESSON: completion] state=complete text='Here are some Azure courses.' message_id=msg-1
+[LESSON: message identity] creating message id=msg-2
+[LESSON: recovery] state=error text='Here are some [ERROR: upstream timeout]' error='upstream timeout' message_id=msg-2
+[LESSON: boundary] chunk after finalize rejected: chunk rejected: message 'msg-2' is already finalized in state 'error'
+```
+
+Two chunks append **in order** onto the same `message_id` (`msg-1`, stable
+throughout). A second message (`msg-2`) receives one chunk, then an error:
+the already-received text `"Here are some "` is preserved and an
+`[ERROR: upstream timeout]` marker is appended rather than discarding the
+partial text. Any chunk sent after a message reaches `complete` or `error`
+is rejected.
+
+### The exact boundary decision
+
+A message is **terminal** the instant it becomes `complete` or `error`; it
+is **open** in both `pending` and `streaming` (a message with zero chunks
+yet can still validly complete with empty text, or receive its first
+chunk). `append_chunk`, `complete_message` and `fail_message` all reject
+with `ValueError` once the message is terminal — there is no partial
+"re-opening" of a finished message. This single check (`state in
+{complete, error}` -> reject) is the whole boundary; everything else in the
+fixture is just text concatenation.
+
+### Boundary and failure scenarios
+
+| scenario | input | expected |
+|---|---|---|
+| smallest valid case | zero chunks, then complete | `complete`, `text=""` |
+| single chunk | one chunk, then complete | `complete`, `text` = the one chunk |
+| normal | two chunks, then complete | `complete`, `text` = chunks joined in order |
+| error with prior text | one chunk, then fail("upstream timeout") | `error`, text = chunk + `[ERROR: upstream timeout]` |
+| error with no prior text | fail("connection refused") directly | `error`, text = `[ERROR: connection refused]` |
+| chunk after completion | append after `complete_message()` | `ValueError` |
+| chunk after error | append after `fail_message()` | `ValueError` |
+| double complete | `complete_message()` twice | `ValueError` |
+| empty message id | `create_message("")` | `ValueError` |
+
+These are fully covered by
+[`test_r40_t052.py`](11-integrating-with-function-calling/applied-labs/r40-t052/test_r40_t052.py);
+the regression check lives in
+[`check_r40_t052.py`](11-integrating-with-function-calling/applied-labs/r40-t052/check_r40_t052.py).
+
+### Lesson-concept mapping: public inputs / outputs
+
+| public input / output | lesson concept it illustrates |
+|---|---|
+| `Message.message_id` | per-item identity, as with the Responses API's `call_id` on a function call |
+| `Message.state` / `append_chunk` | building up a response incrementally before it is used downstream |
+| `fail_message` / `Message.error` | the assignment's call to "create error handling when ... does not return any suitable courses" |
+
+### Where the simplification stops
+
+This fixture models message *bookkeeping* only: one in-memory `Message`
+object, string concatenation for chunks, and a four-state machine. It does
+not call `client.responses.create`, does not stream real server-sent
+events, does not model partial JSON/tool-call argument streaming, and does
+not model retries, backoff or concurrent messages. It demonstrates the
+*shape* of the pending/streaming/complete/error contract a real streaming
+integration must honor, not the Azure OpenAI SDK's actual streaming
+behavior.
+
 ## Great Work! Continue the Journey
 
 After completing this lesson, check out our [Generative AI Learning collection](https://aka.ms/genai-collection?WT.mc_id=academic-105485-koreyst) to continue leveling up your Generative AI knowledge!

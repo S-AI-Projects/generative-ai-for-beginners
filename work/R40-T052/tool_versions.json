@@ -1,0 +1,7 @@
+{
+  "platform": "macOS-27.2.1-arm64-arm-64bit",
+  "python": "3.12.9 (v3.12.9:fdb81425a9a, Feb  4 2025, 12:21:36) [Clang 13.0.0 (clang-1300.0.29.30)]",
+  "python_executable": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3",
+  "git_commit": "d91fa6c90fcfb0a39358125e488dbd4d66fc4e2c",
+  "git_branch": "R40-T052"
+}

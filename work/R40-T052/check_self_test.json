@@ -1,0 +1,10 @@
+{
+  "assert_false": {
+    "exit_code": 1,
+    "nonzero_expected": true
+  },
+  "pass": {
+    "exit_code": 0,
+    "nonzero_expected": true
+  }
+}
