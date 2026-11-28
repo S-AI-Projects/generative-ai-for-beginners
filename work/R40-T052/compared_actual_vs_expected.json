@@ -1,0 +1,36 @@
+{
+  "inputs": {
+    "scenario": {
+      "description": "two chunks append in order, then complete",
+      "chunks": [
+        "Here are some ",
+        "Azure courses."
+      ],
+      "expected_text": "Here are some Azure courses.",
+      "expected_state": "complete"
+    },
+    "error_scenario": {
+      "description": "one chunk then an error preserves received text with a marker",
+      "chunks": [
+        "Here are some "
+      ],
+      "error_reason": "upstream timeout",
+      "expected_text": "Here are some [ERROR: upstream timeout]",
+      "expected_state": "error"
+    },
+    "invalid_scenario": {
+      "description": "a chunk sent after completion must be rejected",
+      "expect_error": "ValueError"
+    }
+  },
+  "expected": {
+    "scenario_text": "Here are some Azure courses.",
+    "scenario_state": "complete",
+    "error_text": "Here are some [ERROR: upstream timeout]",
+    "error_state": "error"
+  },
+  "example_exit_code": 0,
+  "unittest_exit_code": 0,
+  "unittest_test_count": 16,
+  "unittest_combined": "test_chunk_exactly_at_complete_boundary_is_rejected (test_r40_t052.BoundaryScenario.test_chunk_exactly_at_complete_boundary_is_rejected) ... ok\ntest_pending_accepts_first_chunk (test_r40_t052.BoundaryScenario.test_pending_accepts_first_chunk) ... ok\ntest_single_chunk_then_complete (test_r40_t052.BoundaryScenario.test_single_chunk_then_complete) ... ok\ntest_smallest_valid_case_zero_chunks_then_complete (test_r40_t052.BoundaryScenario.test_smallest_valid_case_zero_chunks_then_complete) ... ok\ntest_error_preserves_received_text_with_marker (test_r40_t052.ErrorScenario.test_error_preserves_received_text_with_marker) ... ok\ntest_error_reason_recorded (test_r40_t052.ErrorScenario.test_error_reason_recorded) ... ok\ntest_error_with_no_prior_text_still_records_marker (test_r40_t052.ErrorScenario.test_error_with_no_prior_text_still_records_marker) ... ok\ntest_chunk_after_completion_rejected (test_r40_t052.InvalidScenario.test_chunk_after_completion_rejected) ... ok\ntest_chunk_after_error_rejected (test_r40_t052.InvalidScenario.test_chunk_after_error_rejected) ... ok\ntest_complete_after_error_rejected (test_r40_t052.InvalidScenario.test_complete_after_error_rejected) ... ok\ntest_double_complete_rejected (test_r40_t052.InvalidScenario.test_double_complete_rejected) ... ok\ntest_empty_message_id_rejected (test_r40_t052.InvalidScenario.test_empty_message_id_rejected) ... ok\ntest_fail_after_completion_rejected (test_r40_t052.InvalidScenario.test_fail_after_completion_rejected) ... ok\ntest_message_id_stable_across_transitions (test_r40_t052.NormalScenario.test_message_id_stable_across_transitions) ... ok\ntest_two_chunks_append_in_order (test_r40_t052.NormalScenario.test_two_chunks_append_in_order) ... ok\ntest_wrong_chunk_order_is_not_silently_accepted (test_r40_t052.NormalScenario.test_wrong_chunk_order_is_not_silently_accepted) ... ok\n\n----------------------------------------------------------------------\nRan 16 tests in 0.000s\n\nOK\n"
+}

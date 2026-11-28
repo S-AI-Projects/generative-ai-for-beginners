@@ -1,0 +1,8 @@
+[LESSON: message identity] creating message id=msg-1
+  state=pending text=''
+[LESSON: streaming state] chunk 1 appended -> state=streaming text='Here are some '
+[LESSON: streaming state] chunk 2 appended -> state=streaming text='Here are some Azure courses.'
+[LESSON: completion] state=complete text='Here are some Azure courses.' message_id=msg-1
+[LESSON: message identity] creating message id=msg-2
+[LESSON: recovery] state=error text='Here are some [ERROR: upstream timeout]' error='upstream timeout' message_id=msg-2
+[LESSON: boundary] chunk after finalize rejected: chunk rejected: message 'msg-2' is already finalized in state 'error'
